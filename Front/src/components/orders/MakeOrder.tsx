@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { userAccess } from '../login/loginSlice';
-import { addOrderAsync, availableCarsSelector, checkOrderDatesAsync, getOrdersAsync, notAvilableSelector, ordersSelector } from './OrdersSlice';
+import { addOrderAsync, availableCarsSelector, checkOrderDatesAsync, getOrdersAsync, notAvilableSelector, orderDetailsSelector, ordersSelector } from './OrdersSlice';
 import { Dayjs } from 'dayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -17,6 +17,7 @@ const MakeOrder = () => {
   const token = useAppSelector(userAccess)
   const availableCars = useAppSelector(availableCarsSelector)
   const notAvailableCars = useAppSelector(notAvilableSelector)
+  const orderDetails = useAppSelector(orderDetailsSelector)
   const decoded: any = jwt_decode(token)
   const orders = useAppSelector(ordersSelector)
   const [selectedCar, setselectedCar] = useState<CarModel | null>(null)
@@ -112,7 +113,6 @@ const MakeOrder = () => {
     if ((formatedStartDate && formatedEndDate && formatedStartTime && formatedEndTime) ||
       (formatedStartDate && formatedEndDate && isAllDay)) {
       dispatch(checkOrderDatesAsync({ token: token, dates: { fromDate: fromDate, toDate: toDate, isAllDay: isAllDay } }))
-      console.log(notAvailableCars)
     }
   }, [datesFlag, formatedStartTime, formatedEndTime])
 
@@ -215,15 +215,18 @@ const MakeOrder = () => {
                   צבע: {car.color}<br />
                   שנה: {car.year}   <br />
                   <img src={`http://127.0.0.1:8000${car.image}`} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
-                  <h4>פרטי הזמנה</h4>  
+                  <h4>פרטי הזמנה</h4>
                   <div>
-                    {orders.filter(order => order.car === car.id).map(order => <div key={order.id}>
+                    {orderDetails && orderDetails.map((order, i) => <div key={i}>
                       מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
-                      עד תאריך: {order.toDate!.toString().slice(0, 10)}<br />
-                      {order.isAllDay ? <div> כל היום</div> :
-                        <div> משעה: {order.fromDate!.toString().slice(11, 16)}<br />
-                          עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
+                      {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) &&
+                        <div>
+                          עד תאריך: {order.toDate!.toString().slice(0, 10)}<br />
+                        </div>
                       }
+                      <div> משעה: {order.fromDate!.toString().slice(11, 16)}<br />
+                        עד שעה: {order.toDate!.toString().slice(11, 16)}</div><hr/>
+
 
                     </div>)}
                   </div>

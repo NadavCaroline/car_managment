@@ -9,12 +9,14 @@ export interface OrderState {
   orders: OrderModel[]
   availableCars: CarModel[]
   notAvilable: CarModel[]
+  orderDetails: any[]
 }
 
 const initialState: OrderState = {
   orders: [],
   availableCars: [],
-  notAvilable: []
+  notAvilable: [],
+  orderDetails: []
 };
 
 export const getOrdersAsync = createAsyncThunk(
@@ -58,6 +60,7 @@ export const myOrderSlice = createSlice({
       .addCase(checkOrderDatesAsync.fulfilled, (state, action) => {
         state.availableCars = action.payload.available
         state.notAvilable = action.payload.notAvilable
+        state.orderDetails = action.payload.orderDetails
       });
   },
 });
@@ -66,5 +69,5 @@ export const { } = myOrderSlice.actions;
 export const ordersSelector = (state: RootState) => state.myOrder.orders;
 export const availableCarsSelector = (state: RootState) => state.myOrder.availableCars;
 export const notAvilableSelector = (state: RootState) => state.myOrder.notAvilable;
-
+export const orderDetailsSelector = (state: RootState) => state.myOrder.orderDetails;
 export default myOrderSlice.reducer;

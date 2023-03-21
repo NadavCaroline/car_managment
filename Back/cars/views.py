@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -80,19 +81,20 @@ class AllCarsView(APIView):
 class AvaliableOrdersView(APIView):
     def post(self, request):
         user = request.user
-        date_object = {"fromDate": request.data["fromDate"], "toDate": request.data["toDate"]}
+        date_object = {
+            "fromDate": request.data["fromDate"], "toDate": request.data["toDate"]}
         fromDate = datetime.fromisoformat(date_object['fromDate'][:-1])
         toDate = datetime.fromisoformat(date_object['toDate'][:-1])
         all_orders = CarOrders.objects.all()
         available_cars = set()
-        cars_black_list = set() # Contains the cars that are taken on the specific date
+        cars_black_list = set()  # Contains the cars that are taken on the specific date
+        order_details = []
         for order in all_orders:
             # This row checks wether there is alreay and order on the dates the user entered.
             if (order.toDate.replace(tzinfo=None) <= toDate and order.toDate.replace(tzinfo=None) >= fromDate) or (order.fromDate.replace(tzinfo=None) <= toDate and order.fromDate.replace(tzinfo=None) >= fromDate):
-                # current_car = order.car
-                # order.car['toDate'] = order.toDate
-                # order.car['fromDate'] = order.fromDate
                 cars_black_list.add(order.car)
+                order_details.append({"fromDate": datetime.fromisoformat(str(order.fromDate)).strftime(
+                    "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).strftime("%Y-%m-%d %H:%M:%S"), "carID": order.car.id})
             else:
                 available_cars.add(order.car)
         cars = available_cars.difference(cars_black_list)
@@ -100,11 +102,14 @@ class AvaliableOrdersView(APIView):
             if car not in cars_black_list:
                 cars.add(car)
 
-        cars = list(filter(lambda car: (car.department.id == user.profile.department.id), cars))
-        cars_black_list = list(filter(lambda car: (car.department.id == user.profile.department.id), cars_black_list))
+        cars = list(filter(lambda car: (car.department.id ==
+                    user.profile.department.id), cars))
+        cars_black_list = list(filter(lambda car: (
+            car.department.id == user.profile.department.id), cars_black_list))
         serializer = CarsSerializer(list(cars), many=True)
-        black_list_serializer = CarsSerializer(list(cars_black_list), many=True)
-        return Response({"available": serializer.data, "notAvilable": black_list_serializer.data})
+        black_list_serializer = CarsSerializer(
+            list(cars_black_list), many=True)
+        return Response({"available": serializer.data, "notAvilable": black_list_serializer.data, "orderDetails": order_details})
 
 
 @permission_classes([IsAuthenticated])
@@ -114,7 +119,8 @@ class CarsView(APIView):
         cars = Cars.objects.all()
         # The next row filters the cars_model list to contain only the
         # cars matching the user's department id.
-        cars = list(filter(lambda car: (car.department.id == user.profile.department.id), cars))
+        cars = list(filter(lambda car: (car.department.id ==
+                    user.profile.department.id), cars))
         serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data)
 
@@ -133,7 +139,6 @@ class CarsView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @permission_classes([IsAuthenticated])
