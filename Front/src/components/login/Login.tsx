@@ -7,7 +7,7 @@ import {
   getDepartmentsAsync,
   getRolesAsync,
   remember,
-  dontRemember
+  dontRemember,userToken
 } from './loginSlice';
 import {
   MDBTabs,
@@ -32,6 +32,7 @@ export function Login() {
   const [listDepartments, setListDepartments] = useState<DepModel[]>([]);
   const [listRoles, setListRoles] = useState<RolesModel[]>([]);
   const [basicActive, setBasicActive] = useState('tabLogin');
+  const token = useAppSelector(userToken)
 
   const handleBasicClick = (value: string) => {
     if (value === basicActive) {
@@ -52,11 +53,11 @@ export function Login() {
   //   setListRoles(data);
   // };
   useEffect(() => {
-    if (!localStorage.getItem("access")) {
-      logout()
+    // if (!localStorage.getItem("access")) {
+      // logout()
       dispatch(getDepartmentsAsync()).then((res) => setListDepartments(res.payload))
       dispatch(getRolesAsync()).then((res) => setListRoles(res.payload))
-    }
+    // }
   }, [])
 
   useEffect(() => {

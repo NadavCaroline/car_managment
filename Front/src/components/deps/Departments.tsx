@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { userAccess } from '../login/loginSlice'
+import { userToken } from '../login/loginSlice'
 import { depsSelector, getDepsAsync } from './depsSlicer'
 
 const Departments = () => {
 
   const dispatch = useAppDispatch()
   const deps = useAppSelector(depsSelector)
-  const token  = useAppSelector(userAccess)
+  const token  = useAppSelector(userToken)
 
   useEffect(() => {
     dispatch(getDepsAsync(token))
