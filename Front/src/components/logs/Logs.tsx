@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { userAccess } from '../login/loginSlice';
+import { userToken } from '../login/loginSlice';
 import { getProfileAsync, profileSelector } from '../profile/profileSlicer';
 import { getLogsAsync, logsSelector } from './logsSlice';
 
 const Logs = () => {
   const logs = useAppSelector(logsSelector);
   const dispatch = useAppDispatch();
-  const token = useAppSelector(userAccess)
+  const token = useAppSelector(userToken)
   const profile = useAppSelector(profileSelector)
 
   useEffect(() => {

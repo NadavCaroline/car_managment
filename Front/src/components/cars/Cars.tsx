@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { carsSelector, getAllCarsAsync, getCarsAsync } from './carsSlice';
-import { userAccess } from '../login/loginSlice';
+import { userToken } from '../login/loginSlice';
 import { getProfileAsync, profileSelector } from '../profile/profileSlicer';
 
 export function Cars() {
   const cars = useAppSelector(carsSelector);
   const dispatch = useAppDispatch();
-  const token = useAppSelector(userAccess)
+  const token = useAppSelector(userToken)
   const profile = useAppSelector(profileSelector)
   useEffect(() => {
     dispatch(getProfileAsync(token)) 

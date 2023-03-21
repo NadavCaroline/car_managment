@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { userAccess } from '../login/loginSlice';
+import { userToken } from '../login/loginSlice';
 import { addOrderAsync, availableCarsSelector, checkOrderDatesAsync, getOrdersAsync, notAvilableSelector, orderDetailsSelector, ordersSelector } from './OrdersSlice';
 import { Dayjs } from 'dayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
@@ -14,7 +14,7 @@ import CarModel from '../../models/Car';
 
 const MakeOrder = () => {
   const dispatch = useAppDispatch()
-  const token = useAppSelector(userAccess)
+  const token = useAppSelector(userToken)
   const availableCars = useAppSelector(availableCarsSelector)
   const notAvailableCars = useAppSelector(notAvilableSelector)
   const orderDetails = useAppSelector(orderDetailsSelector)

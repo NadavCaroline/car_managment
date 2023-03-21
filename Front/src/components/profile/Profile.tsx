@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { userAccess } from '../login/loginSlice'
+import { userToken } from '../login/loginSlice'
 import { getProfileAsync, profileSelector } from './profileSlicer'
 
 const Profile = () => {
     const dispatch = useAppDispatch()
     const profile = useAppSelector(profileSelector)
-    const token = useAppSelector(userAccess)
+    const token = useAppSelector(userToken)
 
     useEffect(() => {
         dispatch(getProfileAsync(token))

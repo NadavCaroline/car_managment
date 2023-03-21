@@ -16,7 +16,7 @@ const initialState: loginState = {
   refresh: localStorage.getItem('refresh'),
   logged:localStorage.hasOwnProperty('refresh'),
   // localStorage.hasOwnProperty('access') || localStorage.hasOwnProperty('refresh') ,
-  remember: false
+  remember: localStorage.hasOwnProperty('refresh')
 };
 
 export const loginAsync = createAsyncThunk(
@@ -68,22 +68,32 @@ export const loginSlice = createSlice({
     dontRemember:(state)=>{
       console.log("Called donrRemember")
       state.remember = false
+      
     }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginAsync.fulfilled, (state, action) => {
-        state.access = action.payload.access;
-        state.refresh = action.payload.refresh;
-        localStorage.setItem("access", action.payload.access)
-        state.remember && localStorage.setItem("refresh", action.payload.refresh)
+      .addCase(loginAsync.fulfilled, (state, action) => {  
+        if(state.remember==true){
+          state.refresh = action.payload.refresh
+          state.access = ""
+          localStorage.setItem("refresh", action.payload.refresh)
+          localStorage.removeItem('access');
+        }
+        else{
+          state.access= action.payload.access
+          state.refresh = ""
+          localStorage.setItem("access", action.payload.access)
+          localStorage.removeItem('refresh');
+        }
         state.logged = true
       });
   },
 });
 
 export const { logout, remember, dontRemember } = loginSlice.actions;
-export const userAccess = (state: RootState) => state.login.access;
-export const userRefresh = (state: RootState) => state.login.refresh;
+// export const userAccess = (state: RootState) => state.login.access;
+// export const userRefresh = (state: RootState) => state.login.refresh;
 export const isLogged = (state: RootState) => state.login.logged;
+export const userToken = (state: RootState) => state.login.remember? state.login.refresh :(state.login.logged? state.login.access:"");
 export default loginSlice.reducer;
