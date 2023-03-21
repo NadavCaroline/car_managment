@@ -42,6 +42,8 @@ export function Login() {
   };
 
   const onSubmit = (e: any) => {
+    console.log(e)
+    
     e.preventDefault();
   }
   // // Function to load list Roles and update state
