@@ -14,7 +14,8 @@ export interface loginState {
 const initialState: loginState = {
   access: localStorage.getItem('access'),
   refresh: localStorage.getItem('refresh'),
-  logged: localStorage.hasOwnProperty('access') || localStorage.hasOwnProperty('refresh') ,
+  logged:localStorage.hasOwnProperty('refresh'),
+  // localStorage.hasOwnProperty('access') || localStorage.hasOwnProperty('refresh') ,
   remember: false
 };
 

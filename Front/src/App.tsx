@@ -14,7 +14,7 @@ import jwt_decode from "jwt-decode"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'react-bootstrap/Dropdown';
-import { isLogged, logout, userAccess } from './components/login/loginSlice';
+import { isLogged, logout, userAccess,userRefresh } from './components/login/loginSlice';
 import { Login } from './components/login/Login';
 
 function App() {
@@ -24,16 +24,17 @@ function App() {
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
   const dispatch = useAppDispatch()
   const logged = useAppSelector(isLogged)
-  const token = useAppSelector(userAccess)
+  const accessToken = useAppSelector(userAccess)
+  const refreshToken = useAppSelector(userRefresh)
   const [decoded, setdecoded] = useState<any>("")
 
   useEffect(() => {
-    token && 
-    setdecoded(jwt_decode(token))
+    logged && accessToken &&  setdecoded(jwt_decode(accessToken))
+    refreshToken && setdecoded(jwt_decode(refreshToken))
   }, [])
   
   return (
-    logged ?
+    (logged && accessToken) || refreshToken ?
       <div>
         <div dir='rtl'>
           < header >
