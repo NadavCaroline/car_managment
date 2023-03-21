@@ -1,0 +1,186 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-float infinite 3s ease-in-out;
+  }
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
+
+.App-link {
+  color: rgb(112, 76, 182);
+}
+
+@keyframes App-logo-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.nav-link {
+  color: white !important;
+  font-weight: normal !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+.nav-link.active,
+.nav-link:hover {
+  color: rgb(11,72, 107) !important;
+  font-weight: bold !important;
+}
+#loginName {
+  float:"left";
+  color: rgb(11,72, 107);
+  font-weight: bold;
+}
+.navbar-toggler{
+  margin-left:0.5em;
+  color: rgb(11,72, 107) !important;
+}
+.navbar-brand{
+  font-weight: bold !important;
+  -webkit-text-fill-color: white !important; /* Will override color (regardless of order) */
+  text-shadow:  #0F3E6A 1px 10px 10px !important;
+  /* -webkit-text-stroke-width: 0.04em !important; */
+  /* -webkit-text-stroke-color: #0F3E6A  !important ; */
+  /* color:white !important; */
+  /* font-size: 50px !important; */
+  /* -webkit-text-stroke-width: 1px !important;
+  -webkit-text-stroke-color: rgb(11,72, 107) !important; */
+  /* text-shadow: -1px 1px 0  rgb(11,72, 107),
+                          1px 1px 0  rgb(11,72, 107),
+                         1px -1px 0  rgb(11,72, 107),
+                        -1px -1px 0  rgb(11,72, 107); */
+  /* text-shadow: -1px 0 rgb(11,72, 107), 0 1px rgb(11,72, 107), 1px 0 rgb(11,72, 107), 0 -1px rgb(11,72, 107); */
+}
+.item {
+  position:relative;
+  padding-top:15px;
+  display:inline-block;
+}
+.notify-badge{
+  position: absolute;
+  right:5px;
+  top:2px;
+  background:red;
+  text-align: center;
+  border-radius: 20px 20px 20px 20px;
+  color:white;
+  padding:5px 10px;
+  font-size:10px;
+  font-weight:bold;
+}
+.dropdown-toggle:active, .dropdown-toggle {
+  /* background:#ffffff !important;  */
+  color:white !important;
+  border-color: transparent !important;
+}
+
+/* .round{
+  width: 100px;
+  height: 100px;
+  background: radial-gradient( rgba(10, 53, 33, 0.8) 60%, rgba(255, 255, 255, 1) 62%);
+  border-radius: 50%;
+  position: relative;
+  display: block;
+  margin: 100px auto;
+  box-shadow: 0px 0px 25px 3px rgba(10,53, 33, 0.8);
+  
+} */
+.round {
+  color: white;
+  border: none;
+  padding: 5px;
+  font-size: 31px;
+  height: 130px;
+  width: 130px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+  border-radius: 70%;
+  color:white !important;
+  font-weight: bold !important;
+}
+
+
+.round:active { 
+  transform: translateY(2px);
+}
+.greenBtn{
+  /* background-color: #5CB85C; */
+  /* box-shadow: 0 2px 4px darkslategray; */
+  background: radial-gradient( rgba(92, 184, 92, 0.8) 65%, rgba(255, 255, 255, 1) 62%);
+}
+.greenBtn:hover {
+  background-color: #5CB85C;
+  opacity: 0.8;
+ }
+ .greenBtn:active {
+  box-shadow: 0 0 2px darkslategray;
+}
+.redBtn{
+  background-color: #D9534F;
+  box-shadow: 0 2px 4px darkslategray;
+}
+.redBtn:hover {
+  background-color: #D9534F;
+  opacity: 0.8;
+ }
+ .redBtn:active {
+  box-shadow: 0 0 2px darkslategray;
+}
+
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+  background-color: #0F3E6A !important;
+  opacity:1 !important;
+}
+.btn-primary:hover{
+  opacity:0.9 !important;
+  font-weight: bold;
+}
+.btn-primary:active{
+   box-shadow:0px 0px 0px 3px rgba(0,144,237,.4);/* 2px 1px 2px #0F3E6A; */
+   font-weight: bold;
+}
+
+.nav-link.active, .nav-link:hover{
+  color:white !important;
+}
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link{
+  background-color: rgb(19, 125, 141) !important;
+  color:white !important;
+}
+.nav-pills .nav-link{
+  background-color: #dee2e6c9  !important;
+  color: rgba(0,0,0,.55) !important;
+  font-weight:bold !important;
+}
+.nav-pills li {
+  margin-left: 5px !important; 
+} 
+
+
+
+
+
