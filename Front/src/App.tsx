@@ -26,34 +26,23 @@ function App() {
   const [decoded, setdecoded] = useState<any>("")
 
   useEffect(() => {
-    logged &&  setdecoded(jwt_decode(token))
-  }, [,logged])
-  
+    logged && setdecoded(jwt_decode(token))
+  }, [, logged])
+
   return (
     logged ?
       <div>
         <div dir='rtl'>
           < header >
-            <nav className="navbar navbar-expand-lg navbar-light " style={{ backgroundColor: '#42C1C5' }}>
-              <a className="navbar-brand text-info font-weight-bolder" href="/">
+            <nav className="navbar navbar-expand-lg navbar-light " style={{ backgroundColor: 'rgb(19, 125, 141)' }}>
+              <a className="navbar-brand text-info font-weight-bolder">
                 <img src={Logo} alt="Logo" width="36" height="36" className="vertical-align-middle" />
                 <span className="navbar-brand"> {decoded.username} </span>
               </a>
-              <div className="item justify-content-end">
-                <a href="/Notifications" style={{ paddingRight: "1.5em" }}>
-                  <span className="notify-badge">1</span>
-                  <FontAwesomeIcon icon={faBell} style={{ fontSize: "1.5em", color: "white" }} />
-                </a>
-              </div>
               <button className="custom-toggler navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded={!isNavCollapsed ? true : false} aria-label="Toggle navigation" onClick={handleNavCollapse}>
                 <span className="navbar-toggler-icon"></span>
               </button>
-
               <div className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`} id="navbarsExample09">
-
-                <button onClick={() => dispatch(logout())}>Logout</button>
-
-
                 <a className="nav-link " href="/myOrders">הזמנות שלי</a>
                 <a className="nav-link " href="/makeOrder">הזמנת רכב</a>
                 <a className="nav-link " href="/maintenance">טיפולי רכב</a>
@@ -75,6 +64,16 @@ function App() {
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
+              <div className="item justify-content-end">
+                <a href="/Notifications" style={{ paddingRight: "1.5em", paddingLeft: "1em" }}>
+                  <span className="notify-badge">1</span>
+                  <FontAwesomeIcon icon={faBell} style={{ fontSize: "1.5em", color: "white" }} />
+                </a>
+              </div>
+              <div className=" justify-content-end">
+                <button className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>Logout</button>
+              </div>
+             
             </nav>
 
             {/* <nav className="navbar navbar-expand-lg navbar-light" style={{backgroundColor:'#42C1C5' }}>

@@ -10,9 +10,9 @@ export interface profileState {
 
 const initialState: profileState = {
     profile: {
-        department: '',
+        department: 0,
         jobTitle: ' ',
-        realID: '',
+        realID: 0,
         roleLevel: 0,
         user: ' ',
         user_name: '',

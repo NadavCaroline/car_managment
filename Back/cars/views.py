@@ -22,21 +22,39 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 @api_view(['POST'])
 def register(request):
-    user = User.objects.create_user(
-        first_name=request.data['first_name'],
-        last_name=request.data['last_name'],
-        username=request.data['first_name'] + request.data['last_name'],
-        jobTitle=request.data['jobTitle'],
-        roleLevel=request.data['roleLevel'],
-        department=request.data['department'],
-        email=request.data['email'],
-        password=request.data['password'],
-        is_superuser=0
-    )
-    user.is_active = True
-    user.is_staff = True
-    user.save()
-    return Response("New User Created")
+    msg=""
+    if User.objects.filter(username=request.data['user']['username']).exists():
+        msg={"status":"error","msg":"משתמש כבר קיים"}
+    elif Profile.objects.filter(realID=request.data['profile']['realID']).exists():
+        msg={"status":"error","msg":"תעודת זהות כבר קיימת במערכת"}
+    else: 
+        department = Departments.objects.get(id=request.data['profile']['department'])
+        role = Roles.objects.get(id=request.data['profile']['roleLevel'])
+
+        user = User.objects.create_user(
+            first_name=request.data['user']['first_name'],
+            last_name=request.data['user']['last_name'],
+            username=request.data['user']['username'],
+            email=request.data['user']['email'],
+            password=request.data['user']['password'],
+            is_superuser=True if role.id==3 else False
+                    
+        )
+        user.is_active = True
+        user.is_staff = True
+        user.save()
+    
+        profile = Profile.objects.create(
+            user=user,
+            jobTitle=request.data['profile']['jobTitle'],
+            roleLevel=request.data['profile']['roleLevel'],
+            department=department,
+            realID=request.data['profile']['realID'],
+            )
+        profile.save()
+        msg={"status":"success","msg":"משתמש נוצר בהצלחה"}
+
+    return Response(msg)
 
 
 @permission_classes([IsAuthenticated])

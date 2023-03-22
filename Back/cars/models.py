@@ -9,14 +9,20 @@ class Departments(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Roles(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     realID = models.CharField(max_length=10, blank=True)
     jobTitle = models.CharField(max_length=50, blank=True)
     department = models.ForeignKey(Departments, on_delete=models.PROTECT,  null=True)
-    roleLevel = models.SmallIntegerField(blank=True, default=0)
+    roleLevel = models.ForeignKey(Roles, on_delete=models.PROTECT,  null=True)
 
     @property
     def user_name(self):
@@ -25,6 +31,10 @@ class Profile(models.Model):
     @property
     def dep_name(self):
         return self.department.name
+    
+    @property
+    def role_name(self):
+        return self.roleLevel.name
     
     def __str__(self):
         return self.user_name
@@ -190,9 +200,3 @@ class Drivings(models.Model):
         return self.user_name + " - " + self.car_name
 
 
-class Roles(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name

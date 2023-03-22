@@ -18,5 +18,6 @@ npm install @emotion/react
 npm install @emotion/styled
 npm i mdb-react-ui-kit
 npm install --save mdbreact
+npm install --save react-toastify
 
 npm start
