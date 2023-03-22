@@ -238,20 +238,39 @@ class LogsView(APIView):
 
 
 @permission_classes([IsAuthenticated])
+class AllDrivingsView(APIView):
+    def get(self, request):
+        all_drives = Drivings.objects.all()
+        serializer = DrivingsSerializer(all_drives, many=True)
+        return Response(serializer.data)
+
+
+@permission_classes([IsAuthenticated])
 class DrivingsView(APIView):
     def get(self, request):
-        my_model = Drivings.objects.all()
-        print(my_model)
-        serializer = DrivingsSerializer(my_model, many=True)
+        user = request.user
+        user_drives = user.drivings_set.all()
+        serializer = DrivingsSerializer(user_drives, many=True)
         return Response(serializer.data)
 
     def post(self, request):
+        # print(request.data)
         serializer = CreateDrivingsSerializer(data=request.data)
+        # user = request.user
+        # order = CarOrders.objects.get(id = request.data['order'])
+        # print(user, order)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, id):
+        my_model = Drivings.objects.get(id=id)
+        serializer = CreateDrivingsSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RolesView(APIView):
     def get(self, request):

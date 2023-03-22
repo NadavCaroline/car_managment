@@ -1,7 +1,7 @@
 import axios from  'axios';
 import { DatesCheck } from '../../models/DatesCheck';
 import OrderModel from '../../models/Order';
-export const MY_SERVER = "http://127.0.0.1:8000/"
+import { MY_SERVER } from '../../env';
 
 // A mock function to mimic making an async request for data
 export const getOrders = async (token: string) => {

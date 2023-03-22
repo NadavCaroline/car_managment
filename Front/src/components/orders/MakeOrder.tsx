@@ -19,7 +19,6 @@ const MakeOrder = () => {
   const notAvailableCars = useAppSelector(notAvilableSelector)
   const orderDetails = useAppSelector(orderDetailsSelector)
   const decoded: any = jwt_decode(token)
-  const orders = useAppSelector(ordersSelector)
   const [selectedCar, setselectedCar] = useState<CarModel | null>(null)
   const [isAllDay, setisAllDay] = useState(false)
   const [selectedStartDate, setselectedStartDate] = useState<Dayjs | null>(null)

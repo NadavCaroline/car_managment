@@ -167,25 +167,24 @@ class Logs(models.Model):
 
 class Drivings(models.Model):
     id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     order = models.ForeignKey(CarOrders, on_delete=models.CASCADE, null=True)
-    startDate = models.DateField(default=datetime.date.today)
-    endDate = models.DateField()
-    fromTime = models.TimeField(auto_now=False)
-    toTime = models.TimeField(auto_now=False)
+    startDate = models.DateTimeField()
+    endDate = models.DateTimeField(null=True)
     startKilometer = models.IntegerField()
-    endKilometer = models.IntegerField()
+    endKilometer = models.IntegerField(null=True)
     comments = models.CharField(max_length=200, blank=True)
-    startImg1 = models.ImageField(
+    startImg1 = models.ImageField( upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    startImg2 = models.ImageField(
+    startImg2 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    startImg3 = models.ImageField(
+    startImg3 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    endImg1 = models.ImageField(
+    endImg1 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    endImg2 = models.ImageField(
+    endImg2 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    endImg3 = models.ImageField(
+    endImg3 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
 
     @property
@@ -193,8 +192,12 @@ class Drivings(models.Model):
         return self.order.car.make + ' ' + self.order.car.model
 
     @property
+    def car_image(self):
+        return self.order.car.image.url
+
+    @property
     def user_name(self):
-        return self.order.user.first_name + ' ' + self.order.user.last_name
+        return self.user.first_name + ' ' + self.user.last_name
     
     def __str__(self):
         return self.user_name + " - " + self.car_name
