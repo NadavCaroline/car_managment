@@ -164,17 +164,17 @@ class Drivings(models.Model):
     startKilometer = models.IntegerField()
     endKilometer = models.IntegerField(null=True)
     comments = models.CharField(max_length=200, blank=True)
-    startImg1 = models.ImageField(
+    startImg1 = models.ImageField( upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    startImg2 = models.ImageField(
+    startImg2 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    startImg3 = models.ImageField(
+    startImg3 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    endImg1 = models.ImageField(
+    endImg1 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    endImg2 = models.ImageField(
+    endImg2 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
-    endImg3 = models.ImageField(
+    endImg3 = models.ImageField(upload_to='images/',
         null=True, blank=True, default='/placeholder.png')
 
     @property
