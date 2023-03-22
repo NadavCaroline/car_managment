@@ -126,7 +126,7 @@ class LogsSerializer(serializers.ModelSerializer):
 class DrivingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drivings
-        fields = ['id',  'user_name',  'car_name', 'startDate', 'endDate',
+        fields = ['id', 'user', 'user_name',  'car_name', 'startDate', 'endDate',
                   'startKilometer', 'endKilometer', 'comments', 'car_image',
                   'startImg1', 'startImg2', 'startImg3', 'endImg1', 'endImg2', 'endImg3']
 

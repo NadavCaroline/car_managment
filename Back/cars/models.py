@@ -157,6 +157,7 @@ class Logs(models.Model):
 
 class Drivings(models.Model):
     id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     order = models.ForeignKey(CarOrders, on_delete=models.CASCADE, null=True)
     startDate = models.DateTimeField()
     endDate = models.DateTimeField(null=True)
@@ -186,7 +187,7 @@ class Drivings(models.Model):
 
     @property
     def user_name(self):
-        return self.order.user.first_name + ' ' + self.order.user.last_name
+        return self.user.first_name + ' ' + self.user.last_name
     
     def __str__(self):
         return self.user_name + " - " + self.car_name
