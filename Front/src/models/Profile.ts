@@ -1,9 +1,9 @@
 export interface ProfileModel {
-    user: string
-    user_name: string
-    realID: string
+    user?: string
+    user_name?: string
+    realID: number
     jobTitle: string
-    department: string
-    dep_name: string
+    department: number
+    dep_name?: string
     roleLevel: number
 }
