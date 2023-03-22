@@ -61,6 +61,7 @@ class CreateDepartmentsSerializer(serializers.ModelSerializer):
         model = Departments
         fields = '__all__'
 
+
 class CreateRolesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Roles
@@ -100,18 +101,19 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'user_name', 'realID', 'roleLevel',
                   'jobTitle', 'dep_name', 'department']
 
+
 class CarsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cars
-        fields = ['id', 'licenseNum', 'make', 'model', 
-        'color', 'year', 'department', 'dep_name', 'image']
+        fields = ['id', 'licenseNum', 'make', 'model',
+                  'color', 'year', 'department', 'dep_name', 'image']
 
 
 class CarOrdersSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarOrders
         fields = ['id', 'user_name', 'car_name', 'orderDate',
-                  'fromDate', 'toDate','isAllDay', 'destination', 'car_image']
+                  'fromDate', 'toDate', 'isAllDay', 'destination', 'car_image']
 
 
 class LogsSerializer(serializers.ModelSerializer):
@@ -124,8 +126,8 @@ class LogsSerializer(serializers.ModelSerializer):
 class DrivingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drivings
-        fields = ['id', 'user', 'user_name', 'car', 'car_name', 'startDate', 'endDate',
-                  'fromTime', 'toTime', 'startKilometer', 'endKilometer', 'comments',
+        fields = ['id',  'user_name',  'car_name', 'startDate', 'endDate',
+                  'startKilometer', 'endKilometer', 'comments', 'car_image',
                   'startImg1', 'startImg2', 'startImg3', 'endImg1', 'endImg2', 'endImg3']
 
 

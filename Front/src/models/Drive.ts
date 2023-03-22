@@ -1,12 +1,13 @@
 export interface DriveModel {
-    user?: string
+    id?: number
+    order?: any
     car?: string
-    startDate: string
-    endDate: string
-    fromTime: string
-    toTime: string
-    startKilometer: string
-    endKilometer: string
+    car_name?: string
+    car_image?: string
+    startDate?: Date
+    endDate?: Date
+    startKilometer?: string
+    endKilometer?: string
     comments?: string
     startImg1?: any
     startImg2?: any

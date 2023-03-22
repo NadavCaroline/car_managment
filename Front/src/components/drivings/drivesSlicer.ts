@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { addDrive } from './drivesAPI';
+import { getDrives, startDrive } from './drivesAPI';
 import { DriveModel } from '../../models/Drive'
 
 export interface DriveState {
@@ -11,18 +11,18 @@ const initialState: DriveState = {
   drives: []
 };
 
-// export const getOrdersAsync = createAsyncThunk(
-//   'myOrder/getOrders',
-//   async (token: string) => {
-//     const response = await getOrders(token);
-//     return response;
-//   }
-// );
+export const getDrivesAsync = createAsyncThunk(
+  'myOrder/getDrives',
+  async (token: string) => {
+    const response = await getDrives(token);
+    return response;
+  }
+);
 
-export const addOrderAsync = createAsyncThunk(
-  'drive/addDrive',
+export const startDriveAsync = createAsyncThunk(
+  'drive/startDrive',
   async ({ token, drive }: { token: string, drive: DriveModel }) => {
-    const response = await addDrive(token, drive);
+    const response = await startDrive(token, drive);
     return response;
   }
 );
@@ -35,15 +35,15 @@ export const driveSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    //   .addCase(getOrdersAsync.fulfilled, (state, action) => {
-    //     state.orders = action.payload
-    //   })
-      .addCase(addOrderAsync.fulfilled, (state, action) => {
-        console.log(action.payload)
+      .addCase(getDrivesAsync.fulfilled, (state, action) => {
+        state.drives = action.payload
+      })
+      .addCase(startDriveAsync.fulfilled, (state, action) => {
+        state.drives.push(action.payload)
       });
   },
 });
 
 export const { } = driveSlice.actions;
-export const ordersSelector = (state: RootState) => state.drive.drives;
+export const drivesSelector = (state: RootState) => state.drive.drives;
 export default driveSlice.reducer;

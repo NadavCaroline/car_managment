@@ -223,7 +223,6 @@ class LogsView(APIView):
 class DrivingsView(APIView):
     def get(self, request):
         my_model = Drivings.objects.all()
-        print(my_model)
         serializer = DrivingsSerializer(my_model, many=True)
         return Response(serializer.data)
 
@@ -234,6 +233,13 @@ class DrivingsView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, id):
+        my_model = Drivings.objects.get(id=id)
+        serializer = CreateDrivingsSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RolesView(APIView):
     def get(self, request):

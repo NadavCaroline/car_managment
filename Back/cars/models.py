@@ -158,12 +158,10 @@ class Logs(models.Model):
 class Drivings(models.Model):
     id = models.BigAutoField(primary_key=True)
     order = models.ForeignKey(CarOrders, on_delete=models.CASCADE, null=True)
-    startDate = models.DateField(default=datetime.date.today)
-    endDate = models.DateField()
-    fromTime = models.TimeField(auto_now=False)
-    toTime = models.TimeField(auto_now=False)
+    startDate = models.DateTimeField()
+    endDate = models.DateTimeField(null=True)
     startKilometer = models.IntegerField()
-    endKilometer = models.IntegerField()
+    endKilometer = models.IntegerField(null=True)
     comments = models.CharField(max_length=200, blank=True)
     startImg1 = models.ImageField(
         null=True, blank=True, default='/placeholder.png')
@@ -181,6 +179,10 @@ class Drivings(models.Model):
     @property
     def car_name(self):
         return self.order.car.make + ' ' + self.order.car.model
+
+    @property
+    def car_image(self):
+        return self.order.car.image.url
 
     @property
     def user_name(self):
