@@ -5,6 +5,7 @@ import OrderModel from '../../models/Order';
 import { userAccess } from '../login/loginSlice';
 import { getOrdersAsync, ordersSelector } from '../orders/OrdersSlice';
 import { allDrivesSelector, drivesSelector, getAllDrivesAsync, getDrivesAsync, startDriveAsync } from './drivesSlicer';
+import { DriveModel } from '../../models/Drive';
 
 
 export function Drivings() {
@@ -22,6 +23,7 @@ export function Drivings() {
   const [startSelectedFile1, setstartSelectedFile1] = useState<File | null>(null)
   const [startSelectedFile2, setstartSelectedFile2] = useState<File | null>(null)
   const [startSelectedFile3, setstartSelectedFile3] = useState<File | null>(null)
+  const [activeDrive, setactiveDrive] = useState<DriveModel | null>(null)
 
   // Handles image 1 upload
   const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +61,11 @@ export function Drivings() {
     handleCurrentOrder()
   }, [orders.length])
 
+  useEffect(() => {
+    isRunning &&
+    // console.log("first")
+    setactiveDrive(drives.pop()!)
+  }, [isRunning])
 
   useEffect(() => {
     handleStartKilometer()
@@ -89,7 +96,6 @@ export function Drivings() {
     }
   };
 
-
   return (
     <div >
       <h1>נסיעות קודמות</h1><hr />
@@ -100,7 +106,7 @@ export function Drivings() {
 
             מכונית: {drive.car_name}<br />
             <img src={`http://127.0.0.1:8000${drive.car_image}`} style={{ width: '150px', height: '100px' }} alt={drive.car_name} /><br /><br />
-            {drive.startDate!.toString().slice(0, 10) !== drive.endDate!.toString().slice(0, 10) ?
+            {/* {drive.startDate!.toString().slice(0, 10) !== drive.endDate!.toString().slice(0, 10) ?
               <div>
                 מתאריך: {drive.startDate!.toString().slice(0, 10)}<br />
                 עד תאריך: {drive.endDate!.toString().slice(0, 10)}<br />
@@ -113,43 +119,54 @@ export function Drivings() {
             עד שעה: {drive.endDate!.toString().slice(11, 16)}<br />
             קילומטראז' התחלתי: {Number(drive.startKilometer).toLocaleString()}<br />
             קילומטראז' סופי: {Number(drive.endKilometer).toLocaleString()}<br />
-            הערות: {drive.comments ? drive.comments : 'אין הערות'}
+            הערות: {drive.comments ? drive.comments : 'אין הערות'} */}
           </div>)}
       </div>
       <h1>נסיעה פעילה</h1><hr />
       <div>
-        {activeOrder &&
+        {isRunning ?
           <div>
-            <div> {activeOrder.car_name}</div>
-            <img src={`http://127.0.0.1:8000${activeOrder.car_image}`} style={{ width: '150px', height: '100px' }} alt={activeOrder.car_name} /><br /><br />
-            {activeOrder.isAllDay ?
-              <div>
-                כל היום
-              </div> :
-              <div>
-                משעה: {activeOrder.fromDate!.toString().slice(11, 16)}<br />
-                עד שעה: {activeOrder.toDate!.toString().slice(11, 16)}<br />
-              </div>
-            }
-            {startKilometer ?
-              <div>
-                קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={!changeKilometer} />
-                דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
-              </div> :
-              <div>
-                קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} />
-              </div>
-            }
-            <input type='file' onChange={handleFile1Change} /><br />
-            {startSelectedFile1 &&
-              <div>
-                <input type='file' onChange={handleFile2Change} /><br />
-              </div>}
-            {startSelectedFile2 &&
-              <div>
-                <input type='file' onChange={handleFile3Change} /><br />
-              </div>}
+            הנסיעה התחילה
+            {activeDrive?.car_image}
 
+
+
+          </div> :
+          <div>
+            {activeOrder &&
+              <div>
+                <div> {activeOrder.car_name}</div>
+                <img src={`http://127.0.0.1:8000${activeOrder.car_image}`} style={{ width: '150px', height: '100px' }} alt={activeOrder.car_name} /><br /><br />
+                {activeOrder.isAllDay ?
+                  <div>
+                    כל היום
+                  </div> :
+                  <div>
+                    משעה: {activeOrder.fromDate!.toString().slice(11, 16)}<br />
+                    עד שעה: {activeOrder.toDate!.toString().slice(11, 16)}<br />
+                  </div>
+                }
+                {startKilometer ?
+                  <div>
+                    קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={!changeKilometer} />
+                    דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
+                  </div> :
+                  <div>
+                    קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} />
+                  </div>
+                }
+                <input type='file' onChange={handleFile1Change} /><br />
+                {startSelectedFile1 &&
+                  <div>
+                    <input type='file' onChange={handleFile2Change} /><br />
+                  </div>}
+                {startSelectedFile2 &&
+                  <div>
+                    <input type='file' onChange={handleFile3Change} /><br />
+                  </div>}
+
+              </div>
+            }
           </div>
         }
       </div>

@@ -43,3 +43,20 @@ export const startDrive = async ( token: string,drive: DriveModel) => {
         }
     }).then((res) => res.data)
 }
+
+export const endDrive = async ( token: string,drive: DriveModel) => {
+  console.log(drive)
+    return axios.put(MY_SERVER + 'drives/' + drive.id, {
+        endDate: drive.endDate,
+        endKilometer: drive.endKilometer,
+        endImg1: drive.endImg1,
+        endImg2: drive.endImg2,
+        endImg3: drive.endImg3,
+        comments: drive.comments
+    }, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+        }
+    }).then((res) => res.data)
+}
