@@ -4,7 +4,7 @@ import jwt_decode from "jwt-decode";
 import OrderModel from '../../models/Order';
 import { userAccess } from '../login/loginSlice';
 import { getOrdersAsync, ordersSelector } from '../orders/OrdersSlice';
-import { allDrivesSelector, drivesSelector, getAllDrivesAsync, getDrivesAsync, startDriveAsync } from './drivesSlicer';
+import { allDrivesSelector, drivesSelector, endDriveAsync, getAllDrivesAsync, getDrivesAsync, startDriveAsync } from './drivesSlicer';
 import { DriveModel } from '../../models/Drive';
 
 
@@ -55,6 +55,7 @@ export function Drivings() {
     dispatch(getDrivesAsync(token))
     dispatch(getOrdersAsync(token))
     dispatch(getAllDrivesAsync(token))
+    console.log(drives)
   }, [])
 
   useEffect(() => {
@@ -62,16 +63,13 @@ export function Drivings() {
   }, [orders.length])
 
   useEffect(() => {
-    isRunning &&
-    // console.log("first")
-    setactiveDrive(drives.pop()!)
+    // isRunning &&
+      // setactiveDrive(drives.pop()!)
   }, [isRunning])
 
   useEffect(() => {
     handleStartKilometer()
   }, [refreshFlag, allDrives.length])
-
-
 
   const handleButtonClick = () => {
     const startStopBtn = document.querySelector('.round') as HTMLButtonElement;
@@ -81,7 +79,7 @@ export function Drivings() {
         token: token, drive: {
           user: decoded.user_id,
           order: activeOrder?.id,
-          startDate: new Date(),
+          startDate: new Date().toISOString(),
           startKilometer: startKilometer,
           startImg1: startSelectedFile1,
           startImg2: startSelectedFile2,
@@ -91,6 +89,16 @@ export function Drivings() {
       startStopBtn.textContent = 'Stop';
       startStopBtn.className = "round redBtn";
     } else {
+      // dispatch(endDriveAsync({
+      //   token: token, drive: {
+      //     endDate: new Date(),
+      //     comments: comments,
+      //     endKilometer: endKilometer,
+      //     endImg1: endSelectedFile1,
+      //     endImg2: endSelectedFile2,
+      //     endImg3: endSelectedFile3,
+      //   }
+      // }))
       startStopBtn.textContent = 'Start';
       startStopBtn.className = "round greenBtn";
     }
@@ -102,11 +110,12 @@ export function Drivings() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
 
         {drives.map(drive =>
+
           <div key={drive.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', margin: "10px" }}>
 
             מכונית: {drive.car_name}<br />
             <img src={`http://127.0.0.1:8000${drive.car_image}`} style={{ width: '150px', height: '100px' }} alt={drive.car_name} /><br /><br />
-            {/* {drive.startDate!.toString().slice(0, 10) !== drive.endDate!.toString().slice(0, 10) ?
+            {drive.startDate!.toString().slice(0, 10) !== drive.endDate!.toString().slice(0, 10) ?
               <div>
                 מתאריך: {drive.startDate!.toString().slice(0, 10)}<br />
                 עד תאריך: {drive.endDate!.toString().slice(0, 10)}<br />
@@ -119,17 +128,15 @@ export function Drivings() {
             עד שעה: {drive.endDate!.toString().slice(11, 16)}<br />
             קילומטראז' התחלתי: {Number(drive.startKilometer).toLocaleString()}<br />
             קילומטראז' סופי: {Number(drive.endKilometer).toLocaleString()}<br />
-            הערות: {drive.comments ? drive.comments : 'אין הערות'} */}
+            הערות: {drive.comments ? drive.comments : 'אין הערות'}
           </div>)}
       </div>
-      <h1>נסיעה פעילה</h1><hr />
       <div>
         {isRunning ?
           <div>
+            <h1>נסיעה פעילה</h1><hr />
             הנסיעה התחילה
             {activeDrive?.car_image}
-
-
 
           </div> :
           <div>
@@ -165,15 +172,15 @@ export function Drivings() {
                     <input type='file' onChange={handleFile3Change} /><br />
                   </div>}
 
+                <div className="d-flex justify-content-center">
+                  <button className="round greenBtn" onClick={handleButtonClick}>Start</button>
+                </div>
+
               </div>
             }
+
           </div>
         }
-      </div>
-
-
-      <div className="d-flex justify-content-center">
-        <button className="round greenBtn" onClick={handleButtonClick}>Start</button>
       </div>
 
 

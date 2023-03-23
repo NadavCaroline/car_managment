@@ -108,6 +108,7 @@ const MakeOrder = () => {
     }
   }, [refreshFlag])
 
+
   useEffect(() => {
     if ((formatedStartDate && formatedEndDate && formatedStartTime && formatedEndTime) ||
       (formatedStartDate && formatedEndDate && isAllDay)) {

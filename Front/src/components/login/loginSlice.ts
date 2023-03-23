@@ -61,11 +61,9 @@ export const loginSlice = createSlice({
       state.refresh = ""
     },
     remember:(state)=>{
-      console.log("Called remember")
       state.remember = true
     },
     dontRemember:(state)=>{
-      console.log("Called donrRemember")
       state.remember = false
     }
   },
