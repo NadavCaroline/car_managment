@@ -1,5 +1,5 @@
 import axios from 'axios';
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode";
 import { DriveModel } from '../../models/Drive'
 import { MY_SERVER } from '../../env';
 
@@ -27,7 +27,6 @@ export const getAllDrives = async (token: string) => {
 
 
 export const startDrive = async ( token: string,drive: DriveModel) => {
-  console.log(drive)
     return axios.post(MY_SERVER + 'drives', {
       user: drive.user,
       order: drive.order,
@@ -45,7 +44,6 @@ export const startDrive = async ( token: string,drive: DriveModel) => {
 }
 
 export const endDrive = async ( token: string,drive: DriveModel) => {
-  console.log(drive)
     return axios.put(MY_SERVER + 'drives/' + drive.id, {
         endDate: drive.endDate,
         endKilometer: drive.endKilometer,

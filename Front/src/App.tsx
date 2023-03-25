@@ -28,6 +28,7 @@ function App() {
   const [decoded, setdecoded] = useState<any>("")
 
   useEffect(() => {
+    
     token && 
     setdecoded(jwt_decode(token))
   }, [])

@@ -21,7 +21,6 @@ const initialState: loginState = {
 export const loginAsync = createAsyncThunk(
   'login/login',
   async (cred: Cred) => {
-    console.log(cred)
     const response = await login(cred);
     return response;
   }
