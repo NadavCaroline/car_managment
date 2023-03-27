@@ -4,16 +4,16 @@ import {
   getOrdersAsync,
   ordersSelector
 } from './OrdersSlice';
-import { userToken } from '../login/loginSlice';
+import { userAccess, userToken } from '../login/loginSlice';
 
 
 export function MyOrders() {
   const orders = useAppSelector(ordersSelector);
-  const token = useAppSelector(userToken)
+  const token = useAppSelector(userAccess)
   // const cars = useAppSelector(carsSelector)
   const dispatch = useAppDispatch();
   const today = new Date()
-
+  const oneDay = 1000 * 60 * 60 * 24; // milliseconds in a day
 
   useEffect(() => {
     dispatch(getOrdersAsync(token))
@@ -22,11 +22,11 @@ export function MyOrders() {
 
   return (
     <div>
-      <h1>ההזמנות שלי</h1><hr/>
+      <h1>ההזמנות שלי</h1><hr />
 
       <h3>הזמנות קודמות</h3>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
-        {orders.filter(order =>new Date( order.toDate).getTime() < today.getTime()).map(order =>
+        {orders.filter(order => new Date(order.toDate).getTime() < today.getTime()).map(order =>
           <div key={order.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', textAlign: 'center' }}>
             מכונית: {order.car_name}<br />
             מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
@@ -44,6 +44,10 @@ export function MyOrders() {
           <div key={order.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', textAlign: 'center' }}>
             מכונית: {order.car_name}<br />
             מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
+            {new Date(order.toDate).getTime() - new Date(order.fromDate).getTime() >= oneDay &&
+              <div>
+                עד תאריך: {order.toDate!.toString().slice(0, 10)}<br />
+              </div>}
             {order.isAllDay ? <div> כל היום</div> :
               <div> משעה: {order.fromDate!.toString().slice(11, 16)}<br />
                 עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
@@ -54,7 +58,7 @@ export function MyOrders() {
       </div>
       <h3>הזמנות עתידיות</h3>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
-        {orders.filter(order => new Date( order.fromDate).getTime() > today.getTime()).map(order =>
+        {orders.filter(order => new Date(order.fromDate).getTime() > today.getTime()).map(order =>
           <div key={order.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', textAlign: 'center' }}>
             מכונית: {order.car_name}<br />
             מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />

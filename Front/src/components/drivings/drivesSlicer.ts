@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { getAllDrives, getDrives, startDrive } from './drivesAPI';
+import { endDrive, getAllDrives, getDrives, startDrive } from './drivesAPI';
 import { DriveModel } from '../../models/Drive'
 
 export interface DriveState {
@@ -38,6 +38,14 @@ export const startDriveAsync = createAsyncThunk(
   }
 );
 
+export const endDriveAsync = createAsyncThunk(
+  'drive/endDrive',
+  async ({ token, drive }: { token: string, drive: DriveModel }) => {
+    const response = await endDrive(token, drive);
+    return response;
+  }
+);
+
 export const driveSlice = createSlice({
   name: 'drive',
   initialState,
@@ -54,6 +62,15 @@ export const driveSlice = createSlice({
       })
       .addCase(startDriveAsync.fulfilled, (state, action) => {
         state.drives.push(action.payload)
+      })
+      .addCase(endDriveAsync.fulfilled, (state, action) => {
+        let temp = state.drives.filter(drive => drive.id === action.payload.id)[0]
+        temp.endDate = action.payload.endDate
+        temp.endImg1 = action.payload.endImg1
+        temp.endImg2 = action.payload.endImg2
+        temp.endImg3 = action.payload.endImg3
+        temp.comments = action.payload.comments
+        temp.endKilometer = action.payload.endKilometer
       });
   },
 });

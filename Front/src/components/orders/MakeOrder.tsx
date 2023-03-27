@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { userToken } from '../login/loginSlice';
+import { userAccess, userToken } from '../login/loginSlice';
 import { addOrderAsync, availableCarsSelector, checkOrderDatesAsync, getOrdersAsync, notAvilableSelector, orderDetailsSelector, ordersSelector } from './OrdersSlice';
 import { Dayjs } from 'dayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
@@ -11,10 +11,9 @@ import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
 import jwt_decode from "jwt-decode"
 import CarModel from '../../models/Car';
 
-
 const MakeOrder = () => {
   const dispatch = useAppDispatch()
-  const token = useAppSelector(userToken)
+  const token = useAppSelector(userAccess)
   const availableCars = useAppSelector(availableCarsSelector)
   const notAvailableCars = useAppSelector(notAvilableSelector)
   const orderDetails = useAppSelector(orderDetailsSelector)
@@ -107,6 +106,7 @@ const MakeOrder = () => {
       handleDateTimeVar()
     }
   }, [refreshFlag])
+
 
   useEffect(() => {
     if ((formatedStartDate && formatedEndDate && formatedStartTime && formatedEndTime) ||

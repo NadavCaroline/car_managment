@@ -19,6 +19,7 @@ export const login = async (cred: Cred) => {
   // return await axios.post(MY_SERVER + 'login', cred).then((res) => res.data)
 }
 
+
 export const register = async (user: UserModel, profile: ProfileModel)  => {
   try {
     const response = await axios.post(MY_SERVER + 'reg',{"user":user,"profile":profile});
@@ -27,6 +28,9 @@ export const register = async (user: UserModel, profile: ProfileModel)  => {
     return error;
   }
   // return await axios.post(MY_SERVER + 'reg',{"user":user,"profile":profile}).then((res) => res);
+}
+export const loginWithRefresh = async (refresh: string) => {
+  return await axios.post(MY_SERVER+'token/refresh/', {refresh: refresh}).then((res) => res.data)
 }
 
 export const getProfile = async (token: string) => {

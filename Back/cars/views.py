@@ -254,11 +254,7 @@ class DrivingsView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        # print(request.data)
         serializer = CreateDrivingsSerializer(data=request.data)
-        # user = request.user
-        # order = CarOrders.objects.get(id = request.data['order'])
-        # print(user, order)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -267,6 +263,7 @@ class DrivingsView(APIView):
     def put(self, request, id):
         my_model = Drivings.objects.get(id=id)
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
+        print(serializer.error_messages)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -277,7 +274,6 @@ class RolesView(APIView):
         my_model = Roles.objects.all()
         serializer = CreateRolesSerializer(my_model, many=True)
         return Response(serializer.data)
-
 
 class DepartmentsView(APIView):
     def get(self, request):
