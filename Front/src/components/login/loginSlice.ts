@@ -18,7 +18,6 @@ const initialState: loginState = {
   access: localStorage.getItem('access'),
   refresh: localStorage.getItem('refresh'),
   logged:localStorage.hasOwnProperty('refresh'),
-  // localStorage.hasOwnProperty('access') || localStorage.hasOwnProperty('refresh') ,
   remember: localStorage.hasOwnProperty('refresh'),
   errorMsg:""
 };
@@ -80,28 +79,7 @@ export const loginSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginAsync.fulfilled, (state, action) => {  
-        if(action.payload.response!=undefined && action.payload.response.data.detail)//error login 
-        {
-          // action.payload.response.status
-          state.errorMsg=action.payload.response.data.detail
-        }
-        else if(state.remember==true){//success login
-          state.refresh = action.payload.refresh
-          state.access = ""
-          localStorage.setItem("refresh", action.payload.refresh)
-          localStorage.removeItem('access');
-          state.logged = true
-        }
-        else{
-          state.access= action.payload.access
-          state.refresh = ""
-          localStorage.setItem("access", action.payload.access)
-          localStorage.removeItem('refresh');
-          state.logged = true
-        }
-        
-      })
+
       .addCase(regAsync.fulfilled, (state, action) => { 
         console.log(action);
         // state.errorMsg=action.payload.;
@@ -111,8 +89,7 @@ export const loginSlice = createSlice({
 
 export const { logout, remember, dontRemember ,SetErrorMsg} = loginSlice.actions;
 export const errorMsg = (state: RootState) => state.login.errorMsg;
-// export const userAccess = (state: RootState) => state.login.access;
-// export const userRefresh = (state: RootState) => state.login.refresh;
+
 export const isLogged = (state: RootState) => state.login.logged;
 export const userToken = (state: RootState) => state.login.remember? state.login.refresh :(state.login.logged? state.login.access:"");
 export default loginSlice.reducer;
