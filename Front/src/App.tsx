@@ -11,10 +11,11 @@ import Logo from './images/carLogo.png';
 // import { faCheckSquare, faBell } from '@fortawesome/fontawesome-free-solid'
 // import { library } from "@fortawesome/fontawesome-svg-core";
 import jwt_decode from "jwt-decode"
+import jwtDecode from 'jwt-decode';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'react-bootstrap/Dropdown';
-import { isLogged, logout, userAccess } from './components/login/loginSlice';
+import { isLogged, loginWithRefreshAsync, logout, userAccess, userRefresh } from './components/login/loginSlice';
 import { Login } from './components/login/Login';
 
 function App() {
@@ -24,15 +25,36 @@ function App() {
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
   const dispatch = useAppDispatch()
   const logged = useAppSelector(isLogged)
-  const token = useAppSelector(userAccess)
+  const access = useAppSelector(userAccess)
+  const refresh = useAppSelector(userRefresh)
   const [decoded, setdecoded] = useState<any>("")
 
   useEffect(() => {
-    
-    token && 
-    setdecoded(jwt_decode(token))
+    if (localStorage.hasOwnProperty('access')) {
+      const decodedToken: any = jwtDecode(localStorage.getItem('access')!);
+      if (decodedToken.exp < Date.now() / 1000) {
+        localStorage.removeItem('access')
+        dispatch(loginWithRefreshAsync(refresh))
+      }
+    }
+    else {
+      console.log("Else")
+      if (refresh) {
+        console.log("first")
+        dispatch(loginWithRefreshAsync(refresh))
+      }
+      else {
+        console.log("logout")
+        dispatch(logout())
+      }
+    }
   }, [])
-  
+
+
+  useEffect(() => {
+    access && setdecoded(jwt_decode(access))
+  }, [access])
+
   return (
     logged ?
       <div>

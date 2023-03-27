@@ -159,9 +159,9 @@ class Drivings(models.Model):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     order = models.ForeignKey(CarOrders, on_delete=models.CASCADE, null=True)
-    startDate = models.DateTimeField()
+    startDate = models.DateTimeField(null=True)
     endDate = models.DateTimeField(null=True)
-    startKilometer = models.IntegerField()
+    startKilometer = models.IntegerField(null=True)
     endKilometer = models.IntegerField(null=True)
     comments = models.CharField(max_length=200, blank=True)
     startImg1 = models.ImageField( upload_to='images/',

@@ -11,6 +11,10 @@ export const login = async (cred: Cred) => {
   return await axios.post(MY_SERVER+'login', cred).then((res) => res.data)
 }
 
+export const loginWithRefresh = async (refresh: string) => {
+  return await axios.post(MY_SERVER+'token/refresh/', {refresh: refresh}).then((res) => res.data)
+}
+
 export const register = async (cred: Cred) => {
   return await axios.post(MY_SERVER+'reg', cred).then((res) => res.data);
 }

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { getProfile, login, register,getDepartments,getRoles } from './loginAPI';
+import { getProfile, login, register,getDepartments,getRoles, loginWithRefresh } from './loginAPI';
 import {Cred} from '../../models/Cred'
 
 
@@ -25,6 +25,15 @@ export const loginAsync = createAsyncThunk(
     return response;
   }
 );
+export const loginWithRefreshAsync = createAsyncThunk(
+  'login/loginWithRefresh',
+  async (refresh: string) => {
+    const response = await loginWithRefresh(refresh);
+    console.log(response)
+    return response;
+  }
+);
+
 
 export const regAsync = createAsyncThunk(
   'login/register',
@@ -66,8 +75,15 @@ export const loginSlice = createSlice({
       state.remember = false
     }
   },
+  
   extraReducers: (builder) => {
     builder
+    .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
+      console.log(action.payload.access)
+      state.access = action.payload.access;
+      localStorage.setItem("access", action.payload.access)
+      state.logged = true
+    })
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.access = action.payload.access;
         state.refresh = action.payload.refresh;
@@ -81,5 +97,6 @@ export const loginSlice = createSlice({
 export const { logout, remember, dontRemember } = loginSlice.actions;
 export const userAccess = (state: RootState) => state.login.access;
 export const userRefresh = (state: RootState) => state.login.refresh;
+export const userToken = (state: RootState) => state.login.access || state.login.refresh;
 export const isLogged = (state: RootState) => state.login.logged;
 export default loginSlice.reducer;

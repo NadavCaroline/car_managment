@@ -247,7 +247,6 @@ class DrivingsView(APIView):
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
         print(serializer.error_messages)
         if serializer.is_valid():
-            print(serializer.data)
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -257,7 +256,6 @@ class RolesView(APIView):
         my_model = Roles.objects.all()
         serializer = CreateRolesSerializer(my_model, many=True)
         return Response(serializer.data)
-
 
 class DepartmentsView(APIView):
     def get(self, request):

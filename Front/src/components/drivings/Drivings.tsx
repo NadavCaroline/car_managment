@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import jwt_decode from "jwt-decode";
 import OrderModel from '../../models/Order';
-import { userAccess } from '../login/loginSlice';
+import { userAccess, userToken } from '../login/loginSlice';
 import { getOrdersAsync, ordersSelector } from '../orders/OrdersSlice';
 import { allDrivesSelector, drivesSelector, endDriveAsync, getAllDrivesAsync, getDrivesAsync, startDriveAsync } from './drivesSlicer';
 import { DriveModel } from '../../models/Drive';
@@ -11,7 +11,7 @@ import { DriveModel } from '../../models/Drive';
 export function Drivings() {
   const dispatch = useAppDispatch()
   const token = useAppSelector(userAccess)
-  let decoded: any = jwt_decode(token)
+  const decoded: any = jwt_decode(token)
   const [isRunning, setIsRunning] = useState(false);
   const drives = useAppSelector(drivesSelector)
   const allDrives = useAppSelector(allDrivesSelector)
@@ -29,7 +29,7 @@ export function Drivings() {
   const [endSelectedFile3, setendSelectedFile3] = useState<File | null>(null)
   const [activeDrive, setactiveDrive] = useState<DriveModel | null>(null)
   const [comments, setcomments] = useState("")
-
+  const [activeDriveFlag, setactiveDriveFlag] = useState(false)
 
 
   // Handles image 1 upload
@@ -69,17 +69,17 @@ export function Drivings() {
   // Gets the end kilometer of the car of the active order, according to the report of the last drive
   const handleStartKilometer = () => {
     const lastDrive = allDrives.filter(drive => drive.endKilometer && drive.car_name === activeOrder?.car_name).pop()
-    lastDrive && setstartKilometer(String(lastDrive?.endKilometer))
+    lastDrive ? setstartKilometer(String(lastDrive?.endKilometer)) : setstartKilometer("")
   }
 
+  // Calls the server with GET methods
   useEffect(() => {
     dispatch(getDrivesAsync(token))
     dispatch(getOrdersAsync(token))
     dispatch(getAllDrivesAsync(token))
-
   }, [])
 
-
+  // Checks if there is an active drive when app is loaded
   useEffect(() => {
     const startStopBtn = document.querySelector('.round') as HTMLButtonElement;
     if (localStorage.hasOwnProperty('isRunning')) {
@@ -88,29 +88,35 @@ export function Drivings() {
       setIsRunning(true)
     } 
   }, [])
-  
+
+  // Checks if there is an active drive when app is loaded
   useEffect(() => {
     if (localStorage.hasOwnProperty('activeDrive')) {
       setactiveDrive(drives[drives.length - 1])
-      console.log(activeDrive)
     } 
   }, [])
   
-
-
+  // Checks if there is an order today
   useEffect(() => {
     handleCurrentOrder()
   }, [orders.length])
 
+  // Handles the active drive change
   useEffect(() => {
     dispatch(getDrivesAsync(token))
-    isRunning && setactiveDrive(drives[drives.length - 1])
-    isRunning && console.log(drives[drives.length - 1])
+    setactiveDriveFlag(!activeDriveFlag)
   }, [drives.length])
 
+
+  useEffect(() => {
+    isRunning && console.log(drives[drives.length - 1])
+  }, [activeDriveFlag])
+  
+  // Gets the kilometer of the active order, if exists.
   useEffect(() => {
     handleStartKilometer()
   }, [refreshFlag, allDrives.length])
+
 
   const handleButtonClick = () => {
     const startStopBtn = document.querySelector('.round') as HTMLButtonElement;
@@ -122,7 +128,6 @@ export function Drivings() {
         token: token, drive: {
           user: decoded.user_id,
           order: activeOrder?.id,
-          car_image: activeOrder?.car_image,
           startDate: new Date(),
           startKilometer: startKilometer,
           startImg1: startSelectedFile1,
@@ -130,6 +135,7 @@ export function Drivings() {
           startImg3: startSelectedFile3,
         }
       }))
+
       startStopBtn.textContent = 'Stop';
       startStopBtn.className = "round redBtn";
     } else {
@@ -154,7 +160,7 @@ export function Drivings() {
 
   return (
     <div >
-      <h1>נסיעות קודמות</h1><hr />
+      <h1>נסיעות קודמות</h1>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
 
         {drives.filter(drive => drive.endDate).map(drive =>
@@ -184,9 +190,11 @@ export function Drivings() {
           <div>
             <h1>נסיעה פעילה</h1><hr />
             הנסיעה התחילה
-            <img src={`http://127.0.0.1:8000${activeDrive?.car_image}`} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
+            {activeDrive?.id}
+            
+            <img src={`http://127.0.0.1:8000${activeOrder?.car_image}`} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
             בשעה: {activeDrive?.startDate!.toString().slice(11, 16)}<br />
-            קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} />
+            קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} /><br/>
 
             <input type='file' onChange={handleendFile1Change} /><br />
             {startSelectedFile1 &&
@@ -201,6 +209,8 @@ export function Drivings() {
 
           </div> :
           <div>
+            <hr/>
+            <h3>הזמנה פעילה</h3>
             {activeOrder &&
               <div>
                 <div> {activeOrder.car_name}</div>
