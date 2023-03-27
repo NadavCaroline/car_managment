@@ -74,7 +74,6 @@ export function Drivings() {
 
   // Calls the server with GET methods
   useEffect(() => {
-    console.log(token)
     dispatch(getDrivesAsync(token))
     dispatch(getOrdersAsync(token))
     dispatch(getAllDrivesAsync(token))
@@ -110,13 +109,13 @@ export function Drivings() {
 
 
   useEffect(() => {
-    isRunning && console.log(drives[drives.length - 1])
+    isRunning && setactiveDrive(drives[drives.length - 1])
   }, [activeDriveFlag])
   
   // Gets the kilometer of the active order, if exists.
   useEffect(() => {
     handleStartKilometer()
-  }, [refreshFlag, allDrives.length])
+  }, [refreshFlag, allDrives.length, drives.length])
 
 
   const handleButtonClick = () => {
@@ -136,7 +135,7 @@ export function Drivings() {
           startImg3: startSelectedFile3,
         }
       }))
-
+      
       startStopBtn.textContent = 'Stop';
       startStopBtn.className = "round redBtn";
     } else {
@@ -152,6 +151,7 @@ export function Drivings() {
         }
       }))
       setactiveDrive(null)
+      setactiveOrder(null)
       localStorage.removeItem('isRunning')
       localStorage.removeItem('activeDrive')
       startStopBtn.textContent = 'Start';
