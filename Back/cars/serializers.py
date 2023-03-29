@@ -112,7 +112,7 @@ class CarsSerializer(serializers.ModelSerializer):
 class CarOrdersSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarOrders
-        fields = ['id', 'user_name', 'car_name', 'orderDate',
+        fields = ['id', 'user_name', 'car_name', 'orderDate','ended',
                   'fromDate', 'toDate', 'isAllDay', 'destination', 'car_image']
 
 

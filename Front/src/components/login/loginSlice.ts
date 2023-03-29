@@ -37,7 +37,6 @@ export const loginWithRefreshAsync = createAsyncThunk(
   }
 );
 
-
 export const regAsync = createAsyncThunk(
   'login/register',
   async ({ user, profile }: { user: UserModel, profile: ProfileModel }) => {
@@ -90,10 +89,12 @@ export const loginSlice = createSlice({
         // state.errorMsg=action.payload.;
   })
     .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
-          state.access = action.payload.access;
-          localStorage.setItem("access", action.payload.access)
-          state.logged = true
-        })
+      console.log(action.payload.access)
+      state.access = action.payload.access;
+      localStorage.setItem("access", action.payload.access)
+      localStorage.setItem("refresh", action.payload.refresh) 
+      state.logged = true
+    })
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.access = action.payload.access;
         state.refresh = action.payload.refresh;

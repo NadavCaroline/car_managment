@@ -44,7 +44,6 @@ export const startDrive = async ( token: string,drive: DriveModel) => {
 }
 
 export const endDrive = async ( token: string,drive: DriveModel) => {
-  console.log(drive)
     return axios.put(MY_SERVER + 'drives/' + drive.id, {
         endDate: drive.endDate,
         endKilometer: drive.endKilometer,

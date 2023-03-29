@@ -3,7 +3,7 @@ import { RootState, AppThunk } from '../../app/store';
 import CarModel from '../../models/Car';
 import { DatesCheck } from '../../models/DatesCheck';
 import OrderModel from '../../models/Order';
-import { addOrder, checkOrderDates, getOrders } from './OrdersAPI';
+import { addOrder, checkOrderDates, getOrders, orderEnded } from './OrdersAPI';
 
 export interface OrderState {
   orders: OrderModel[]
@@ -35,6 +35,15 @@ export const addOrderAsync = createAsyncThunk(
   }
 );
 
+export const orderEndedAsync = createAsyncThunk(
+  'myOrder/orderEnded',
+  async ({ token, id }: { token: string, id: number }) => {
+    const response = await orderEnded(token, id);
+    console.log(response)
+    return response;
+  }
+);
+
 export const checkOrderDatesAsync = createAsyncThunk(
   'myOrder/checkOrderDates',
   async ({ token, dates }: { token: string, dates: DatesCheck }) => {
@@ -57,6 +66,11 @@ export const myOrderSlice = createSlice({
       .addCase(addOrderAsync.fulfilled, (state, action) => {
         state.orders.push(action.payload)
       })
+      .addCase(orderEndedAsync.fulfilled, (state, action) => {
+        let temp = state.orders.filter(order => order.id === action.payload.id)[0]
+        temp.ended = true
+      })
+
       .addCase(checkOrderDatesAsync.fulfilled, (state, action) => {
         state.availableCars = action.payload.available
         state.notAvilable = action.payload.notAvilable

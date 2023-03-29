@@ -71,6 +71,7 @@ class CarOrders(models.Model):
     toDate = models.DateTimeField()
     isAllDay = models.BooleanField()
     destination = models.CharField(max_length=50)
+    ended = models.BooleanField()
 
     @property
     def car_name(self):

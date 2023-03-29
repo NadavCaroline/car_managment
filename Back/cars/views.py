@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -173,6 +174,15 @@ class CarOrdersView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, id):
+        my_model = CarOrders.objects.get(id=int(id))
+        my_model.ended = True
+        model_dict = model_to_dict(my_model)
+        serializer = CreateCarOrdersSerializer(my_model, data=model_dict)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
 
 
 @permission_classes([IsAuthenticated])
