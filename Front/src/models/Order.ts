@@ -11,4 +11,5 @@ export default interface OrderModel {
     isAllDay: boolean
     destination?: string
     car_image?: string
+    ended?: boolean
 }

@@ -12,6 +12,7 @@ import Logo from './images/carLogo.png';
 // import { library } from "@fortawesome/fontawesome-svg-core";
 import jwt_decode from "jwt-decode"
 import jwtDecode from 'jwt-decode';
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -38,13 +39,10 @@ function App() {
       }
     }
     else {
-      console.log("Else")
       if (refresh) {
-        console.log("first")
         dispatch(loginWithRefreshAsync(refresh))
       }
       else {
-        console.log("logout")
         dispatch(logout())
       }
     }

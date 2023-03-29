@@ -3,7 +3,7 @@ import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import jwt_decode from "jwt-decode";
 import OrderModel from '../../models/Order';
 import { userAccess, userToken } from '../login/loginSlice';
-import { getOrdersAsync, ordersSelector } from '../orders/OrdersSlice';
+import { getOrdersAsync, orderEndedAsync, ordersSelector } from '../orders/OrdersSlice';
 import { allDrivesSelector, drivesSelector, endDriveAsync, getAllDrivesAsync, getDrivesAsync, startDriveAsync } from './drivesSlicer';
 import { DriveModel } from '../../models/Drive';
 
@@ -30,7 +30,7 @@ export function Drivings() {
   const [activeDrive, setactiveDrive] = useState<DriveModel | null>(null)
   const [comments, setcomments] = useState("")
   const [activeDriveFlag, setactiveDriveFlag] = useState(false)
-
+  const [selectedDrive, setselectedDrive] = useState<DriveModel | null>(null)
 
   // Handles image 1 upload
   const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,7 +62,7 @@ export function Drivings() {
   // Detects the active order by the date of today
   const handleCurrentOrder = () => {
     const today = new Date()
-    const currentOrder = orders.find(order => new Date(order.fromDate).getTime() <= today.getTime() && new Date(order.toDate).getTime() >= today.getTime())
+    const currentOrder = orders.find(order => new Date(order.fromDate).getTime() <= today.getTime() && new Date(order.toDate).getTime() >= today.getTime() && order.ended === false)
     setactiveOrder(currentOrder!)
     setrefreshFlag(!refreshFlag)
   }
@@ -72,12 +72,12 @@ export function Drivings() {
     lastDrive ? setstartKilometer(String(lastDrive?.endKilometer)) : setstartKilometer("")
   }
 
-  // Calls the server with GET methods
+  // Calls the server with GET methods When the app goes live
   useEffect(() => {
     dispatch(getDrivesAsync(token))
     dispatch(getOrdersAsync(token))
     dispatch(getAllDrivesAsync(token))
-  }, [])
+  }, [token])
 
   // Checks if there is an active drive when app is loaded
   useEffect(() => {
@@ -86,20 +86,21 @@ export function Drivings() {
       startStopBtn.textContent = 'Stop';
       startStopBtn.className = "round redBtn";
       setIsRunning(true)
-    } 
+    }
   }, [])
 
   // Checks if there is an active drive when app is loaded
   useEffect(() => {
     if (localStorage.hasOwnProperty('activeDrive')) {
       setactiveDrive(drives[drives.length - 1])
-    } 
+    }
+    console.log(activeOrder)
   }, [])
-  
+
   // Checks if there is an order today
   useEffect(() => {
     handleCurrentOrder()
-  }, [orders.length])
+  }, [orders.length, token])
 
   // Handles the active drive change
   useEffect(() => {
@@ -109,13 +110,13 @@ export function Drivings() {
 
 
   useEffect(() => {
-    isRunning && console.log(drives[drives.length - 1])
+    isRunning && setactiveDrive(drives[drives.length - 1])
   }, [activeDriveFlag])
-  
+
   // Gets the kilometer of the active order, if exists.
   useEffect(() => {
     handleStartKilometer()
-  }, [refreshFlag, allDrives.length])
+  }, [refreshFlag, allDrives.length, token])
 
 
   const handleButtonClick = () => {
@@ -150,7 +151,12 @@ export function Drivings() {
           endImg3: endSelectedFile3,
         }
       }))
+      dispatch(orderEndedAsync({
+        token: token,
+        id: activeOrder?.id!
+      }))
       setactiveDrive(null)
+      setactiveOrder(null)
       localStorage.removeItem('isRunning')
       localStorage.removeItem('activeDrive')
       startStopBtn.textContent = 'Start';
@@ -169,20 +175,22 @@ export function Drivings() {
 
             מכונית: {drive.car_name}<br />
             <img src={`http://127.0.0.1:8000${drive.car_image}`} style={{ width: '150px', height: '100px' }} alt={drive.car_name} /><br /><br />
-            <div>
-              מתאריך: {drive.startDate!.toString().slice(0, 10)}<br />
-              עד תאריך: {drive.endDate!.toString().slice(0, 10)}<br />
-            </div>
-            <div>
-              בתאריך: {drive.startDate!.toString().slice(0, 10)}<br />
-            </div>
+            {drive.startDate!.toString().slice(0, 10) === drive.endDate!.toString().slice(0, 10) ?
+              <div>
+                בתאריך: {drive.startDate!.toString().slice(0, 10)}<br />
+              </div> :
+              <div>
+                מתאריך: {drive.startDate!.toString().slice(0, 10)}<br />
+                עד תאריך: {drive.endDate!.toString().slice(0, 10)}<br />
+              </div>
+            }
 
             משעה: {drive.startDate!.toString().slice(11, 16)}<br />
             עד שעה: {drive.endDate!.toString().slice(11, 16)}<br />
             קילומטראז' התחלתי: {Number(drive.startKilometer).toLocaleString()}<br />
             קילומטראז' סופי: {Number(drive.endKilometer).toLocaleString()}<br />
-            הערות: {drive.comments ? drive.comments : 'אין הערות'}
-            <button>עריכה</button>
+            הערות: {drive.comments ? drive.comments : 'אין הערות'}<br />
+            <button onClick={() => setselectedDrive(drive)}>לצפייה בכל הפרטים</button>
           </div>)}
       </div>
       <div>
@@ -191,10 +199,10 @@ export function Drivings() {
             <h1>נסיעה פעילה</h1><hr />
             הנסיעה התחילה
             {activeDrive?.id}
-            
+
             <img src={`http://127.0.0.1:8000${activeOrder?.car_image}`} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
             בשעה: {activeDrive?.startDate!.toString().slice(11, 16)}<br />
-            קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} /><br/>
+            קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} /><br />
 
             <input type='file' onChange={handleendFile1Change} /><br />
             {startSelectedFile1 &&
@@ -206,14 +214,19 @@ export function Drivings() {
                 <input type='file' onChange={handleendFile3Change} /><br />
               </div>}
             הערות: <input onChange={(e) => setcomments(e.target.value)} />
+                
+            <div className="d-flex justify-content-center">
+                  <button className="round greenBtn" onClick={handleButtonClick}>Stop</button>
+                </div>
 
           </div> :
           <div>
-            <hr/>
-            <h3>הזמנה פעילה</h3>
-            {activeOrder &&
+            {(activeOrder && !activeOrder?.ended) &&
               <div>
-                <div> {activeOrder.car_name}</div>
+                <hr />
+                <h3>הזמנה פעילה</h3>
+                <div> {activeOrder.car_name}</div><br />
+                <div>{activeOrder.ended}</div>
                 <img src={`http://127.0.0.1:8000${activeOrder.car_image}`} style={{ width: '150px', height: '100px' }} alt={activeOrder.car_name} /><br />
                 {activeOrder.isAllDay ?
                   <div>
@@ -244,6 +257,9 @@ export function Drivings() {
                   </div>}
 
 
+                <div className="d-flex justify-content-center">
+                  <button className="round greenBtn" onClick={handleButtonClick}>Start</button>
+                </div>
 
               </div>
             }
@@ -251,11 +267,16 @@ export function Drivings() {
           </div>
         }
 
-        <div className="d-flex justify-content-center">
-          <button className="round greenBtn" onClick={handleButtonClick}>Start</button>
-        </div>
       </div>
-
+      {/* {selectedDrive &&
+        <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <div style={{ position: "relative", padding: "32px", width: "400px", height: "300px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px" }}>
+            <img src={`http://127.0.0.1:8000${selectedCar.image}`} style={{ width: '150px', height: '100px' }} alt={selectedCar.model} /><br /><br />
+            יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} />
+            <button onClick={() => handleOrder()}>הזמן</button>
+          </div>
+        </div>
+      } */}
 
     </div>
   );

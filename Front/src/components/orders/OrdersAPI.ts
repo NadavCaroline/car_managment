@@ -31,3 +31,14 @@ export const checkOrderDates = async (token: string, dates: DatesCheck) => {
       }
     }).then((res) => res.data);
 }
+
+export const orderEnded = async (token: string, id: number) => {
+
+  return axios.put(MY_SERVER + 'orders/' + id,
+  {ended: true},
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((res) => res.data);
+}

@@ -29,11 +29,9 @@ export const loginWithRefreshAsync = createAsyncThunk(
   'login/loginWithRefresh',
   async (refresh: string) => {
     const response = await loginWithRefresh(refresh);
-    console.log(response)
     return response;
   }
 );
-
 
 export const regAsync = createAsyncThunk(
   'login/register',
@@ -82,6 +80,7 @@ export const loginSlice = createSlice({
       console.log(action.payload.access)
       state.access = action.payload.access;
       localStorage.setItem("access", action.payload.access)
+      localStorage.setItem("refresh", action.payload.refresh) 
       state.logged = true
     })
       .addCase(loginAsync.fulfilled, (state, action) => {

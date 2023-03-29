@@ -116,6 +116,11 @@ const MakeOrder = () => {
     }
   }, [datesFlag, formatedStartTime, formatedEndTime])
 
+const handleOrder = ()=>{
+  dispatch(addOrderAsync({ token: token, order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false } }))
+  setselectedCar(null)
+}
+
   return (
     <div style={{ margin: '10px' }}>
       יום שלם: <input defaultChecked={false} type={'checkbox'} onChange={() => handleIsAllDay()} />
@@ -216,6 +221,7 @@ const MakeOrder = () => {
                   <img src={`http://127.0.0.1:8000${car.image}`} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
                   <h4>פרטי הזמנה</h4>
                   <div>
+                  <hr />
                     {orderDetails && orderDetails.map((order, i) => <div key={i}>
                       מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
                       {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) &&
@@ -224,7 +230,7 @@ const MakeOrder = () => {
                         </div>
                       }
                       <div> משעה: {order.fromDate!.toString().slice(11, 16)}<br />
-                        עד שעה: {order.toDate!.toString().slice(11, 16)}</div><hr />
+                      עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
                     </div>)}
                   </div>
                 </div>
@@ -238,7 +244,7 @@ const MakeOrder = () => {
           <div style={{ position: "relative", padding: "32px", width: "400px", height: "300px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px" }}>
             <img src={`http://127.0.0.1:8000${selectedCar.image}`} style={{ width: '150px', height: '100px' }} alt={selectedCar.model} /><br /><br />
             יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} />
-            <button onClick={() => dispatch(addOrderAsync({ token: token, order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar.id!, destination } }))}>הזמן</button>
+            <button onClick={() => handleOrder()}>הזמן</button>
           </div>
         </div>
       }

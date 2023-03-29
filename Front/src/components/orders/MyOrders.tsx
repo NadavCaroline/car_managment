@@ -17,7 +17,7 @@ export function MyOrders() {
 
   useEffect(() => {
     dispatch(getOrdersAsync(token))
-  }, [orders.length])
+  }, [orders.length, token])
 
 
   return (
