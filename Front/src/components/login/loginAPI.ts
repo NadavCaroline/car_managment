@@ -19,13 +19,13 @@ export const login = async (cred: Cred) => {
   }
 }
 export const register = async (user: UserModel, profile: ProfileModel) => {
-  try {
-    const response = await axios.post(MY_SERVER + 'reg', { "user": user, "profile": profile });
-    return response;
-  } catch (error: any) {
-    return error.response;
-  }
-  // return await axios.post(MY_SERVER + 'reg',{"user":user,"profile":profile}).then((res) => {console.log(res);return res;});
+  // try {
+  //   const response = await axios.post(MY_SERVER + 'reg', { "user": user, "profile": profile });
+  //   return response;
+  // } catch (error: any) {
+  //   return error.response;
+  // }
+  return await axios.post(MY_SERVER + 'reg',{"user":user,"profile":profile}).then((res) => res.data);
 }
 export const loginWithRefresh = async (refresh: string) => {
   return await axios.post(MY_SERVER + 'token/refresh/', { refresh: refresh }).then((res) => res.data)

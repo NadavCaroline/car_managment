@@ -12,6 +12,7 @@ export interface loginState {
   logged: boolean
   remember: boolean
   error: string | null;
+  msg:string | null;
 }
 
 const initialState: loginState = {
@@ -19,7 +20,8 @@ const initialState: loginState = {
   refresh: localStorage.getItem('refresh'),
   logged: localStorage.hasOwnProperty('access') || localStorage.hasOwnProperty('remember'),
   remember: localStorage.hasOwnProperty('refresh'),
-  error: ""
+  error: "",
+  msg:""
 };
 
 
@@ -81,17 +83,20 @@ export const loginSlice = createSlice({
     SetError: (state) => {
       state.error = ""
     },
+    SetMsg: (state) => {
+      state.msg = ""
+    },
   },
 
   extraReducers: (builder) => {
     builder
       .addCase(regAsync.fulfilled, (state, action) => {
-        if (action.payload.status === 200) {
-          state.error="משתמש נוצר בהצלחה"
+        if (action.payload.status === "error") {
+          state.error=action.payload.msg;
         }
-        // else{
-        //     state.error=action.payload.status;
-        // }
+        else if (action.payload.status === "success"){
+            state.msg=action.payload.msg;
+        }
         
        
         // state.error=action.payload.;
@@ -131,8 +136,9 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { logout, remember, dontRemember, SetError } = loginSlice.actions;
+export const { logout, remember, dontRemember, SetError,SetMsg } = loginSlice.actions;
 export const loginError = (state: RootState) => state.login.error;
+export const loginMsg = (state: RootState) => state.login.msg;
 export const userAccess = (state: RootState) => state.login.access;
 export const userRefresh = (state: RootState) => state.login.refresh;
 export const isLogged = (state: RootState) => state.login.logged;

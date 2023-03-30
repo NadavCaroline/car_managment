@@ -8,7 +8,7 @@ import {
   getDepartmentsAsync,
   getRolesAsync,
   remember,
-  dontRemember, userToken, loginError, SetError
+  dontRemember, userToken, loginError, SetError,loginMsg,SetMsg
 } from './loginSlice';
 import {
   MDBTabs,
@@ -32,6 +32,7 @@ export function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const logged = useAppSelector(isLogged)
   const errorMessage = useAppSelector(loginError)
+  const loginMessage = useAppSelector(loginMsg)
   const [listDepartments, setListDepartments] = useState<DepModel[]>([]);
   const [listRoles, setListRoles] = useState<RolesModel[]>([]);
   const [basicActive, setBasicActive] = useState('tabLogin');
@@ -62,7 +63,19 @@ export function Login() {
 
     setBasicActive(value);
   };
-  const message = (value: string) => toast.error(value, {
+  const messageError = (value: string) => toast.error(value, {
+    position: "top-left",
+    //autoClose: 5000,
+    autoClose: false,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "colored",
+  });
+
+  const message = (value: string) => toast.success(value, {
     position: "top-left",
     //autoClose: 5000,
     autoClose: false,
@@ -87,9 +100,16 @@ export function Login() {
   // };
   useEffect(() => {
     if (errorMessage && errorMessage != "" )
-      message(errorMessage)
+    messageError(errorMessage)
     dispatch(SetError())
   }, [errorMessage])
+
+  useEffect(() => {
+    if (loginMessage && loginMessage != "" )
+      message(loginMessage)
+    dispatch(SetMsg())
+  }, [loginMessage])
+  
 
   useEffect(() => {
     // if (!localStorage.getItem("access")) {
