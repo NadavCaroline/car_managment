@@ -3,34 +3,32 @@ import { Cred } from '../../models/Cred'
 import { ProfileModel } from '../../models/Profile'
 import { UserModel } from '../../models/User'
 import { MY_SERVER } from '../../env'
-
-// const SERVER ='http://127.0.0.1:8000/'
-// const LOGIN_SERVER = 'http://127.0.0.1:8000/login'
-// const REG_SERVER = 'http://127.0.0.1:8000/reg'
-// const PROFILE_SERVER = 'http://127.0.0.1:8000/profile'
+import { AxiosError } from 'axios';
 
 export const login = async (cred: Cred) => {
+  // return await axios.post(MY_SERVER + 'login', cred).then((res) => res.data)
   try {
     const response = await axios.post(MY_SERVER + 'login', cred);
-    return response.data;
-  } catch (error) {
-    return error;
-  }
-  // return await axios.post(MY_SERVER + 'login', cred).then((res) => res.data)
-}
-
-
-export const register = async (user: UserModel, profile: ProfileModel)  => {
-  try {
-    const response = await axios.post(MY_SERVER + 'reg',{"user":user,"profile":profile});
     return response;
-  } catch (error) {
-    return error;
+     // console.log(response.data);
+    // return response.data;
+  } catch (error: any) {
+    return error.response;
+    // return error.response?.status;
+    // console.error(`API request failed with status code: ${error.response?.status}`);
   }
-  // return await axios.post(MY_SERVER + 'reg',{"user":user,"profile":profile}).then((res) => res);
+}
+export const register = async (user: UserModel, profile: ProfileModel) => {
+  try {
+    const response = await axios.post(MY_SERVER + 'reg', { "user": user, "profile": profile });
+    return response;
+  } catch (error: any) {
+    return error.response;
+  }
+  // return await axios.post(MY_SERVER + 'reg',{"user":user,"profile":profile}).then((res) => {console.log(res);return res;});
 }
 export const loginWithRefresh = async (refresh: string) => {
-  return await axios.post(MY_SERVER+'token/refresh/', {refresh: refresh}).then((res) => res.data)
+  return await axios.post(MY_SERVER + 'token/refresh/', { refresh: refresh }).then((res) => res.data)
 }
 
 export const getProfile = async (token: string) => {

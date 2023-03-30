@@ -23,38 +23,42 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 @api_view(['POST'])
 def register(request):
-    msg=""
-    if User.objects.filter(username=request.data['user']['username']).exists():
-        msg={"status":"error","msg":"משתמש כבר קיים"}
-    elif Profile.objects.filter(realID=request.data['profile']['realID']).exists():
-        msg={"status":"error","msg":"תעודת זהות כבר קיימת במערכת"}
-    else: 
-        department = Departments.objects.get(id=request.data['profile']['department'])
-        role = Roles.objects.get(id=request.data['profile']['roleLevel'])
+    try:
+        msg=""
+        if User.objects.filter(username=request.data['user']['username']).exists():
+            msg={"status":"error","msg":"משתמש כבר קיים"}
+        elif Profile.objects.filter(realID=request.data['profile']['realID']).exists():
+            msg={"status":"error","msg":"תעודת זהות כבר קיימת במערכת"}
+        else: 
+            department = Departments.objects.get(id=request.data['profile']['department'])
+            role = Roles.objects.get(id=request.data['profile']['roleLevel'])
 
-        user = User.objects.create_user(
-            first_name=request.data['user']['first_name'],
-            last_name=request.data['user']['last_name'],
-            username=request.data['user']['username'],
-            email=request.data['user']['email'],
-            password=request.data['user']['password'],
-            is_superuser=True if role.id==3 else False
-                    
-        )
-        user.is_active = True
-        user.is_staff = True
-        user.save()
-    
-        profile = Profile.objects.create(
-            user=user,
-            jobTitle=request.data['profile']['jobTitle'],
-            roleLevel=request.data['profile']['roleLevel'],
-            department=department,
-            realID=request.data['profile']['realID'],
+            user = User.objects.create_user(
+                first_name=request.data['user']['first_name'],
+                last_name=request.data['user']['last_name'],
+                username=request.data['user']['username'],
+                email=request.data['user']['email'],
+                password=request.data['user']['password'],
+                is_superuser=True if role.id==3 else False
+                        
             )
-        profile.save()
-        msg={"status":"success","msg":"משתמש נוצר בהצלחה"}
-
+            user.is_active = True
+            user.is_staff = True
+            user.save()
+        
+            profile = Profile.objects.create(
+                user=user,
+                jobTitle=request.data['profile']['jobTitle'],
+                roleLevel=role,
+                department=department,
+                realID=request.data['profile']['realID'],
+                )
+            profile.save()
+            msg={"status":"success","msg":"משתמש נוצר בהצלחה"}
+    except Exception as e:
+        # Handle the exception
+        msg={"status":"error","msg":str(e)}
+        # error_message = str(e)
     return Response(msg)
 
 

@@ -8,7 +8,7 @@ import {
   getDepartmentsAsync,
   getRolesAsync,
   remember,
-  dontRemember, userToken, errorMsg, SetErrorMsg
+  dontRemember, userToken, loginError, SetError
 } from './loginSlice';
 import {
   MDBTabs,
@@ -31,7 +31,7 @@ export function Login() {
   const [password, setpassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false);
   const logged = useAppSelector(isLogged)
-  const errorMessage = useAppSelector(errorMsg)
+  const errorMessage = useAppSelector(loginError)
   const [listDepartments, setListDepartments] = useState<DepModel[]>([]);
   const [listRoles, setListRoles] = useState<RolesModel[]>([]);
   const [basicActive, setBasicActive] = useState('tabLogin');
@@ -64,7 +64,8 @@ export function Login() {
   };
   const message = (value: string) => toast.error(value, {
     position: "top-left",
-    autoClose: 5000,
+    //autoClose: 5000,
+    autoClose: false,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
@@ -85,9 +86,9 @@ export function Login() {
   //   setListRoles(data);
   // };
   useEffect(() => {
-    if (errorMessage != "")
+    if (errorMessage && errorMessage != "" )
       message(errorMessage)
-    dispatch(SetErrorMsg())
+    dispatch(SetError())
   }, [errorMessage])
 
   useEffect(() => {
@@ -106,9 +107,7 @@ export function Login() {
   return (
     <div>
       <ToastContainer
-        position="top-left"
-        autoClose={5000}
-        hideProgressBar={false}
+        position="top-left"      
         newestOnTop={false}
         closeOnClick
         rtl={false}
