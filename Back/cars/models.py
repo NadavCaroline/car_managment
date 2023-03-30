@@ -200,6 +200,10 @@ class Drivings(models.Model):
     def user_name(self):
         return self.user.first_name + ' ' + self.user.last_name
     
+    @property
+    def destination(self):
+        return self.order.destination
+    
     def __str__(self):
         return self.user_name + " - " + self.car_name
 

@@ -5,6 +5,7 @@ export interface DriveModel {
     car?: string
     car_name?: string
     car_image?: string
+    destination?: string
     startDate?: Date | string
     endDate?: Date| string
     startKilometer?: string
@@ -16,5 +17,4 @@ export interface DriveModel {
     endImg1?: any
     endImg2?: any
     endImg3?: any
-
 }

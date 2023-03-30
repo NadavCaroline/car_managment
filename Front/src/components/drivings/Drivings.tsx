@@ -268,15 +268,15 @@ export function Drivings() {
         }
 
       </div>
-      {/* {selectedDrive &&
+      {selectedDrive &&
         <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <div style={{ position: "relative", padding: "32px", width: "400px", height: "300px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px" }}>
-            <img src={`http://127.0.0.1:8000${selectedCar.image}`} style={{ width: '150px', height: '100px' }} alt={selectedCar.model} /><br /><br />
-            יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} />
-            <button onClick={() => handleOrder()}>הזמן</button>
+            <img src={`http://127.0.0.1:8000${selectedDrive.car_image}`} style={{ width: '150px', height: '100px' }} alt={selectedDrive.car_name} /><br /><br />
+            {/* יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} /> */}
+            {/* <button onClick={() => handleOrder()}>הזמן</button> */}
           </div>
         </div>
-      } */}
+      }
 
     </div>
   );
