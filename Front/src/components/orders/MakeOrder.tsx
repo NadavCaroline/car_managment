@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { userAccess } from '../login/loginSlice';
 import { addOrderAsync, availableCarsSelector, checkOrderDatesAsync, getOrdersAsync, notAvilableSelector, orderDetailsSelector, ordersSelector } from './OrdersSlice';
 import { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -10,6 +11,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
 import jwt_decode from "jwt-decode"
 import CarModel from '../../models/Car';
+import { MY_SERVER } from '../../env';
 
 
 const MakeOrder = () => {
@@ -116,10 +118,10 @@ const MakeOrder = () => {
     }
   }, [datesFlag, formatedStartTime, formatedEndTime])
 
-const handleOrder = ()=>{
-  dispatch(addOrderAsync({ token: token, order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false } }))
-  setselectedCar(null)
-}
+  const handleOrder = () => {
+    dispatch(addOrderAsync({ token: token, order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false } }))
+    setselectedCar(null)
+  }
 
   return (
     <div style={{ margin: '10px' }}>
@@ -130,6 +132,7 @@ const handleOrder = ()=>{
             {/* Date Picking Component */}
             <DemoItem >
               <DatePicker
+                minDate={dayjs()}
                 format='DD-MM-YYYY'
                 value={selectedStartDate}
                 onChange={handleStartDateChange} />
@@ -140,6 +143,7 @@ const handleOrder = ()=>{
               <div>
                 <DemoItem >
                   <DatePicker
+                    minDate={dayjs()}
                     format='DD-MM-YYYY'
                     value={selectedEndDate}
                     onChange={handleEndDateChange} />
@@ -200,8 +204,8 @@ const handleOrder = ()=>{
               דגם: {car.model}<br />
               צבע: {car.color}<br />
               שנה: {car.year}   <br />
-              <img src={`http://127.0.0.1:8000${car.image}`} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
-              <button onClick={() => setselectedCar(car)}>Order Car</button>
+              <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
+              <button onClick={() => setselectedCar(car)}>הזמן מכונית</button>
             </div>
           </div>)}
       </div>
@@ -218,10 +222,10 @@ const handleOrder = ()=>{
                   דגם: {car.model}<br />
                   צבע: {car.color}<br />
                   שנה: {car.year}   <br />
-                  <img src={`http://127.0.0.1:8000${car.image}`} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
+                  <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
                   <h4>פרטי הזמנה</h4>
                   <div>
-                  <hr />
+                    <hr />
                     {orderDetails && orderDetails.map((order, i) => <div key={i}>
                       מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
                       {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) &&
@@ -230,7 +234,7 @@ const handleOrder = ()=>{
                         </div>
                       }
                       <div> משעה: {order.fromDate!.toString().slice(11, 16)}<br />
-                      עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
+                        עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
                     </div>)}
                   </div>
                 </div>
@@ -238,13 +242,12 @@ const handleOrder = ()=>{
           </div>
         </div>
       }
-      {/* Pop Up Component - Finish Order */}
       {selectedCar &&
         <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <div style={{ position: "relative", padding: "32px", width: "400px", height: "300px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px" }}>
-            <img src={`http://127.0.0.1:8000${selectedCar.image}`} style={{ width: '150px', height: '100px' }} alt={selectedCar.model} /><br /><br />
+            <img src={MY_SERVER + selectedCar.image} style={{ width: '150px', height: '100px' }} alt={selectedCar.model} /><br /><br />
             יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} />
-            <button onClick={() => handleOrder()}>הזמן</button>
+            <button type={'submit'} onClick={() => handleOrder()}>הזמן</button>
           </div>
         </div>
       }

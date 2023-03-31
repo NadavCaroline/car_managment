@@ -69,6 +69,15 @@ export const driveSlice = createSlice({
       })
       .addCase(getAllDrivesAsync.fulfilled, (state, action) => {
         state.allDrives = action.payload
+        state.allDrives = state.allDrives.sort((a: DriveModel, b: DriveModel) => {
+          if (a.startDate! < b.startDate!) {
+            return -1;
+          } else if (a.startDate! > b.startDate!) {
+            return 1;
+          } else {
+            return 0;
+          }
+        })
       })
       .addCase(startDriveAsync.fulfilled, (state, action) => {
         state.drives.push(action.payload)

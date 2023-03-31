@@ -5,6 +5,7 @@ import {
   ordersSelector
 } from './OrdersSlice';
 import { userAccess } from '../login/loginSlice';
+import { MY_SERVER } from '../../env';
 
 
 export function MyOrders() {
@@ -13,7 +14,6 @@ export function MyOrders() {
   // const cars = useAppSelector(carsSelector)
   const dispatch = useAppDispatch();
   const today = new Date()
-
 
   useEffect(() => {
     dispatch(getOrdersAsync(token))
@@ -35,7 +35,7 @@ export function MyOrders() {
                 עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
             }
             יעד: {order.destination}<br />
-            <img src={`http://127.0.0.1:8000${order.car_image}`} style={{ width: '150px', height: '100px' }} alt={order.car_name} /><br />
+            <img src={MY_SERVER + order.car_image} style={{ width: '150px', height: '100px' }} alt={order.car_name} /><br />
           </div>)}
       </div>
       <h3>הזמנות פעילות</h3>
@@ -49,7 +49,7 @@ export function MyOrders() {
                 עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
             }
             יעד: {order.destination}<br />
-            <img src={`http://127.0.0.1:8000${order.car_image}`} style={{ width: '150px', height: '100px' }} alt={order.car_name} /><br />
+            <img src={MY_SERVER + order.car_image} style={{ width: '150px', height: '100px' }} alt={order.car_name} /><br />
           </div>)}
       </div>
       <h3>הזמנות עתידיות</h3>
@@ -63,7 +63,7 @@ export function MyOrders() {
                 עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
             }
             יעד: {order.destination}<br />
-            <img src={`http://127.0.0.1:8000${order.car_image}`} style={{ width: '150px', height: '100px' }} alt={order.car_name} /><br />
+            <img src={MY_SERVER + order.car_image} style={{ width: '150px', height: '100px' }} alt={order.car_name} /><br />
           </div>)}
       </div>
     </div>

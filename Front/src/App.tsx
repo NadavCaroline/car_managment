@@ -48,7 +48,6 @@ function App() {
     }
   }, [])
 
-
   useEffect(() => {
     access && setdecoded(jwt_decode(access))
   }, [access])
