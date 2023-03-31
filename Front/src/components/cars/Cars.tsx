@@ -3,6 +3,7 @@ import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { carsSelector, getAllCarsAsync, getCarsAsync } from './carsSlice';
 import { userToken } from '../login/loginSlice';
 import { getProfileAsync, profileSelector } from '../profile/profileSlicer';
+import { MY_SERVER } from '../../env';
 
 export function Cars() {
   const cars = useAppSelector(carsSelector);
@@ -27,7 +28,7 @@ export function Cars() {
               דגם: {car.model}<br />
               צבע: {car.color}<br />
               שנה: {car.year}   <br />
-              <img src={`http://127.0.0.1:8000${car.image}`} style={{ width: '150px', height: '100px' }} alt={car.model} /><br/>
+              <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br/>
             </div>
 
 

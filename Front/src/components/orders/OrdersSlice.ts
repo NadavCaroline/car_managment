@@ -13,10 +13,10 @@ export interface OrderState {
 }
 
 const initialState: OrderState = {
-  orders: [],
-  availableCars: [],
-  notAvilable: [],
-  orderDetails: []
+  orders: [], // The orders of the user.
+  availableCars: [], // The available cars in a specific date.
+  notAvilable: [], // The taken cars in a specific date.
+  orderDetails: [] // The details about the taken cars - Date and hour.
 };
 
 export const getOrdersAsync = createAsyncThunk(
@@ -39,7 +39,6 @@ export const orderEndedAsync = createAsyncThunk(
   'myOrder/orderEnded',
   async ({ token, id }: { token: string, id: number }) => {
     const response = await orderEnded(token, id);
-    console.log(response)
     return response;
   }
 );
@@ -70,7 +69,6 @@ export const myOrderSlice = createSlice({
         let temp = state.orders.filter(order => order.id === action.payload.id)[0]
         temp.ended = true
       })
-
       .addCase(checkOrderDatesAsync.fulfilled, (state, action) => {
         state.availableCars = action.payload.available
         state.notAvilable = action.payload.notAvilable

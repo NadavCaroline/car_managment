@@ -3,7 +3,8 @@ import { DatesCheck } from '../../models/DatesCheck';
 import OrderModel from '../../models/Order';
 import { MY_SERVER } from '../../env';
 
-// A mock function to mimic making an async request for data
+
+// Gets the order of the user from the server.
 export const getOrders = async (token: string) => {
   return axios.get(MY_SERVER + 'orders', 
     {
@@ -13,7 +14,7 @@ export const getOrders = async (token: string) => {
     }).then((res) => res.data);
 }
 
-
+// Create a new order object.
 export const addOrder = async (token: string, order: OrderModel) => {
   return axios.post(MY_SERVER + 'orders', order,
     {
@@ -23,6 +24,7 @@ export const addOrder = async (token: string, order: OrderModel) => {
     }).then((res) => res.data);
 }
 
+// Check the available rental dates for the cars.
 export const checkOrderDates = async (token: string, dates: DatesCheck) => {
   return axios.post(MY_SERVER + 'CheckOrders', dates,
     {
@@ -32,6 +34,7 @@ export const checkOrderDates = async (token: string, dates: DatesCheck) => {
     }).then((res) => res.data);
 }
 
+// After the Driver ended the drive that was connected to the order.
 export const orderEnded = async (token: string, id: number) => {
 
   return axios.put(MY_SERVER + 'orders/' + id,
