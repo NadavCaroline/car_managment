@@ -23,6 +23,9 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 @api_view(['POST'])
 def register(request):
+    print(request.data)
+    # print(type(request.data['profile']['rolelvel']))
+
     msg=""
     if User.objects.filter(username=request.data['user']['username']).exists():
         msg={"status":"error","msg":"משתמש כבר קיים"}
@@ -48,7 +51,7 @@ def register(request):
         profile = Profile.objects.create(
             user=user,
             jobTitle=request.data['profile']['jobTitle'],
-            roleLevel=request.data['profile']['roleLevel'],
+            roleLevel= Roles.objects.get(id= request.data['profile']['roleLevel']),
             department=department,
             realID=request.data['profile']['realID'],
             )

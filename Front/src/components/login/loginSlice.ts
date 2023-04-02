@@ -40,6 +40,8 @@ export const loginWithRefreshAsync = createAsyncThunk(
 export const regAsync = createAsyncThunk(
   'login/register',
   async ({ user, profile }: { user: UserModel, profile: ProfileModel }) => {
+    console.log(user)
+    console.log(profile)
     const response = await register(user, profile);
     return response;
   }

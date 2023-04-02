@@ -50,11 +50,6 @@ export function Login() {
 
   
 
-
-
-
-
-
   const handleBasicClick = (value: string) => {
     if (value === basicActive) {
       return;
@@ -170,7 +165,7 @@ export function Login() {
               </form>
             </MDBTabsPane>
             <MDBTabsPane show={basicActive === 'tabRegister'}>
-              <form style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+              <form onSubmit={onSubmit} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                 <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Register</h1>
                 {/* <!-- First Name input --> */}
                 <div className="form-floating mb-2">
@@ -240,7 +235,7 @@ export function Login() {
                 </div>
                 {/* <button type="submit" className="btn btn-primary btn-block mb-3">Register</button> */}
 
-                <button type="submit" onClick={() => dispatch(regAsync({  user: { first_name: firstName, last_name: lastName,password:passwordReg, username: userNameReg,email:email },profile:{jobTitle: jobTitle, roleLevel: role, department: department, realID:Id } }))} className="btn btn-primary btn-block mb-3">Register</button>
+                <button type='submit'  onClick={() => dispatch(regAsync({  user: { first_name: firstName, last_name: lastName,password:passwordReg, username: userNameReg,email:email },profile:{jobTitle: jobTitle, roleLevel: role, department: department, realID:Id } }))} className="btn btn-primary btn-block mb-3">Register</button>
               </form>
             </MDBTabsPane>
           </MDBTabsContent>
