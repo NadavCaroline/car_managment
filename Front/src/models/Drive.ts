@@ -7,6 +7,8 @@ export interface DriveModel {
     car_image?: string
     startDate?: Date | string
     endDate?: Date| string
+    startTime?: string 
+    endTime?: string 
     startKilometer?: string
     endKilometer?: string
     comments?: string

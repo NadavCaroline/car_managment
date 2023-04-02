@@ -77,7 +77,6 @@ export const loginSlice = createSlice({
   extraReducers: (builder) => {
     builder
     .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
-      console.log(action.payload.access)
       state.access = action.payload.access;
       localStorage.setItem("access", action.payload.access)
       localStorage.setItem("refresh", action.payload.refresh) 
