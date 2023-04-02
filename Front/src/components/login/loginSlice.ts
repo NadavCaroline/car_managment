@@ -11,7 +11,8 @@ export interface loginState {
   refresh: any
   logged: boolean
   remember: boolean
-  errorMsg: any
+  error: string | null;
+  msg:string | null;
 }
 
 const initialState: loginState = {
@@ -19,8 +20,10 @@ const initialState: loginState = {
   refresh: localStorage.getItem('refresh'),
   logged: localStorage.hasOwnProperty('access') || localStorage.hasOwnProperty('remember'),
   remember: localStorage.hasOwnProperty('refresh'),
-  errorMsg: ""
+  error: "",
+  msg:""
 };
+
 
 export const loginAsync = createAsyncThunk(
   'login/login',
@@ -79,36 +82,65 @@ export const loginSlice = createSlice({
       state.remember = false
 
     },
-    SetErrorMsg: (state) => {
-      state.errorMsg = ""
+    SetError: (state) => {
+      state.error = ""
+    },
+    SetMsg: (state) => {
+      state.msg = ""
     },
   },
 
   extraReducers: (builder) => {
     builder
       .addCase(regAsync.fulfilled, (state, action) => {
-        console.log(action);
-        // state.errorMsg=action.payload.;
-  })
-    .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
-      console.log(action.payload.access)
-      state.access = action.payload.access;
-      localStorage.setItem("access", action.payload.access)
-      localStorage.setItem("refresh", action.payload.refresh) 
-      state.logged = true
-    })
-      .addCase(loginAsync.fulfilled, (state, action) => {
+        if (action.payload.status === "error") {
+          state.error=action.payload.msg;
+        }
+        else if (action.payload.status === "success"){
+            state.msg=action.payload.msg;
+        }
+        
+       
+        // state.error=action.payload.;
+      })
+      .addCase(regAsync.rejected, (state, action) => {
+        // state.isLoading = false;
+        state.error ="error";
+      //  state.error = action.error.message ?? 'An error occurred.';
+      })
+      .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
+        console.log(action.payload.access)
         state.access = action.payload.access;
-        state.refresh = action.payload.refresh;
         localStorage.setItem("access", action.payload.access)
-        state.remember && localStorage.setItem("refresh", action.payload.refresh)
+        localStorage.setItem("refresh", action.payload.refresh)
         state.logged = true
-      });
+      })
+      // .addCase(loginWithRefreshAsync.rejected, (state, action) => {
+      //   state.error = action.error.message ?? 'An error occurred.';
+      // })
+      .addCase(loginAsync.fulfilled, (state, action) => {
+        if (action.payload.status === 200) {
+          let d = action.payload.data;
+          state.access = d.access;
+          state.refresh = d.refresh;
+          localStorage.setItem("access", d.access)
+          state.remember && localStorage.setItem("refresh", d.refresh)
+          state.logged = true
+        }
+        else if (action.payload.status === 401) {
+          state.error ="משתמש לא קיים או סיסמא לא נכונה";
+        }
+
+      })
+    // .addCase(loginAsync.rejected, (state, action) => {
+    //   state.error = action.error.message ?? 'An error occurred.';
+    // });
   },
 });
 
-export const { logout, remember, dontRemember, SetErrorMsg } = loginSlice.actions;
-export const errorMsg = (state: RootState) => state.login.errorMsg;
+export const { logout, remember, dontRemember, SetError,SetMsg } = loginSlice.actions;
+export const loginError = (state: RootState) => state.login.error;
+export const loginMsg = (state: RootState) => state.login.msg;
 export const userAccess = (state: RootState) => state.login.access;
 export const userRefresh = (state: RootState) => state.login.refresh;
 export const isLogged = (state: RootState) => state.login.logged;
