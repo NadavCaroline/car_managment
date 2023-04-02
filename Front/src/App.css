@@ -179,6 +179,12 @@
 .nav-pills li {
   margin-left: 5px !important; 
 } 
+input.invalid {
+  border-color: red;
+}
+select.invalid {
+  border-color: red;
+}
 
 
 

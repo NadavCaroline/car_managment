@@ -50,7 +50,77 @@ export function Login() {
   const [Id, setId] = useState(-1)
 
   
+const checkvalidForm=()=>{
+  let msg=""
+  const expressionEmail: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+  if(!firstName){
+    msg="נא להזין שם פרטי"
+  }
+  else if (!lastName){
+    msg="נא להזין שם משפחה"
+  }
+  else if (!userNameReg){
+    msg="נא להזין שם משתמש"
+  }
+  else if (!Id){
+    msg="נא להכניס מספר תעודת זהות"
+  }
+  else if(Id.toString().length!==9){
+    msg="מספר תעודת זהות חייב להיות 9 ספרות"
+  }
+  else if (!email){
+    msg="נא להזין מייל "
+  }
+  else if(!expressionEmail.test(email))
+  {
+    msg="נא להזין מייל תקין"
+  }
+  else if (!passwordReg){
+    msg="נא להזין סיסמא "
+  }
+  else if (!repeatPassword){
+    msg="נא להזין שוב סיסמא "
+  }
+  else if(passwordReg!==repeatPassword)
+  {
+    msg="סיסמא אינה תואמת לסיסמא שהכנסת שוב "
+  }
+  else if (!department || department==-1){
+    msg="נא לבחור מחלקה"
+  }
+  else if (!role || role==-1){
+    msg="נא לבחור סוג הרשאה"
+  }
+  else if (!jobTitle){
+    msg="נא להכניס תפקיד"
+  }
+  
 
+  if(msg){
+    const inputElement = document.getElementById('registerUsername') as HTMLInputElement;
+    inputElement.setCustomValidity("EEROOR");
+    inputElement.reportValidity();
+    inputElement.focus();
+    inputElement.classList.add('invalid');
+    // messageError(msg)
+    return false
+  }
+  else{
+    return true
+  }
+  
+  // dispatch(SetError(msg))
+
+  // const form = document.getElementById('formRegister') as HTMLFormElement;
+  // if (form.checkValidity()) {
+  //   // form.submit();
+  //   return true;
+  // }
+  // else{
+  //   return false
+  // }
+  
+}
   const handleBasicClick = (value: string) => {
     if (value === basicActive) {
       return;
@@ -85,6 +155,7 @@ export function Login() {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+   
   }
   // // Function to load list Roles and update state
   // const getListRoles = async () => {
@@ -94,13 +165,13 @@ export function Login() {
   //   setListRoles(data);
   // };
   useEffect(() => {
-    if (errorMessage && errorMessage != "" )
+    if (errorMessage && errorMessage !== "" )
     messageError(errorMessage)
     dispatch(SetError())
   }, [errorMessage])
 
   useEffect(() => {
-    if (loginMessage && loginMessage != "" )
+    if (loginMessage && loginMessage !== "" )
       message(loginMessage)
     dispatch(SetMsg())
   }, [loginMessage])
@@ -184,11 +255,13 @@ export function Login() {
               </form>
             </MDBTabsPane>
             <MDBTabsPane show={basicActive === 'tabRegister'}>
-              <form onSubmit={onSubmit} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+              <form onSubmit={onSubmit} id="formRegister" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                 <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Register</h1>
                 {/* <!-- First Name input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text" id="registerFistName" onChange={(e) => setFistName(e.target.value)} className="form-control" placeholder="First Name" required />
+                  {/* <input type="text" id="registerFistName" onChange={(e) => setFistName(e.target.value)} className="form-control" placeholder="First Name" required onInvalid={(e) => {const inputElement = e.target as HTMLInputElement;  inputElement.setCustomValidity('הכנס שם פרטי!!')}} 
+          onInput={(e) => {const inputElement = e.target as HTMLInputElement;inputElement.setCustomValidity('')}} /> */}
+                 <input type="text" id="registerFistName" onChange={(e) => setFistName(e.target.value)} className="form-control" placeholder="First Name"  />
                   <label className="form-label" htmlFor="registerFisrtName" style={{ marginLeft: "0px" }}>First Name</label>
                 </div>
                 {/* <!-- Last Name input --> */}
@@ -203,7 +276,7 @@ export function Login() {
                 </div>
                 {/* <!-- ID input --> */}
                 <div className="form-floating mb-2">
-                  <input type="number" id="registerId" onChange={(e) => setId(Number(e.target.value))} className="form-control" placeholder="ID" required />
+                  <input type="number" id="registerId" onChange={(e) => setId(Number(e.target.value))} className="form-control" placeholder="ID" minLength={9} maxLength={9}  required />
                   <label className="form-label" htmlFor="registerId" style={{ marginLeft: "0px" }}>ID</label>
                 </div>
                 {/* <!-- Email input --> */}
@@ -223,7 +296,7 @@ export function Login() {
                 </div>
                 {/* <!-- Department select --> */}
                 <div className="form-floating mb-2">
-                  <select id="selectDepartment" onChange={(e) => setDepartment(Number(e.target.value))} className="form-select" defaultValue={'DEFAULT'} required>
+                  <select id="selectDepartment" onChange={(e) => setDepartment(Number(e.target.value))} className="form-select" defaultValue={'DEFAULT'} required >
                     <option value="DEFAULT" disabled>Choose a Department ...</option>
                     {listDepartments.map(item => (
                       <option value={item.id} key={item.id} >{item.name}</option>
@@ -236,7 +309,7 @@ export function Login() {
                 </div>
                 {/* <!-- Role level select --> */}
                 <div className="form-floating mb-2">
-                  <select id="selectRole" onChange={(e) => setRole(Number(e.target.value))} className="form-select" defaultValue={'DEFAULT'} required>
+                  <select id="selectRole" onChange={(e) => setRole(Number(e.target.value))} className="form-select" defaultValue={'DEFAULT'} required >
                     <option value="DEFAULT" disabled>Choose a Role ...</option>
                     {listRoles.map(item => (
                       <option value={item.id} key={item.id}>{item.name}</option>
@@ -249,12 +322,12 @@ export function Login() {
                 </div>
                 {/* <!-- JobTitle input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text" id="registerJobTitle" onChange={(e) => setJobTitle(e.target.value)} className="form-control" placeholder="JobTitle" required />
+                  <input type="text" id="registerJobTitle" onChange={(e) => setJobTitle(e.target.value)} className="form-control" placeholder="JobTitle" required  />
                   <label className="form-label" htmlFor="registerJobTitle" style={{ marginLeft: "0px" }}>JobTitle</label>
                 </div>
                 {/* <button type="submit" className="btn btn-primary btn-block mb-3">Register</button> */}
 
-                <button type='submit'  onClick={() => dispatch(regAsync({  user: { first_name: firstName, last_name: lastName,password:passwordReg, username: userNameReg,email:email },profile:{jobTitle: jobTitle, roleLevel: role, department: department, realID:Id } }))} className="btn btn-primary btn-block mb-3">Register</button>
+                <button type='submit'    onClick={() => checkvalidForm() && dispatch(regAsync({  user: { first_name: firstName, last_name: lastName,password:passwordReg, username: userNameReg,email:email },profile:{jobTitle: jobTitle, roleLevel: role, department: department, realID:Id } }))} className="btn btn-primary btn-block mb-3">Register</button>
               </form>
             </MDBTabsPane>
           </MDBTabsContent>
