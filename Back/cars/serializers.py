@@ -127,7 +127,7 @@ class DrivingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drivings
         fields = ['id', 'user', 'user_name',  'car_name', 'startDate', 'endDate',
-                  'startKilometer', 'endKilometer', 'comments', 'car_image',
+                  'startKilometer', 'endKilometer', 'comments', 'car_image', 'destination',
                   'startImg1', 'startImg2', 'startImg3', 'endImg1', 'endImg2', 'endImg3']
 
 
