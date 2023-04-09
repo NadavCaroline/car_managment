@@ -1,6 +1,6 @@
 export interface DriveModel {
     id?: number
-    order?: any
+    order?: number
     user?: any
     car?: string
     car_name?: string

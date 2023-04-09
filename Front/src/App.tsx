@@ -18,6 +18,7 @@ import { faBell } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'react-bootstrap/Dropdown';
 import { isLogged, loginWithRefreshAsync, logout, userAccess, userRefresh } from './components/login/loginSlice';
 import { Login } from './components/login/Login';
+import { getOrdersAsync } from './components/orders/OrdersSlice';
 
 function App() {
   // const uNameeee = useAppSelector(selectuserName);
@@ -52,6 +53,10 @@ function App() {
     access && setdecoded(jwt_decode(access))
   }, [access])
 
+  useEffect(() => {
+    dispatch(getOrdersAsync(access))
+  }, [])
+  
   return (
     logged ?
       <div>

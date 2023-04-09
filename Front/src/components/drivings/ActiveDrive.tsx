@@ -60,10 +60,6 @@ const ActiveDrive = () => {
     };
 
 
-    useEffect(() => {
-        startSelectedFile1 && console.log(startSelectedFile1)
-    }, [startSelectedFile1])
-
     // Detects the active order by the date of today
     const handleCurrentOrder = () => {
         const today = new Date()
@@ -88,8 +84,6 @@ const ActiveDrive = () => {
     useEffect(() => {
         const startStopBtn = document.querySelector('.round') as HTMLButtonElement;
         if (localStorage.hasOwnProperty('isRunning')) {
-            startStopBtn.textContent = 'Stop';
-            startStopBtn.className = "round redBtn";
             setIsRunning(true)
         }
     }, [])
@@ -166,6 +160,50 @@ const ActiveDrive = () => {
             startStopBtn.className = "round greenBtn";
         }
     };
+    // Handles the auto fill of the start/end date of a drive
+    // if the user didn't start/end the drive
+    useEffect(() => {
+
+        if (orders && drives) {
+            if ((orders[orders.length - 1]?.ended === false) && (new Date().getTime() > new Date(orders[orders.length - 1].toDate).getTime())) {
+                console.log("First if")
+                if (orders[orders.length - 1]?.id === drives[drives.length - 1].order) {
+                    console.log("Second if - The drive is active")
+
+                    dispatch(endDriveAsync({
+                        token: token, drive: drives[drives.length - 1]
+                    }))
+                    dispatch(orderEndedAsync({
+                        token: token,
+                        id: orders[orders.length - 1].id!
+                    }))
+                    setactiveDrive(null)
+                    setIsRunning(false)
+                    localStorage.removeItem('isRunning')
+                    localStorage.removeItem('activeDrive')
+                } else {
+                    console.log("Else - The drive isn't active")
+                    console.log(orders[orders.length - 1].id!)
+                    dispatch(startDriveAsync({
+                        token: token, drive: {
+                            user: decoded.user_id,
+                            order: orders[orders.length - 1]?.id,
+                        }
+                    }))
+                    dispatch(endDriveAsync({
+                        token: token, drive: drives[drives.length - 1]
+                    }))
+                    dispatch(orderEndedAsync({
+                        token: token,
+                        id: orders[orders.length - 1].id!
+                    }))
+                }
+            } else {
+                console.log("First Else")
+            }
+
+        }
+    }, [orders.length, drives.length])
 
     return (
         <div>
@@ -195,12 +233,12 @@ const ActiveDrive = () => {
                                 style={{ width: '150px', height: '100px' }} /><br />
                             <input type='file' onChange={handleendFile3Change} />
                         </div>}
-                    {endSelectedFile3 && 
-                    <div>
-                        <img src={URL.createObjectURL(endSelectedFile3)}
+                    {endSelectedFile3 &&
+                        <div>
+                            <img src={URL.createObjectURL(endSelectedFile3)}
                                 alt={endSelectedFile3.name}
                                 style={{ width: '150px', height: '100px' }} /><br />
-                    </div>
+                        </div>
                     }
                     הערות: <input onChange={(e) => setcomments(e.target.value)} />
                     <div className="d-flex justify-content-center">
