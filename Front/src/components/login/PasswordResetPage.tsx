@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 
 
 interface Props {
@@ -23,6 +25,7 @@ const PasswordResetPage = () => {
         password: string;
         confirmPassword: string;
     };
+    const [passwordShown, setPasswordShown] = useState(false);
     const emailRegExp: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     const validationSchema = Yup.object().shape({
         password: Yup.string()
@@ -42,7 +45,7 @@ const PasswordResetPage = () => {
     } = useForm<UserResetForm>({
         resolver: yupResolver(validationSchema)
     });
-    
+
     const onReset = (data: UserResetForm) => {
         console.log(JSON.stringify(data, null, 2));
         // Send a request to the backend to update the password
@@ -54,25 +57,49 @@ const PasswordResetPage = () => {
             //   confirmPassword: data.confirmPassword,
             // });
             // handle success
-          } catch (error) {
+        } catch (error) {
             // setError(error.response.data.detail);
-          }
+        }
+    };
+    // Password toggle handler
+    const togglePassword = () => {
+        // When the handler is invoked
+        // inverse the boolean state of passwordShown
+        setPasswordShown(!passwordShown);
     };
     return (
         <form id="resetPasswordPage" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
             <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Reset password</h1>
             {/* <!-- Password input --> */}
-            <div className="form-floating mb-2">
-                <input type="password" id="registerPassword"  {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
-                <div className="invalid-feedback">{errors.password?.message}</div>
-                <label className="form-label" htmlFor="registerPassword" style={{ marginLeft: "0px" }} >Password</label>
+            <div className="input-group mb-3">
+                <div className="form-floating">
+                    <input type={passwordShown ? "text" : "password"} {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} placeholder="Password"   id="passwordReset"/>
+                    <label htmlFor="floatingPassword">Password</label>
+                    <div className="invalid-feedback">{errors.password?.message}</div>
+                </div>
+                <span className="input-group-text">
+                    <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
+                        {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                    </i>
+                </span>
+                
             </div>
+            
             {/* <!-- Confirm Password input --> */}
-            <div className="form-floating mb-2">
-                <input type="password" id="registerConfirmPassword"   {...register('confirmPassword')} className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`} />
-                <div className="invalid-feedback"> {errors.confirmPassword?.message}</div>
-                <label className="form-label" htmlFor="registerConfirmPassword" style={{ marginLeft: "0px" }}>Confirm password</label>
+            <div className="input-group mb-3">
+                <div className="form-floating">
+                    <input type={passwordShown ? "text" : "password"} {...register('confirmPassword')} className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`} placeholder="Confirm Password"  id="confirmPasswordReset" />
+                    <label htmlFor="confirmPassword">Confirm Password</label>
+                    <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
+                </div>
+                <span className="input-group-text">
+                    <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
+                        {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                    </i>
+                </span>
+               
             </div>
+           
             <div className="col text-center">
                 <button type='submit' className="btn btn-primary" >Reset Password</button>
             </div>

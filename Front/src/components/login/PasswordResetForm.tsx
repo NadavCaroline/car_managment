@@ -37,7 +37,7 @@ const PasswordResetForm = () => {
     <form id="resetPasswordForm" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
     <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Reset password</h1>
     <div className="form-floating mb-2">
-      <input type="email" id="registerEmail"   {...register('email')} className={`form-control ${errors.email ? 'is-invalid' : ''}`}  />
+      <input type="email" id="registerEmail"   {...register('email')} className={`form-control ${errors.email ? 'is-invalid' : ''}`} placeholder="Email" />
       <div className="invalid-feedback">{errors.email?.message}</div>
       <label className="form-label" htmlFor="registerEmail" style={{ marginLeft: "0px" }}>Email</label>
     </div>
