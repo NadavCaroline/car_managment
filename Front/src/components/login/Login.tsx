@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import  PasswordResetForm from './PasswordResetForm';
+import PasswordResetPage from './PasswordResetPage'
+
 import {
   // isLogged,
  // logout,
@@ -171,7 +174,6 @@ export function Login() {
         pauseOnHover
         theme="colored"
       />
-
       <div className="row mt-3" style={{ direction: "ltr" }}>
         <div className="mx-auto col-10 col-md-8 col-lg-6">
           <MDBTabs pills fill className='mb-3'>
@@ -222,6 +224,10 @@ export function Login() {
                   <button type='submit' className="btn btn-primary" >Log in</button>
                 </div>
               </form>
+
+              <PasswordResetForm/>
+              <PasswordResetPage/>
+             
             </MDBTabsPane>
             <MDBTabsPane show={basicActive === 'tabRegister'}>
               <form id="formRegister" onSubmit={handleSubmit(onSubmitReg)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
