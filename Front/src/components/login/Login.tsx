@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import PasswordResetForm from './PasswordResetForm';
+import PasswordResetPage from './PasswordResetPage'
+
 import {
   // isLogged,
- // logout,
+  // logout,
   loginAsync,
   regAsync,
   getDepartmentsAsync,
@@ -18,7 +21,7 @@ import {
   MDBTabsPane
 } from 'mdb-react-ui-kit';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faVcard } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faVcard, faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons'
 import { DepModel } from '../../models/Deps'
 import { RolesModel } from '../../models/Roles'
 import { ToastContainer, toast } from 'react-toastify';
@@ -40,18 +43,20 @@ export function Login() {
   const [listRoles, setListRoles] = useState<RolesModel[]>([]);
   const [basicActive, setBasicActive] = useState('tabLogin');
   const token = useAppSelector(userToken)
+  const [passwordShown, setPasswordShown] = useState(false);
+
 
   type UserSubmitForm = {
     firstName: string;
-    lastName:string;
+    lastName: string;
     userName: string;
-    id:number;
+    id: number;
     email: string;
     password: string;
     confirmPassword: string;
-    department:number;
-    role:number
-    jobTitle:string;
+    department: number;
+    role: number
+    jobTitle: string;
     // acceptTerms: boolean;
   };
   const emailRegExp: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -69,7 +74,7 @@ export function Login() {
     email: Yup.string()
       .required('נא להזין מייל')
       .email('מייל לא תקין')
-      .matches(emailRegExp,'מייל לא תקין'),
+      .matches(emailRegExp, 'מייל לא תקין'),
     password: Yup.string()
       .required('נא להזין סיסמא')
       .min(4, 'סיסמא חייבת להיות לפחות 4 תווים')
@@ -78,9 +83,9 @@ export function Login() {
       .required('נא להזין אימות סיסמא')
       .oneOf([Yup.ref('password')], 'אימות סיסמא לא תואם לסיסמא שהכנסת'),
     department: Yup.string()
-    .required('נא לבחור מחלקה'),
+      .required('נא לבחור מחלקה'),
     role: Yup.string()
-    .required('נא להזין הרשאה'),
+      .required('נא להזין הרשאה'),
     jobTitle: Yup.string()
       .required('נא להזין תפקיד')
     // acceptTerms: Yup.bool().oneOf([true], 'Accept Terms is required')
@@ -102,7 +107,7 @@ export function Login() {
     console.log(JSON.stringify(data, null, 2));
     dispatch(regAsync({ user: { first_name: data.firstName, last_name: data.lastName, password: data.password, username: data.userName, email: data.email }, profile: { jobTitle: data.jobTitle, roleLevel: data.role, department: data.department, realID: data.id } }));
   };
- 
+
   const handleBasicClick = (value: string) => {
     if (value === basicActive) {
       return;
@@ -158,7 +163,12 @@ export function Login() {
     rememberMe ? dispatch(remember()) : dispatch(dontRemember())
   }, [rememberMe])
 
-
+  // Password toggle handler
+  const togglePassword = () => {
+    // When the handler is invoked
+    // inverse the boolean state of passwordShown
+    setPasswordShown(!passwordShown);
+  };
   return (
     <div>
       <ToastContainer
@@ -171,7 +181,6 @@ export function Login() {
         pauseOnHover
         theme="colored"
       />
-
       <div className="row mt-3" style={{ direction: "ltr" }}>
         <div className="mx-auto col-10 col-md-8 col-lg-6">
           <MDBTabs pills fill className='mb-3'>
@@ -200,10 +209,21 @@ export function Login() {
                     Please provide a User name.
                   </div>
                 </div>
-                <div className="form-floating">
+                <div className="input-group mb-3">
+                  <div className="form-floating">
+                    <input type={passwordShown ? "text" : "password"} onChange={(e) => setpassword(e.target.value)} className="form-control" id="floatingPassword" placeholder="Password" required />
+                    <label htmlFor="floatingPassword">Password</label>
+                  </div>
+                  <span className="input-group-text">
+                    <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
+                      {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                    </i>
+                  </span>
+                </div>
+                {/* <div className="form-floating">
                   <input type="password" onChange={(e) => setpassword(e.target.value)} className="form-control" id="floatingPassword" placeholder="Password" required />
                   <label htmlFor="floatingPassword">Password</label>
-                </div>
+                </div> */}
                 <div className="row mb-2" style={{ marginTop: "1.5rem " }}>
                   <div className="col-md-6 d-flex justify-content-center">
                     <div className="form-check mb-3 mb-md-0">
@@ -222,55 +242,89 @@ export function Login() {
                   <button type='submit' className="btn btn-primary" >Log in</button>
                 </div>
               </form>
+
+              <PasswordResetForm />
+              <PasswordResetPage />
+
             </MDBTabsPane>
             <MDBTabsPane show={basicActive === 'tabRegister'}>
               <form id="formRegister" onSubmit={handleSubmit(onSubmitReg)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                 <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Register</h1>
                 {/* <!-- First Name input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text"  id="registerFirstName" {...register('firstName')} className={`form-control ${errors.firstName ? 'is-invalid' : ''}`} />
+                  <input type="text" id="registerFirstName" {...register('firstName')} className={`form-control ${errors.firstName ? 'is-invalid' : ''}`} placeholder="First Name" />
                   <div className="invalid-feedback">{errors.firstName?.message}</div>
                   <label className="form-label" htmlFor="registerFirstName" style={{ marginLeft: "0px" }}>First Name</label>
                 </div>
                 {/* <!-- Last Name input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text" id="registerLastName"  {...register('lastName')} className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}/>
+                  <input type="text" id="registerLastName"  {...register('lastName')} className={`form-control ${errors.lastName ? 'is-invalid' : ''}`} placeholder="Last Name" />
                   <div className="invalid-feedback">{errors.lastName?.message}</div>
                   <label className="form-label" htmlFor="registerLastName" style={{ marginLeft: "0px" }}>Last Name</label>
                 </div>
                 {/* <!-- Username input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text" id="registerUsername"  {...register('userName')}  className={`form-control ${errors.userName ? 'is-invalid' : ''}`} />
+                  <input type="text" id="registerUsername"  {...register('userName')} className={`form-control ${errors.userName ? 'is-invalid' : ''}`} placeholder="User Name" />
                   <div className="invalid-feedback">{errors.userName?.message}</div>
                   <label className="form-label" htmlFor="registerUsername" style={{ marginLeft: "0px" }}>Username</label>
                 </div>
                 {/* <!-- ID input --> */}
                 <div className="form-floating mb-2">
-                  <input type="number" id="registerId" {...register('id')}  className={`form-control ${errors.id ? 'is-invalid' : ''}`} />
+                  <input type="number" id="registerId" {...register('id')} className={`form-control ${errors.id ? 'is-invalid' : ''}`} placeholder="Id" />
                   <div className="invalid-feedback">{errors.id?.message}</div>
                   <label className="form-label" htmlFor="registerId" style={{ marginLeft: "0px" }}>ID</label>
                 </div>
                 {/* <!-- Email input --> */}
                 <div className="form-floating mb-2">
-                  <input type="email" id="registerEmail"   {...register('email')} className={`form-control ${errors.email ? 'is-invalid' : ''}`}  />
+                  <input type="email" id="registerEmail"   {...register('email')} className={`form-control ${errors.email ? 'is-invalid' : ''}`} placeholder="Email" />
                   <div className="invalid-feedback">{errors.email?.message}</div>
                   <label className="form-label" htmlFor="registerEmail" style={{ marginLeft: "0px" }}>Email</label>
                 </div>
                 {/* <!-- Password input --> */}
-                <div className="form-floating mb-2">
-                  <input type="password" id="registerPassword"  {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
+                <div className="input-group mb-3">
+                  <div className="form-floating">
+                    <input type={passwordShown ? "text" : "password"} {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} placeholder="Password" id="registerPassword" />
+                    <label htmlFor="registerPassword" style={{ marginLeft: "0px" }}>Password</label>
+                    <div className="invalid-feedback">{errors.password?.message}</div>
+                  </div>
+                  <span className="input-group-text">
+                    <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
+                      {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                    </i>
+                  </span>
+                </div>
+                {/* <div className="form-floating mb-2">
+                  <input type={passwordShown ? "text" : "password"} id="registerPassword"  {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} placeholder="Password" />
                   <div className="invalid-feedback">{errors.password?.message}</div>
                   <label className="form-label" htmlFor="registerPassword" style={{ marginLeft: "0px" }} >Password</label>
-                </div>
+                  <span className="input-group-text">
+                    <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
+                        {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                    </i>
+                </span>
+                </div> */}
                 {/* <!-- Confirm Password input --> */}
-                <div className="form-floating mb-2">
-                  <input type="password" id="registerConfirmPassword"   {...register('confirmPassword')} className={`form-control ${ errors.confirmPassword ? 'is-invalid' : '' }`} />
+                <div className="input-group mb-3">
+                  <div className="form-floating">
+                    <input type={passwordShown ? "text" : "password"} {...register('confirmPassword')} className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`} placeholder="Confirm Password" id="registerConfirmPassword" />
+                    <label htmlFor="registerConfirmPassword" style={{ marginLeft: "0px" }}>Confirm Password</label>
+                    <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
+                  </div>
+                  <span className="input-group-text">
+                    <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
+                      {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                    </i>
+                  </span>
+                </div>
+
+                {/* <div className="form-floating mb-2">
+                  <input type={passwordShown ? "text" : "password"} id="registerConfirmPassword"   {...register('confirmPassword')} className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`} placeholder="Confirm Password" />
                   <div className="invalid-feedback"> {errors.confirmPassword?.message}</div>
                   <label className="form-label" htmlFor="registerConfirmPassword" style={{ marginLeft: "0px" }}>Confirm password</label>
-                </div>
+                </div> */}
                 {/* <!-- Department select --> */}
                 <div className="form-floating mb-2">
-                  <select id="selectDepartment" {...register('department')} className={`form-select ${errors.department ? 'is-invalid' : ''}`}   defaultValue={''}  >
+                  <select id="selectDepartment" {...register('department')} className={`form-select ${errors.department ? 'is-invalid' : ''}`} defaultValue={''}  >
                     <option value="" disabled>בחר מחלקה...</option>
                     {listDepartments.map(item => (
                       <option value={item.id} key={item.id} >{item.name}</option>
@@ -281,7 +335,7 @@ export function Login() {
                 </div>
                 {/* <!-- Role level select --> */}
                 <div className="form-floating mb-2">
-                  <select id="selectRole"  {...register('role')} className={`form-select ${errors.role ? 'is-invalid' : ''}`}  defaultValue={''} >
+                  <select id="selectRole"  {...register('role')} className={`form-select ${errors.role ? 'is-invalid' : ''}`} defaultValue={''} >
                     <option value="" disabled>בחר הרשאה...</option>
                     {listRoles.map(item => (
                       <option value={item.id} key={item.id}>{item.name}</option>
@@ -292,7 +346,7 @@ export function Login() {
                 </div>
                 {/* <!-- JobTitle input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text" id="registerJobTitle"   {...register('jobTitle')} className={`form-control ${ errors.jobTitle ? 'is-invalid' : '' }`} />
+                  <input type="text" id="registerJobTitle"   {...register('jobTitle')} className={`form-control ${errors.jobTitle ? 'is-invalid' : ''}`} placeholder="Job Title" />
                   <div className="invalid-feedback"> {errors.jobTitle?.message}</div>
                   <label className="form-label" htmlFor="registerJobTitle" style={{ marginLeft: "0px" }}>JobTitle</label>
                 </div>
