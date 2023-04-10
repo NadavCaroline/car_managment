@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import {
-  isLogged,
+  // isLogged,
+ // logout,
   loginAsync,
   regAsync,
-  logout,
   getDepartmentsAsync,
   getRolesAsync,
   remember,
-  dontRemember, userToken, loginError, SetError,loginMsg,SetMsg
+  dontRemember, userToken, loginError, SetError, loginMsg, SetMsg
 } from './loginSlice';
 import {
   MDBTabs,
@@ -23,6 +23,9 @@ import { DepModel } from '../../models/Deps'
 import { RolesModel } from '../../models/Roles'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 
 export function Login() {
 
@@ -30,7 +33,7 @@ export function Login() {
   const [username, setusername] = useState("")
   const [password, setpassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false);
-  const logged = useAppSelector(isLogged)
+  // const logged = useAppSelector(isLogged)
   const errorMessage = useAppSelector(loginError)
   const loginMessage = useAppSelector(loginMsg)
   const [listDepartments, setListDepartments] = useState<DepModel[]>([]);
@@ -38,94 +41,72 @@ export function Login() {
   const [basicActive, setBasicActive] = useState('tabLogin');
   const token = useAppSelector(userToken)
 
-  const [firstName, setFistName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [userNameReg, setUserNameReg] = useState("")
-  const [email, setEmail] = useState("")
-  const [passwordReg, setPasswordReg] = useState("")
-  const [repeatPassword, setRepeatPassword] = useState("")
-  const [department, setDepartment] = useState(-1)
-  const [role, setRole] = useState(-1)
-  const [jobTitle, setJobTitle] = useState("")
-  const [Id, setId] = useState(-1)
+  type UserSubmitForm = {
+    firstName: string;
+    lastName:string;
+    userName: string;
+    id:number;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    department:number;
+    role:number
+    jobTitle:string;
+    // acceptTerms: boolean;
+  };
+  const emailRegExp: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required('נא להזין שם פרטי'),
+    lastName: Yup.string().required('נא להזין שם משפחה'),
+    userName: Yup.string()
+      .required('נא להזין שם משתמש')
+      .min(4, 'שם משתמש חייב להיות מעל 4 אותיות')
+      .max(20, 'שם משתמש חייב להיות עד 20 אותיות'),
+    id: Yup.string()
+      .required('נא להזין תעודת זהות ')
+      .min(9, 'נא להכניס תעודת זהות בעל 9 ספרות')
+      .max(9, 'נא להכניס תעודת זהות בעל 9 ספרות'),
+    email: Yup.string()
+      .required('נא להזין מייל')
+      .email('מייל לא תקין')
+      .matches(emailRegExp,'מייל לא תקין'),
+    password: Yup.string()
+      .required('נא להזין סיסמא')
+      .min(4, 'סיסמא חייבת להיות לפחות 4 תווים')
+      .max(40, 'ססימא חייבת להיות עד 40 תווים'),
+    confirmPassword: Yup.string()
+      .required('נא להזין אימות סיסמא')
+      .oneOf([Yup.ref('password')], 'אימות סיסמא לא תואם לסיסמא שהכנסת'),
+    department: Yup.string()
+    .required('נא לבחור מחלקה'),
+    role: Yup.string()
+    .required('נא להזין הרשאה'),
+    jobTitle: Yup.string()
+      .required('נא להזין תפקיד')
+    // acceptTerms: Yup.bool().oneOf([true], 'Accept Terms is required')
+  });
 
-  
-const checkvalidForm=()=>{
-  let msg=""
-  const expressionEmail: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-  if(!firstName){
-    msg="נא להזין שם פרטי"
-  }
-  else if (!lastName){
-    msg="נא להזין שם משפחה"
-  }
-  else if (!userNameReg){
-    msg="נא להזין שם משתמש"
-  }
-  else if (!Id){
-    msg="נא להכניס מספר תעודת זהות"
-  }
-  else if(Id.toString().length!==9){
-    msg="מספר תעודת זהות חייב להיות 9 ספרות"
-  }
-  else if (!email){
-    msg="נא להזין מייל "
-  }
-  else if(!expressionEmail.test(email))
-  {
-    msg="נא להזין מייל תקין"
-  }
-  else if (!passwordReg){
-    msg="נא להזין סיסמא "
-  }
-  else if (!repeatPassword){
-    msg="נא להזין שוב סיסמא "
-  }
-  else if(passwordReg!==repeatPassword)
-  {
-    msg="סיסמא אינה תואמת לסיסמא שהכנסת שוב "
-  }
-  else if (!department || department==-1){
-    msg="נא לבחור מחלקה"
-  }
-  else if (!role || role==-1){
-    msg="נא לבחור סוג הרשאה"
-  }
-  else if (!jobTitle){
-    msg="נא להכניס תפקיד"
-  }
-  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<UserSubmitForm>({
+    resolver: yupResolver(validationSchema)
+  });
 
-  if(msg){
-    const inputElement = document.getElementById('registerUsername') as HTMLInputElement;
-    inputElement.setCustomValidity("EEROOR");
-    inputElement.reportValidity();
-    inputElement.focus();
-    inputElement.classList.add('invalid');
-    // messageError(msg)
-    return false
+  const onSubmitLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    dispatch(loginAsync({ username, password }))
   }
-  else{
-    return true
-  }
-  
-  // dispatch(SetError(msg))
-
-  // const form = document.getElementById('formRegister') as HTMLFormElement;
-  // if (form.checkValidity()) {
-  //   // form.submit();
-  //   return true;
-  // }
-  // else{
-  //   return false
-  // }
-  
-}
+  const onSubmitReg = (data: UserSubmitForm) => {
+    console.log(JSON.stringify(data, null, 2));
+    dispatch(regAsync({ user: { first_name: data.firstName, last_name: data.lastName, password: data.password, username: data.userName, email: data.email }, profile: { jobTitle: data.jobTitle, roleLevel: data.role, department: data.department, realID: data.id } }));
+  };
+ 
   const handleBasicClick = (value: string) => {
     if (value === basicActive) {
       return;
     }
-
     setBasicActive(value);
   };
   const messageError = (value: string) => toast.error(value, {
@@ -152,30 +133,18 @@ const checkvalidForm=()=>{
     theme: "colored",
   });
 
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-   
-  }
-  // // Function to load list Roles and update state
-  // const getListRoles = async () => {
-  //   // const response = await fetch('/api/list');
-  //   // const data = await response.json();
-  //   const data = [{ id: 0, name: 'עובד' }, { id:1, name: 'אחראי מחלקה' }, { id: 2, name: 'מנהל מערכת' },]
-  //   setListRoles(data);
-  // };
   useEffect(() => {
-    if (errorMessage && errorMessage !== "" )
-    messageError(errorMessage)
+    if (errorMessage && errorMessage !== "")
+      messageError(errorMessage)
     dispatch(SetError())
   }, [errorMessage])
 
   useEffect(() => {
-    if (loginMessage && loginMessage !== "" )
+    if (loginMessage && loginMessage !== "")
       message(loginMessage)
     dispatch(SetMsg())
   }, [loginMessage])
-  
+
 
   useEffect(() => {
     // if (!localStorage.getItem("access")) {
@@ -193,7 +162,7 @@ const checkvalidForm=()=>{
   return (
     <div>
       <ToastContainer
-        position="top-left"      
+        position="top-left"
         newestOnTop={false}
         closeOnClick
         rtl={false}
@@ -222,7 +191,7 @@ const checkvalidForm=()=>{
 
           <MDBTabsContent>
             <MDBTabsPane show={basicActive === 'tabLogin'}>
-              <form onSubmit={onSubmit} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+              <form onSubmit={onSubmitLogin} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                 <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Log in</h1>
                 <div className="form-floating mb-2">
                   <input type="text" onChange={(e) => setusername(e.target.value)} className="form-control" id="floatingInput" placeholder="User name" required />
@@ -250,84 +219,84 @@ const checkvalidForm=()=>{
                 </div>
 
                 <div className="col text-center">
-                  <button type='submit' onClick={() => dispatch(loginAsync({ username, password }))} className="btn btn-primary" >Log in</button>
+                  <button type='submit' className="btn btn-primary" >Log in</button>
                 </div>
               </form>
             </MDBTabsPane>
             <MDBTabsPane show={basicActive === 'tabRegister'}>
-              <form onSubmit={onSubmit} id="formRegister" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+              <form id="formRegister" onSubmit={handleSubmit(onSubmitReg)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                 <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Register</h1>
                 {/* <!-- First Name input --> */}
                 <div className="form-floating mb-2">
-                  {/* <input type="text" id="registerFistName" onChange={(e) => setFistName(e.target.value)} className="form-control" placeholder="First Name" required onInvalid={(e) => {const inputElement = e.target as HTMLInputElement;  inputElement.setCustomValidity('הכנס שם פרטי!!')}} 
-          onInput={(e) => {const inputElement = e.target as HTMLInputElement;inputElement.setCustomValidity('')}} /> */}
-                 <input type="text" id="registerFistName" onChange={(e) => setFistName(e.target.value)} className="form-control" placeholder="First Name"  />
-                  <label className="form-label" htmlFor="registerFisrtName" style={{ marginLeft: "0px" }}>First Name</label>
+                  <input type="text"  id="registerFirstName" {...register('firstName')} className={`form-control ${errors.firstName ? 'is-invalid' : ''}`} />
+                  <div className="invalid-feedback">{errors.firstName?.message}</div>
+                  <label className="form-label" htmlFor="registerFirstName" style={{ marginLeft: "0px" }}>First Name</label>
                 </div>
                 {/* <!-- Last Name input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text" id="registerLastName" onChange={(e) => setLastName(e.target.value)} className="form-control" placeholder="Last Name" required />
+                  <input type="text" id="registerLastName"  {...register('lastName')} className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}/>
+                  <div className="invalid-feedback">{errors.lastName?.message}</div>
                   <label className="form-label" htmlFor="registerLastName" style={{ marginLeft: "0px" }}>Last Name</label>
                 </div>
                 {/* <!-- Username input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text" id="registerUsername" onChange={(e) => setUserNameReg(e.target.value)} className="form-control" placeholder="Username" required />
+                  <input type="text" id="registerUsername"  {...register('userName')}  className={`form-control ${errors.userName ? 'is-invalid' : ''}`} />
+                  <div className="invalid-feedback">{errors.userName?.message}</div>
                   <label className="form-label" htmlFor="registerUsername" style={{ marginLeft: "0px" }}>Username</label>
                 </div>
                 {/* <!-- ID input --> */}
                 <div className="form-floating mb-2">
-                  <input type="number" id="registerId" onChange={(e) => setId(Number(e.target.value))} className="form-control" placeholder="ID" minLength={9} maxLength={9}  required />
+                  <input type="number" id="registerId" {...register('id')}  className={`form-control ${errors.id ? 'is-invalid' : ''}`} />
+                  <div className="invalid-feedback">{errors.id?.message}</div>
                   <label className="form-label" htmlFor="registerId" style={{ marginLeft: "0px" }}>ID</label>
                 </div>
                 {/* <!-- Email input --> */}
                 <div className="form-floating mb-2">
-                  <input type="email" id="registerEmail" onChange={(e) => setEmail(e.target.value)} className="form-control" placeholder="Email" required />
+                  <input type="email" id="registerEmail"   {...register('email')} className={`form-control ${errors.email ? 'is-invalid' : ''}`}  />
+                  <div className="invalid-feedback">{errors.email?.message}</div>
                   <label className="form-label" htmlFor="registerEmail" style={{ marginLeft: "0px" }}>Email</label>
                 </div>
                 {/* <!-- Password input --> */}
                 <div className="form-floating mb-2">
-                  <input type="password" id="registerPassword" onChange={(e) => setPasswordReg(e.target.value)} className="form-control" placeholder="Password" required />
+                  <input type="password" id="registerPassword"  {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
+                  <div className="invalid-feedback">{errors.password?.message}</div>
                   <label className="form-label" htmlFor="registerPassword" style={{ marginLeft: "0px" }} >Password</label>
                 </div>
-                {/* <!-- Repeat Password input --> */}
+                {/* <!-- Confirm Password input --> */}
                 <div className="form-floating mb-2">
-                  <input type="password" id="registerRepeatPassword" onChange={(e) => setRepeatPassword(e.target.value)} className="form-control" placeholder=" Repeat password" required />
-                  <label className="form-label" htmlFor="registerRepeatPassword" style={{ marginLeft: "0px" }}>Repeat password</label>
+                  <input type="password" id="registerConfirmPassword"   {...register('confirmPassword')} className={`form-control ${ errors.confirmPassword ? 'is-invalid' : '' }`} />
+                  <div className="invalid-feedback"> {errors.confirmPassword?.message}</div>
+                  <label className="form-label" htmlFor="registerConfirmPassword" style={{ marginLeft: "0px" }}>Confirm password</label>
                 </div>
                 {/* <!-- Department select --> */}
                 <div className="form-floating mb-2">
-                  <select id="selectDepartment" onChange={(e) => setDepartment(Number(e.target.value))} className="form-select" defaultValue={'DEFAULT'} required >
-                    <option value="DEFAULT" disabled>Choose a Department ...</option>
+                  <select id="selectDepartment" {...register('department')} className={`form-select ${errors.department ? 'is-invalid' : ''}`}   defaultValue={''}  >
+                    <option value="" disabled>בחר מחלקה...</option>
                     {listDepartments.map(item => (
                       <option value={item.id} key={item.id} >{item.name}</option>
                     ))}
-                    {/* <option value="1">It</option>
-                  <option value="2">Dev</option>
-                  <option value="3">Gis</option> */}
                   </select>
+                  <div className="invalid-feedback"> {errors.department?.message}</div>
                   <label className="form-label" htmlFor="selectDepartment" style={{ marginLeft: "0px" }}>Department</label>
                 </div>
                 {/* <!-- Role level select --> */}
                 <div className="form-floating mb-2">
-                  <select id="selectRole" onChange={(e) => setRole(Number(e.target.value))} className="form-select" defaultValue={'DEFAULT'} required >
-                    <option value="DEFAULT" disabled>Choose a Role ...</option>
+                  <select id="selectRole"  {...register('role')} className={`form-select ${errors.role ? 'is-invalid' : ''}`}  defaultValue={''} >
+                    <option value="" disabled>בחר הרשאה...</option>
                     {listRoles.map(item => (
                       <option value={item.id} key={item.id}>{item.name}</option>
                     ))}
-                    {/* <option value="0">עובד</option>
-                  <option value="1">אחראי מחלקה</option>
-                  <option value="2">מנהל מערכת</option> */}
                   </select>
+                  <div className="invalid-feedback"> {errors.role?.message}</div>
                   <label className="form-label" htmlFor="selectRole" style={{ marginLeft: "0px" }}>Role Level</label>
                 </div>
                 {/* <!-- JobTitle input --> */}
                 <div className="form-floating mb-2">
-                  <input type="text" id="registerJobTitle" onChange={(e) => setJobTitle(e.target.value)} className="form-control" placeholder="JobTitle" required  />
+                  <input type="text" id="registerJobTitle"   {...register('jobTitle')} className={`form-control ${ errors.jobTitle ? 'is-invalid' : '' }`} />
+                  <div className="invalid-feedback"> {errors.jobTitle?.message}</div>
                   <label className="form-label" htmlFor="registerJobTitle" style={{ marginLeft: "0px" }}>JobTitle</label>
                 </div>
-                {/* <button type="submit" className="btn btn-primary btn-block mb-3">Register</button> */}
-
-                <button type='submit'    onClick={() => checkvalidForm() && dispatch(regAsync({  user: { first_name: firstName, last_name: lastName,password:passwordReg, username: userNameReg,email:email },profile:{jobTitle: jobTitle, roleLevel: role, department: department, realID:Id } }))} className="btn btn-primary btn-block mb-3">Register</button>
+                <button type='submit' className="btn btn-primary btn-block mb-3">Register</button>
               </form>
             </MDBTabsPane>
           </MDBTabsContent>
