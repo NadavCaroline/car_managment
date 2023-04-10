@@ -20,4 +20,8 @@ npm i mdb-react-ui-kit
 npm install --save mdbreact
 npm install --save react-toastify
 
+npm install react-hook-form    
+npm install @hookform/resolvers
+npm i yup
+
 npm start
