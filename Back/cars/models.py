@@ -88,39 +88,14 @@ class CarOrders(models.Model):
     def __str__(self):
         # return str(self.orderDate)
         return self.user_name + " : " + self.car_name
-
-
-class CarMaintenance(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    car = models.ForeignKey(Cars, on_delete=models.CASCADE, null=True)
-    maintenanceDate = models.DateField()
-    maintenanceFile = models.FileField(
-        upload_to='maintenance/', max_length=200, blank=True)
-    testDate = models.DateField()
-    testFile = models.FileField(
-        upload_to='car_test/', max_length=200, blank=True)
-    mekifFile = models.FileField(
-        upload_to='mekif/', max_length=200, blank=True)
-    hovaFile = models.FileField(upload_to='hova/', max_length=200, blank=True)
-    kilometer = models.IntegerField()
-
     
-    @property
-    def car_name(self):
-        return self.car.make + ' ' + self.car.model
-
-
-    def __str__(self):
-        return str(self.car.model) + " : " + str(self.maintenanceDate)
-
-
 class MaintenanceTypes(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
+    numofdays=models.IntegerField( default=365)
 
     def __str__(self):
         return self.name
-
 
 class Shifts(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -144,6 +119,35 @@ class Shifts(models.Model):
 
     def __str__(self):
         return self.user_name + ': ' + self.car_name + ' ' + self.maintenance_name
+
+class CarMaintenance(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    car = models.ForeignKey(Cars, on_delete=models.CASCADE, null=True)
+    maintenanceDate = models.DateField()
+    file1 = models.FileField(upload_to='maintenance/', max_length=200, blank=True)
+    file2 = models.FileField(upload_to='maintenance/', max_length=200, blank=True)
+    shift = models.ForeignKey(Shifts, on_delete=models.CASCADE, null=True)
+    maintenanceType = models.ForeignKey(MaintenanceTypes, on_delete=models.CASCADE, null=True)
+    kilometer = models.IntegerField()
+    # maintenanceFile = models.FileField(upload_to='maintenance/', max_length=200, blank=True)
+    # testFile = models.FileField(upload_to='car_test/', max_length=200, blank=True)
+    # mekifFile = models.FileField( upload_to='mekif/', max_length=200, blank=True)
+    # hovaFile = models.FileField(upload_to='hova/', max_length=200, blank=True)
+
+    
+    @property
+    def car_name(self):
+        return self.car.make + ' ' + self.car.model
+    @property
+    def nextmainenancedate(self):
+        return self.maintenanceDate.date() + datetime.timedelta(days=self.maintenanceType.numofdays)   
+
+
+    def __str__(self):
+        return str(self.car.model) + " : " + str(self.maintenanceDate)
+
+
+
 
 
 class Logs(models.Model):
