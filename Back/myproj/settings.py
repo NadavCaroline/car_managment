@@ -22,7 +22,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'cbettach@gmail.com'
-EMAIL_HOST_PASSWORD = 'Car0line'
+EMAIL_HOST_PASSWORD = 'mypass'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
