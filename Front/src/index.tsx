@@ -25,6 +25,9 @@ import { Drivings } from './components/drivings/Drivings';
 import Users from './components/users/Users';
 import MaintenanceType from './components/maintenance/MaintenanceType';
 import Notifications from './components/notifications/Notifications';
+import Forgot from './components/login/Forgot';
+import Reset from './components/login/Reset';
+
 
 
 const container = document.getElementById('root')!;
@@ -48,6 +51,8 @@ root.render(
                         <Route path="/allUsers" element={<Users/>} />
                         <Route path="/maintenanceTypes" element={<MaintenanceType/>} />
                         <Route path="/notifications" element={<Notifications/>} />
+                        <Route path="/forgot" element={<Forgot/>} />
+                        <Route path="/reset/:id" element={<Reset/>} />
                     </Route>
                 </Routes>
             </BrowserRouter>
