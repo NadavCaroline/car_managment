@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-
+import Redirect from  "react-router-dom";
 
 interface Props {
     match: {
@@ -15,7 +15,7 @@ interface Props {
         }
     }
 }
-const PasswordResetPage = () => {
+const Reset = () => {
     //   const [newPassword, setNewPassword] = useState("");
     //   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     //     event.preventDefault();
@@ -45,14 +45,17 @@ const PasswordResetPage = () => {
     } = useForm<UserResetForm>({
         resolver: yupResolver(validationSchema)
     });
+//  const data={
+//   token: this && this?.props.match.param.id
 
+//  }
     const onReset = (data: UserResetForm) => {
         console.log(JSON.stringify(data, null, 2));
         // Send a request to the backend to update the password
         try {
             // const response = await axios.post('/api/password/reset/confirm/', {
             //   uidb64: props.match.params.uidb64,
-            //   token: props.match.params.token,
+            //   token: props.match.params.token,//props.match.param.id
             //   password: data.password,
             //   confirmPassword: data.confirmPassword,
             // });
@@ -67,7 +70,8 @@ const PasswordResetPage = () => {
         // inverse the boolean state of passwordShown
         setPasswordShown(!passwordShown);
     };
-    return (
+    return (     
+      // this.state.reset ? <Redirect to={'/login'}/> :
         <form id="resetPasswordPage" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
             <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Reset password</h1>
             {/* <!-- Password input --> */}
@@ -77,7 +81,7 @@ const PasswordResetPage = () => {
                     <label htmlFor="floatingPassword">Password</label>
                     <div className="invalid-feedback">{errors.password?.message}</div>
                 </div>
-                <span className="input-group-text">
+                <span onClick={togglePassword} className="input-group-text">
                     <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
                         {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
                     </i>
@@ -92,7 +96,7 @@ const PasswordResetPage = () => {
                     <label htmlFor="confirmPassword">Confirm Password</label>
                     <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
                 </div>
-                <span className="input-group-text">
+                <span  onClick={togglePassword} className="input-group-text">
                     <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
                         {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
                     </i>
@@ -108,4 +112,5 @@ const PasswordResetPage = () => {
     );
 };
 
-export default PasswordResetPage;
+export default Reset;
+

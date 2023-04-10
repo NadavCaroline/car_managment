@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 
-const PasswordResetForm = () => {
+const Forgot = () => {
 //   const [email, setEmail] = useState("");
 //   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 //     event.preventDefault();
@@ -35,17 +35,17 @@ const PasswordResetForm = () => {
   };
   return (
     <form id="resetPasswordForm" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
-    <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Reset password</h1>
+    <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Forgot password</h1>
     <div className="form-floating mb-2">
-      <input type="email" id="registerEmail"   {...register('email')} className={`form-control ${errors.email ? 'is-invalid' : ''}`} placeholder="Email" />
+      <input type="email" id="resetEmail"   {...register('email')} className={`form-control ${errors.email ? 'is-invalid' : ''}`} placeholder="Email" />
       <div className="invalid-feedback">{errors.email?.message}</div>
-      <label className="form-label" htmlFor="registerEmail" style={{ marginLeft: "0px" }}>Email</label>
+      <label className="form-label" htmlFor="resetEmail" style={{ marginLeft: "0px" }}>Email</label>
     </div>
     <div className="col text-center">
-      <button type='submit' className="btn btn-primary" >Reset password</button>
+      <button type='submit' className="btn btn-primary" >Submit</button>
     </div>
   </form>
   );
 };
 
-export default PasswordResetForm;
+export default Forgot;

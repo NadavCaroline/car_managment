@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import PasswordResetForm from './PasswordResetForm';
-import PasswordResetPage from './PasswordResetPage'
+import Reset from './Reset';
+import Forgot from './Forgot'
 
 import {
   // isLogged,
@@ -29,6 +29,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
 
 export function Login() {
 
@@ -214,7 +215,7 @@ export function Login() {
                     <input type={passwordShown ? "text" : "password"} onChange={(e) => setpassword(e.target.value)} className="form-control" id="floatingPassword" placeholder="Password" required />
                     <label htmlFor="floatingPassword">Password</label>
                   </div>
-                  <span className="input-group-text">
+                  <span onClick={togglePassword} className="input-group-text">
                     <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
                       {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
                     </i>
@@ -234,7 +235,8 @@ export function Login() {
 
                   <div className="col-md-6 d-flex justify-content-center">
                     {/* <!-- Simple link --> */}
-                    <a href="#!">Forgot password?</a>
+                    {/* <a href="#!">Forgot password?</a> */}
+                    <Link to={'/forgot'}>Forgot password</Link>
                   </div>
                 </div>
 
@@ -243,8 +245,8 @@ export function Login() {
                 </div>
               </form>
 
-              <PasswordResetForm />
-              <PasswordResetPage />
+              <Reset />
+              <Forgot />
 
             </MDBTabsPane>
             <MDBTabsPane show={basicActive === 'tabRegister'}>
@@ -287,7 +289,7 @@ export function Login() {
                     <label htmlFor="registerPassword" style={{ marginLeft: "0px" }}>Password</label>
                     <div className="invalid-feedback">{errors.password?.message}</div>
                   </div>
-                  <span className="input-group-text">
+                  <span onClick={togglePassword} className="input-group-text">
                     <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
                       {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
                     </i>
@@ -310,7 +312,7 @@ export function Login() {
                     <label htmlFor="registerConfirmPassword" style={{ marginLeft: "0px" }}>Confirm Password</label>
                     <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
                   </div>
-                  <span className="input-group-text">
+                  <span  onClick={togglePassword} className="input-group-text">
                     <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
                       {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
                     </i>
