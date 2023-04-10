@@ -1,6 +1,6 @@
 export interface DriveModel {
     id?: number
-    order?: any
+    order?: number
     user?: any
     car?: string
     car_name?: string
@@ -8,6 +8,8 @@ export interface DriveModel {
     destination?: string
     startDate?: Date | string
     endDate?: Date| string
+    startTime?: string 
+    endTime?: string 
     startKilometer?: string
     endKilometer?: string
     comments?: string

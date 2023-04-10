@@ -179,6 +179,8 @@ class CarOrdersView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, id):
+        print(id)
+        print(request.data)
         my_model = CarOrders.objects.get(id=int(id))
         my_model.ended = True
         model_dict = model_to_dict(my_model)
@@ -258,6 +260,18 @@ class AllDrivingsView(APIView):
         return Response(serializer.data)
 
 
+# Responsible for the manual update of a drive
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateDrive(request, id):
+    my_model = Drivings.objects.get(id=id)
+    serializer = CreateDrivingsSerializer(my_model, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @permission_classes([IsAuthenticated])
 class DrivingsView(APIView):
     def get(self, request):
@@ -282,11 +296,13 @@ class DrivingsView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class RolesView(APIView):
     def get(self, request):
         my_model = Roles.objects.all()
         serializer = CreateRolesSerializer(my_model, many=True)
         return Response(serializer.data)
+
 
 class DepartmentsView(APIView):
     def get(self, request):

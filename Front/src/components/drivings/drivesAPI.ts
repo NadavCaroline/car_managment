@@ -58,3 +58,13 @@ export const endDrive = async ( token: string,drive: DriveModel) => {
         }
     }).then((res) => res.data)
 }
+
+
+export const updateDrive = async ( token: string,drive: DriveModel) => {
+  return axios.put(MY_SERVER + 'updatedrive/' + drive.id, drive, {
+      headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+      }
+  }).then((res) => res.data)
+}

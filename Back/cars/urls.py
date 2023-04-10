@@ -29,6 +29,7 @@ urlpatterns = [
     path('logs/<id>', views.LogsView.as_view()),
     path('drives', views.DrivingsView.as_view()),
     path('drives/<id>', views.DrivingsView.as_view()),
+    path('updatedrive/<id>', views.updateDrive),
     path('alldrives', views.AllDrivingsView.as_view()),
     path('rolesLevel', views.RolesView.as_view()),
 

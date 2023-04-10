@@ -91,7 +91,6 @@ export const loginSlice = createSlice({
         // state.errorMsg=action.payload.;
   })
     .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
-      console.log(action.payload.access)
       state.access = action.payload.access;
       localStorage.setItem("access", action.payload.access)
       localStorage.setItem("refresh", action.payload.refresh) 
