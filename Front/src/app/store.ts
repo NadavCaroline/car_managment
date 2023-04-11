@@ -6,6 +6,7 @@ import loginReducer  from '../components/login/loginSlice';
 import  logReducer  from '../components/logs/logsSlice';
 import  myOrderReducer  from '../components/orders/OrdersSlice';
 import  profileReducer  from '../components/profile/profileSlicer';
+import userReducer from '../components/users/userSlicer';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     profile: profileReducer,
     dep: depsReducer,
     log: logReducer,
+    users: userReducer,
   },
 });
 

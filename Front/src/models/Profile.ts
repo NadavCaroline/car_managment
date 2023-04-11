@@ -1,4 +1,5 @@
 export interface ProfileModel {
+    id? : number
     user?: string
     user_name?: string
     realID: number
