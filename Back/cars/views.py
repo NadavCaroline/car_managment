@@ -11,6 +11,18 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from .serializers import *
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_protect
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode    
+from django.contrib.auth.forms import SetPasswordForm
+from django.utils.encoding import force_bytes
+
+
+
 
 @api_view(['GET'])
 def index(r):
@@ -23,41 +35,42 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 @api_view(['POST'])
 def register(request):
-    print(request.data)
-    # print(type(request.data['profile']['rolelvel']))
+    try:
+        msg=""
+        if User.objects.filter(username=request.data['user']['username']).exists():
+            msg={"status":"error","msg":"משתמש כבר קיים"}
+        elif Profile.objects.filter(realID=request.data['profile']['realID']).exists():
+            msg={"status":"error","msg":"תעודת זהות כבר קיימת במערכת"}
+        else: 
+            department = Departments.objects.get(id=request.data['profile']['department'])
+            role = Roles.objects.get(id=request.data['profile']['roleLevel'])
 
-    msg=""
-    if User.objects.filter(username=request.data['user']['username']).exists():
-        msg={"status":"error","msg":"משתמש כבר קיים"}
-    elif Profile.objects.filter(realID=request.data['profile']['realID']).exists():
-        msg={"status":"error","msg":"תעודת זהות כבר קיימת במערכת"}
-    else: 
-        department = Departments.objects.get(id=request.data['profile']['department'])
-        role = Roles.objects.get(id=request.data['profile']['roleLevel'])
-
-        user = User.objects.create_user(
-            first_name=request.data['user']['first_name'],
-            last_name=request.data['user']['last_name'],
-            username=request.data['user']['username'],
-            email=request.data['user']['email'],
-            password=request.data['user']['password'],
-            is_superuser=True if role.id==3 else False
-                    
-        )
-        user.is_active = True
-        user.is_staff = True
-        user.save()
-    
-        profile = Profile.objects.create(
-            user=user,
-            jobTitle=request.data['profile']['jobTitle'],
-            roleLevel= Roles.objects.get(id= request.data['profile']['roleLevel']),
-            department=department,
-            realID=request.data['profile']['realID'],
+            user = User.objects.create_user(
+                first_name=request.data['user']['first_name'],
+                last_name=request.data['user']['last_name'],
+                username=request.data['user']['username'],
+                email=request.data['user']['email'],
+                password=request.data['user']['password'],
+                is_superuser=True if role.id==3 else False
+                        
             )
-        profile.save()
-        msg={"status":"success","msg":"משתמש נוצר בהצלחה"}
-
+            user.is_active = True
+            user.is_staff = True
+            user.save()
+        
+            profile = Profile.objects.create(
+                user=user,
+                jobTitle=request.data['profile']['jobTitle'],
+                roleLevel=role,
+                department=department,
+                realID=request.data['profile']['realID'],
+                )
+            profile.save()
+            msg={"status":"success","msg":"משתמש נוצר בהצלחה"}
+    except Exception as e:
+        # Handle the exception
+        msg={"status":"error","msg":str(e)}
+        # error_message = str(e)
     return Response(msg)
 
 
@@ -317,3 +330,41 @@ class DepartmentsView(APIView):
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class resetView(APIView):
+    @csrf_protect
+    def password_reset_request(request):
+        # User = get_user_model()
+        if request.method == "POST":
+            email = request.POST.get('email')
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                user = None
+            if user:
+                token = default_token_generator.make_token(user)
+                reset_url = request.build_absolute_uri(reverse('password_reset_confirm', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(user.pk)), 'token': token}))
+                message = f"Hello {user.username},\n\nPlease click on the following link to reset your password:\n\n{reset_url}\n\nThanks,\nYour website team"
+                send_mail('Password reset request', message, 'your_email@gmail.com', [user.email], fail_silently=False)
+            return render(request, 'registration/password_reset_request.html')
+        else:
+            return render(request, 'registration/password_reset_request.html')
+    @csrf_protect
+    def password_reset_confirm(request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user and default_token_generator.check_token(user, token):
+            if request.method == 'POST':
+                form = SetPasswordForm(user, request.POST)
+                if form.is_valid():
+                    form.save()
+                    return render(request, 'registration/password_reset_complete.html')
+            else:
+                form = SetPasswordForm(user)
+            return render(request, 'registration/password_reset_confirm.html', {'form': form})
+        else:
+            return render(request, 'registration/password_reset_invalid.html')

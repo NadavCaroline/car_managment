@@ -28,6 +28,10 @@ import Notifications from './components/notifications/Notifications';
 import { useAppSelector } from './app/hooks';
 import { ordersSelector } from './components/orders/OrdersSlice';
 
+import Forgot from './components/login/Forgot';
+import Reset from './components/login/Reset';
+
+
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -49,6 +53,8 @@ root.render(
                         <Route path="/allUsers" element={<Users/>} />
                         <Route path="/maintenanceTypes" element={<MaintenanceType/>} />
                         <Route path="/notifications" element={<Notifications/>} />
+                        <Route path="/forgot" element={<Forgot/>} />
+                        <Route path="/reset/:id" element={<Reset/>} />
                     </Route>
                 </Routes>
             </BrowserRouter>
