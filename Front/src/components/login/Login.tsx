@@ -11,7 +11,7 @@ import {
   getDepartmentsAsync,
   getRolesAsync,
   remember,
-  dontRemember, userToken, loginError, SetError, loginMsg, SetMsg
+  dontRemember, userToken, loginError, SetError, loginMsg, SetMsg,sformToShow,SetFormLogin,SetFormForgot
 } from './loginSlice';
 import {
   MDBTabs,
@@ -29,7 +29,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 export function Login() {
 
@@ -45,7 +45,7 @@ export function Login() {
   const [basicActive, setBasicActive] = useState('tabLogin');
   const token = useAppSelector(userToken)
   const [passwordShown, setPasswordShown] = useState(false);
-
+  const formToShow =useAppSelector(sformToShow) ;
 
   type UserSubmitForm = {
     firstName: string;
@@ -110,6 +110,9 @@ export function Login() {
   };
 
   const handleBasicClick = (value: string) => {
+    if (value === 'tabLogin') {
+      dispatch(SetFormLogin());
+    }
     if (value === basicActive) {
       return;
     }
@@ -170,6 +173,10 @@ export function Login() {
     // inverse the boolean state of passwordShown
     setPasswordShown(!passwordShown);
   };
+  const forgotClick = () => {
+    dispatch(SetFormForgot());
+  };
+  
   return (
     <div>
       <ToastContainer
@@ -201,53 +208,58 @@ export function Login() {
 
           <MDBTabsContent>
             <MDBTabsPane show={basicActive === 'tabLogin'}>
-              <form onSubmit={onSubmitLogin} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
-                <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Log in</h1>
-                <div className="form-floating mb-2">
-                  <input type="text" onChange={(e) => setusername(e.target.value)} className="form-control" id="floatingInput" placeholder="User name" required />
-                  <label htmlFor="floatingInput">User name</label>
-                  <div className="invalid-feedback">
-                    Please provide a User name.
+              {formToShow === 'login' &&
+                <form onSubmit={onSubmitLogin} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+                  <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Log in</h1>
+                  <div className="form-floating mb-2">
+                    <input type="text" onChange={(e) => setusername(e.target.value)} className="form-control" id="floatingInput" placeholder="User name" required />
+                    <label htmlFor="floatingInput">User name</label>
+                    <div className="invalid-feedback">
+                      Please provide a User name.
+                    </div>
                   </div>
-                </div>
-                <div className="input-group mb-3">
-                  <div className="form-floating">
-                    <input type={passwordShown ? "text" : "password"} onChange={(e) => setpassword(e.target.value)} className="form-control" id="floatingPassword" placeholder="Password" required />
-                    <label htmlFor="floatingPassword">Password</label>
+                  <div className="input-group mb-3">
+                    <div className="form-floating">
+                      <input type={passwordShown ? "text" : "password"} onChange={(e) => setpassword(e.target.value)} className="form-control" id="floatingPassword" placeholder="Password" required />
+                      <label htmlFor="floatingPassword">Password</label>
+                    </div>
+                    <span onClick={togglePassword} className="input-group-text">
+                      <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
+                        {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                      </i>
+                    </span>
                   </div>
-                  <span onClick={togglePassword} className="input-group-text">
-                    <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
-                      {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
-                    </i>
-                  </span>
-                </div>
-                {/* <div className="form-floating">
+                  {/* <div className="form-floating">
                   <input type="password" onChange={(e) => setpassword(e.target.value)} className="form-control" id="floatingPassword" placeholder="Password" required />
                   <label htmlFor="floatingPassword">Password</label>
                 </div> */}
-                <div className="row mb-2" style={{ marginTop: "1.5rem " }}>
-                  <div className="col-md-6 d-flex justify-content-center">
-                    <div className="form-check mb-3 mb-md-0">
-                      <input className="form-check-input" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} id="loginCheck" />
-                      <label className="form-check-label" htmlFor="loginCheck"> Remember me </label>
+                  <div className="row mb-2" style={{ marginTop: "1.5rem " }}>
+                    <div className="col-md-6 d-flex justify-content-center">
+                      <div className="form-check mb-3 mb-md-0">
+                        <input className="form-check-input" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} id="loginCheck" />
+                        <label className="form-check-label" htmlFor="loginCheck"> Remember me </label>
+                      </div>
+                    </div>
+
+                    <div className="col-md-6 d-flex justify-content-center">
+                      {/* <!-- Simple link --> */}
+                      <a href="#!" style={{ cursor: "pointer" }} onClick={forgotClick}>Forgot password</a>
+                      {/* <Link to='/forgot' onClick={() => setStatus("forgot")} >Forgot password</Link> */}
                     </div>
                   </div>
 
-                  <div className="col-md-6 d-flex justify-content-center">
-                    {/* <!-- Simple link --> */}
-                    {/* <a href="#!">Forgot password?</a> */}
-                    <Link to={'/forgot'}>Forgot password</Link>
+                  <div className="col text-center">
+                    <button type='submit'  className="btn btn-primary" >Log in</button>
                   </div>
-                </div>
-
-                <div className="col text-center">
-                  <button type='submit' className="btn btn-primary" >Log in</button>
-                </div>
-              </form>
-
-              <Reset />
-              <Forgot />
-
+                </form>
+              }
+              {formToShow === 'forgot' &&
+                <Forgot />
+              }
+               {formToShow === 'reset' &&
+                <Reset />
+              }
+              {/* <Outlet></Outlet> */}
             </MDBTabsPane>
             <MDBTabsPane show={basicActive === 'tabRegister'}>
               <form id="formRegister" onSubmit={handleSubmit(onSubmitReg)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
@@ -312,7 +324,7 @@ export function Login() {
                     <label htmlFor="registerConfirmPassword" style={{ marginLeft: "0px" }}>Confirm Password</label>
                     <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
                   </div>
-                  <span  onClick={togglePassword} className="input-group-text">
+                  <span onClick={togglePassword} className="input-group-text">
                     <i onClick={togglePassword} className="fa fa-eye" id="togglePassword" style={{ cursor: "pointer" }}>
                       {passwordShown ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
                     </i>

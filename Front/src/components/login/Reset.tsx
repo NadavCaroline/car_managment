@@ -6,6 +6,9 @@ import axios from 'axios';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import Redirect from  "react-router-dom";
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { SetFormLogin } from './loginSlice';
+
 
 interface Props {
     match: {
@@ -21,6 +24,8 @@ const Reset = () => {
     //     event.preventDefault();
     //     // Send a request to the backend to update the password
     //   };
+    const dispatch = useAppDispatch();
+
     type UserResetForm = {
         password: string;
         confirmPassword: string;
@@ -60,6 +65,8 @@ const Reset = () => {
             //   confirmPassword: data.confirmPassword,
             // });
             // handle success
+             dispatch(SetFormLogin());
+
         } catch (error) {
             // setError(error.response.data.detail);
         }
