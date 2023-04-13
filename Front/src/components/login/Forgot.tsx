@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { SetFormReset } from './loginSlice';
+import { SetFormReset ,forgotAsync} from './loginSlice';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 
 
@@ -36,8 +36,10 @@ const Forgot = () => {
   });
   const onReset = (data: UserResetForm) => {
     console.log(JSON.stringify(data, null, 2));
-    dispatch(SetFormReset());
     // Send a password reset link to the user's email
+    dispatch(forgotAsync({ email: data.email}));
+    // dispatch(SetFormReset());
+
     // dispatch(regAsync({ user: { first_name: data.firstName, last_name: data.lastName, password: data.password, username: data.userName, email: data.email }, profile: { jobTitle: data.jobTitle, roleLevel: data.role, department: data.department, realID: data.id } }));
   };
   return (

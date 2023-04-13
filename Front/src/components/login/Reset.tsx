@@ -8,17 +8,22 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import Redirect from  "react-router-dom";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { SetFormLogin } from './loginSlice';
+import {useParams} from 'react-router-dom';
 
-
-interface Props {
-    match: {
-        params: {
-            uidb64: string;
-            token: string;
-        }
-    }
-}
-const Reset = () => {
+// interface Props {
+//     match: {
+//         params: {
+//             uidb64: string;
+//             token: string;
+//         }
+//     }
+// }
+const Reset : React.FC = (): JSX.Element => {
+    const params = useParams();
+    // const uidb64=params.uidb64;
+    // const token= params.token;
+   
+    //  return <>Link ID parameter === "{params.id}"</>;
     //   const [newPassword, setNewPassword] = useState("");
     //   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     //     event.preventDefault();
@@ -58,14 +63,17 @@ const Reset = () => {
         console.log(JSON.stringify(data, null, 2));
         // Send a request to the backend to update the password
         try {
-            // const response = await axios.post('/api/password/reset/confirm/', {
-            //   uidb64: props.match.params.uidb64,
-            //   token: props.match.params.token,//props.match.param.id
-            //   password: data.password,
-            //   confirmPassword: data.confirmPassword,
-            // });
+            //  const response = await axios.post('/api/password/reset/confirm/', {
+            //  const response = await axios.post('/reset/'+params.uidb64+"/"+params.token, {
+
+            //   uidb64:params.uidb64,// props.match.params.uidb64,
+            //   token: params.token,//props.match.params.token,//props.match.param.id
+            //    password: data.password,
+            //    confirmPassword: data.confirmPassword,
+            //  });
             // handle success
-             dispatch(SetFormLogin());
+            dispatch(SetFormLogin());
+             
 
         } catch (error) {
             // setError(error.response.data.detail);

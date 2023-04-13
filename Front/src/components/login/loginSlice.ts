@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { getProfile, login, register, getDepartments, getRoles, loginWithRefresh } from './loginAPI';
+import { getProfile, login, register, getDepartments, getRoles, loginWithRefresh, forgot } from './loginAPI';
 import { Cred } from '../../models/Cred'
 import { ProfileModel } from '../../models/Profile'
 import { UserModel } from '../../models/User'
@@ -12,8 +12,8 @@ export interface loginState {
   logged: boolean
   remember: boolean
   error: string | null;
-  msg:string | null;
-  formToShow:string ;
+  msg: string | null;
+  formToShow: string;
 }
 
 const initialState: loginState = {
@@ -22,8 +22,8 @@ const initialState: loginState = {
   logged: localStorage.hasOwnProperty('access') || localStorage.hasOwnProperty('remember'),
   remember: localStorage.hasOwnProperty('refresh'),
   error: "",
-  msg:"",
-  formToShow:"login",
+  msg: "",
+  formToShow: "login",
 };
 
 
@@ -48,6 +48,14 @@ export const regAsync = createAsyncThunk(
     console.log(user)
     console.log(profile)
     const response = await register(user, profile);
+    return response;
+  }
+);
+export const forgotAsync = createAsyncThunk(
+  'login/forgot',
+  async ({ email }: { email: string }) => {
+    console.log(email)
+    const response = await forgot(email);
     return response;
   }
 );
@@ -93,14 +101,14 @@ export const loginSlice = createSlice({
     SetMsg: (state) => {
       state.msg = ""
     },
-    SetFormForgot:(state)=> {
-      state.formToShow ="forgot";
+    SetFormForgot: (state) => {
+      state.formToShow = "forgot";
     },
-    SetFormReset:(state)=> {
-      state.formToShow ="reset";
+    SetFormReset: (state) => {
+      state.formToShow = "reset";
     },
-    SetFormLogin:(state)=> {
-      state.formToShow ="login";
+    SetFormLogin: (state) => {
+      state.formToShow = "login";
     },
   },
 
@@ -108,14 +116,20 @@ export const loginSlice = createSlice({
     builder
       .addCase(regAsync.fulfilled, (state, action) => {
         console.log(action);
-        // state.errorMsg=action.payload.;
-  })
-    .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
-      state.access = action.payload.access;
-      localStorage.setItem("access", action.payload.access)
-      localStorage.setItem("refresh", action.payload.refresh) 
-      state.logged = true
-    })
+        if(action.payload.status==="success"){
+          state.msg=action.payload.msg;
+        }
+        else if(action.payload.status==="error"){
+          state.error=action.payload.msg;
+        }
+        
+      })
+      .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
+        state.access = action.payload.access;
+        localStorage.setItem("access", action.payload.access)
+        localStorage.setItem("refresh", action.payload.refresh)
+        state.logged = true
+      })
       .addCase(loginAsync.fulfilled, (state, action) => {
         if (action.payload.status === 200) {
           let d = action.payload.data;
@@ -126,17 +140,28 @@ export const loginSlice = createSlice({
           state.logged = true
         }
         else if (action.payload.status === 401) {
-          state.error ="משתמש לא קיים או סיסמא לא נכונה";
+          state.error = "משתמש לא קיים או סיסמא לא נכונה";
         }
 
       })
     // .addCase(loginAsync.rejected, (state, action) => {
     //   state.error = action.error.message ?? 'An error occurred.';
     // });
+    .addCase(forgotAsync.fulfilled, (state, action) => {
+      console.log(action);
+        if(action.payload.status==="success"){
+          state.msg=action.payload.msg;
+          SetFormReset();
+        }
+        else if(action.payload.status==="error"){
+          state.error=action.payload.msg;
+        }
+
+    })
   },
 });
 
-export const { logout, remember, dontRemember, SetError,SetMsg,SetFormForgot,SetFormLogin,SetFormReset } = loginSlice.actions;
+export const { logout, remember, dontRemember, SetError, SetMsg, SetFormForgot, SetFormLogin, SetFormReset } = loginSlice.actions;
 export const loginError = (state: RootState) => state.login.error;
 export const loginMsg = (state: RootState) => state.login.msg;
 export const userAccess = (state: RootState) => state.login.access;

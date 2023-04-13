@@ -31,5 +31,7 @@ urlpatterns = [
     path('drives/<id>', views.DrivingsView.as_view()),
     path('alldrives', views.AllDrivingsView.as_view()),
     path('rolesLevel', views.RolesView.as_view()),
+    path('forgot', views.ForgotView.as_view()),
+    path('reset/<str:uidb64>/<str:token>',  views.ResetView.as_view(), name='password_reset_confirm'),
 
 ]
