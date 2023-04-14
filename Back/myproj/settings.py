@@ -27,6 +27,8 @@ EMAIL_HOST_USER = 'carmngnoga@gmail.com'
 EMAIL_HOST_PASSWORD = 'wcgidbpbdbyrbywc' #past the key or password app here
 CSRF_TRUSTED_ORIGINS =['http://localhost:3000']# ['https://example.com']
 SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY =False
+CSRF_COOKIE_SECURE =False
 
 # DEFAULT_FROM_EMAIL = 'default from email' 
 
@@ -62,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

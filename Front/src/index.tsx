@@ -52,7 +52,8 @@ root.render(
                         <Route path="/maintenanceTypes" element={<MaintenanceType/>} />
                         <Route path="/notifications" element={<Notifications/>} />
                         <Route path="/forgot" element={<Forgot/>} />
-                        <Route path="/reset/:id" element={<Reset/>} />
+                        <Route path="/reset/:uidb64/:token" element={<Reset/>} />
+                        {/* <Route path="/reset/:id" element={<Reset/>} /> */}
                     </Route>
                 </Routes>
             </BrowserRouter>

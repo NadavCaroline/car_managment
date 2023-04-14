@@ -36,6 +36,10 @@ export const forgot = async (email:string) => {
   //   return error.response;
   return await axios.post(MY_SERVER + 'forgot',{"email":email}).then((res) => res.data);
 }
+export const reset = async (uidb64: string,token: string,password: string,confirmPassword: string) => {
+  
+  return await axios.post(MY_SERVER + 'reset/'+uidb64+"/"+token,{"uidb64":uidb64,"token":token,"password":password,"confirmPassword":confirmPassword}).then((res) => res.data);
+}
 export const loginWithRefresh = async (refresh: string) => {
   return await axios.post(MY_SERVER + 'token/refresh/', { refresh: refresh }).then((res) => res.data)
 }

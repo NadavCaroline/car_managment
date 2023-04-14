@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { getProfile, login, register, getDepartments, getRoles, loginWithRefresh, forgot } from './loginAPI';
+import { getProfile, login, register, getDepartments, getRoles, loginWithRefresh, forgot,reset } from './loginAPI';
 import { Cred } from '../../models/Cred'
 import { ProfileModel } from '../../models/Profile'
 import { UserModel } from '../../models/User'
@@ -56,6 +56,29 @@ export const forgotAsync = createAsyncThunk(
   async ({ email }: { email: string }) => {
     console.log(email)
     const response = await forgot(email);
+    return response;
+  }
+);
+export const resetAsync = createAsyncThunk(
+  'login/reset',
+  async ({
+    uidb64,
+    token,
+    password,
+    confirmPassword,
+  }: {
+    uidb64: string,// props.match.params.uidb64,
+    token: string,//props.match.params.token,//props.match.param.id
+    password: string,
+    confirmPassword: string,
+  }) => {
+    // console.log(email)
+    const response = await reset(
+      uidb64,
+      token,
+      password,
+      confirmPassword,
+    );
     return response;
   }
 );
@@ -116,13 +139,13 @@ export const loginSlice = createSlice({
     builder
       .addCase(regAsync.fulfilled, (state, action) => {
         console.log(action);
-        if(action.payload.status==="success"){
-          state.msg=action.payload.msg;
+        if (action.payload.status === "success") {
+          state.msg = action.payload.msg;
         }
-        else if(action.payload.status==="error"){
-          state.error=action.payload.msg;
+        else if (action.payload.status === "error") {
+          state.error = action.payload.msg;
         }
-        
+
       })
       .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
         state.access = action.payload.access;
@@ -144,20 +167,32 @@ export const loginSlice = createSlice({
         }
 
       })
-    // .addCase(loginAsync.rejected, (state, action) => {
-    //   state.error = action.error.message ?? 'An error occurred.';
-    // });
-    .addCase(forgotAsync.fulfilled, (state, action) => {
-      console.log(action);
-        if(action.payload.status==="success"){
-          state.msg=action.payload.msg;
+      // .addCase(loginAsync.rejected, (state, action) => {
+      //   state.error = action.error.message ?? 'An error occurred.';
+      // });
+      .addCase(forgotAsync.fulfilled, (state, action) => {
+        console.log(action);
+        if (action.payload.status === "success") {
+          state.msg = action.payload.msg;
           SetFormReset();
         }
-        else if(action.payload.status==="error"){
-          state.error=action.payload.msg;
+        else if (action.payload.status === "error") {
+          state.error = action.payload.msg;
         }
 
-    })
+      })
+      .addCase(resetAsync.fulfilled, (state, action) => {
+        console.log(action);
+        if (action.payload.status === "success") {
+          state.msg = action.payload.msg;
+          SetFormLogin();
+        }
+        else if (action.payload.status === "error") {
+          state.error = action.payload.msg;
+        }
+
+      })
+      
   },
 });
 

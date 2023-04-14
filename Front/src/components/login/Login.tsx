@@ -29,7 +29,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet ,useOutlet} from 'react-router-dom';
 
 export function Login() {
 
@@ -46,6 +46,12 @@ export function Login() {
   const token = useAppSelector(userToken)
   const [passwordShown, setPasswordShown] = useState(false);
   const formToShow =useAppSelector(sformToShow) ;
+  const outlet = useOutlet();
+  console.log("outlet");
+  console.log(outlet);
+  // const isComponentInOutlet =  false;//outlet?.('my-outlet') !== null;
+
+
 
   type UserSubmitForm = {
     firstName: string;
@@ -208,7 +214,7 @@ export function Login() {
 
           <MDBTabsContent>
             <MDBTabsPane show={basicActive === 'tabLogin'}>
-              {formToShow === 'login' &&
+              {formToShow === 'login' && !outlet &&
                 <form onSubmit={onSubmitLogin} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                   <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Log in</h1>
                   <div className="form-floating mb-2">
@@ -259,7 +265,7 @@ export function Login() {
                {formToShow === 'reset' &&
                 <Reset />
               }
-              {/* <Outlet></Outlet> */}
+              <Outlet/>
             </MDBTabsPane>
             <MDBTabsPane show={basicActive === 'tabRegister'}>
               <form id="formRegister" onSubmit={handleSubmit(onSubmitReg)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
