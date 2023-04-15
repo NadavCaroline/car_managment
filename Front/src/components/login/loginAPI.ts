@@ -27,6 +27,19 @@ export const register = async (user: UserModel, profile: ProfileModel) => {
   // }
   return await axios.post(MY_SERVER + 'reg',{"user":user,"profile":profile}).then((res) => res.data);
 }
+export const forgot = async (email:string) => {
+  // try {
+  //   const response = await axios.post(MY_SERVER + 'forgot', { "email": email }).then((res) => res.data);
+  //   return response;
+
+  // } catch (error: any) {
+  //   return error.response;
+  return await axios.post(MY_SERVER + 'forgot',{"email":email}).then((res) => res.data);
+}
+export const reset = async (uidb64: string,token: string,password: string) => {
+  
+  return await axios.post(MY_SERVER + 'reset/'+uidb64+"/"+token,{"password":password}).then((res) => res.data);
+}
 export const loginWithRefresh = async (refresh: string) => {
   return await axios.post(MY_SERVER + 'token/refresh/', { refresh: refresh }).then((res) => res.data)
 }
