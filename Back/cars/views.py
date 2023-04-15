@@ -11,20 +11,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from .serializers import *
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.shortcuts import render
-from django.urls import reverse
-from django.views.decorators.csrf import csrf_protect
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode    
-from django.contrib.auth.forms import SetPasswordForm
 from django.utils.encoding import force_bytes
-# from django.utils.decorators import method_decorator
-# from django.views.decorators.csrf import ensure_csrf_cookie
-# from django.views.decorators.csrf import csrf_exempt
-
-
 
 @api_view(['GET'])
 def index(r):
@@ -320,15 +310,10 @@ class DepartmentsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ForgotView(APIView):
-    # def password_reset_request(request):
-    # @csrf_exempt
-    # @method_decorator(csrf_protect)
     def post(self, request):
         try:
-            # User = get_user_model()
             msg=""
-            # if request.method == "POST":
-            email =request.data["email"]; #request.POST.get('email')
+            email =request.data["email"];
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
@@ -341,62 +326,32 @@ class ForgotView(APIView):
                 message = f"Hello {user.username},\n\nPlease click on the following link to reset your password:\n\n{reset_url}\n\nThanks,\nYour website team"
                 send_mail('Password reset request', message, None, [user.email], fail_silently=False)
                 msg={"status":"success","msg":"מייל נשלח בהצלחה עם קישור לאיפוס סיסמא"}
-            # return render(request, 'registration/password_reset_request.html')
-            # else:
-                # return render(request, 'registration/password_reset_request.html')
         except Exception as e:
             # Handle the exception
             msg={"status":"error","msg":str(e)}
         return Response(msg)
     
-# @method_decorator(ensure_csrf_cookie, name='dispatch')
-# @method_decorator(csrf_protect, name='dispatch')
-# @method_decorator(csrf_exempt, name='dispatch')
+
 class ResetView(APIView):
     def post(self,request, uidb64, token):
         msg=""
-        try: 
-            uid = urlsafe_base64_decode(uidb64).decode()
-            user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            user = None
-            raise Exception('uid has an invalid value')
+        try:
+            try: 
+                uid = urlsafe_base64_decode(uidb64).decode()
+                user = User.objects.get(pk=uid)
+            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+                user = None
+                msg={"status":"error","msg":"uid has an invalid value"}
 
-        if user and default_token_generator.check_token(user, token):
-            # if request.method == 'POST':
-                form = SetPasswordForm(user, request.POST)
-                if form.is_valid():
-                    form.save()
-                    return render(request, 'registration/password_reset_complete.html')
-            # else:
-            #     form = SetPasswordForm(user)
-                return render(request, 'registration/password_reset_confirm.html', {'form': form})
-        else:
-            raise Exception("The token is not valid")
-            return render(request, 'registration/password_reset_invalid.html')
-    # @csrf_protect
-    # def password_reset_confirm(request, uidb64, token):
-    # def get(self,request, uidb64, token):
-    #     msg=""
-    #     try: 
-    #         uid = urlsafe_base64_decode(uidb64).decode()
-    #         user = User.objects.get(pk=uid)
-    #     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-    #         user = None
-    #         raise Exception('uid has an invalid value')
-
-    #     if user and default_token_generator.check_token(user, token):
-    #         if request.method == 'POST':
-    #             form = SetPasswordForm(user, request.POST)
-    #             if form.is_valid():
-    #                 form.save()
-    #                 return render(request, 'registration/password_reset_complete.html')
-    #         else:
-    #             form = SetPasswordForm(user)
-    #         return render(request, 'registration/password_reset_confirm.html', {'form': form})
-    #     else:
-    #         raise Exception("The token is not valid")
-    #         return render(request, 'registration/password_reset_invalid.html')
-        
-   
+            if user and default_token_generator.check_token(user, token):
+                user.set_password(request.data["password"])
+                user.save()
+                msg={"status":"success","msg":"סיסמא חדשה עודכנה בהצלחה"}
+            else:
+                msg={"status":"error","msg":"The token is not valid"}
+        except Exception as e:
+            # Handle the exception
+            msg={"status":"error","msg":str(e)}
+        return Response(msg)
+    
     

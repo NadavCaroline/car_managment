@@ -8,27 +8,12 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import Redirect from "react-router-dom";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { SetFormLogin, resetAsync, } from './loginSlice';
-import { useParams } from 'react-router-dom';
+import { useParams ,useNavigate  } from 'react-router-dom';
 
-// interface Props {
-//     match: {
-//         params: {
-//             uidb64: string;
-//             token: string;
-//         }
-//     }
-// }
 const Reset: React.FC = (): JSX.Element => {
     const params = useParams();
-    // const uidb64=params.uidb64;
-    // const token= params.token;
-
-    //  return <>Link ID parameter === "{params.id}"</>;
-    //   const [newPassword, setNewPassword] = useState("");
-    //   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    //     event.preventDefault();
-    //     // Send a request to the backend to update the password
-    //   };
+    const navigate = useNavigate ();
+  
     const dispatch = useAppDispatch();
 
     type UserResetForm = {
@@ -55,35 +40,20 @@ const Reset: React.FC = (): JSX.Element => {
     } = useForm<UserResetForm>({
         resolver: yupResolver(validationSchema)
     });
-    //  const data={
-    //   token: this && this?.props.match.param.id
-
-    //  }
+    
     const onReset = (data: UserResetForm) => {
         console.log(JSON.stringify(data, null, 2));
         // Send a request to the backend to update the password
         try {
             dispatch(resetAsync({
-                uidb64: String(params.uidb64),// props.match.params.uidb64,
-                token: String(params.token),//props.match.params.token,//props.match.param.id
+                uidb64: String(params.uidb64),
+                token: String(params.token),
                 password: data.password,
-                confirmPassword: data.confirmPassword,
-            }));
+            })).then((res) => {res.payload?.status==="success" && navigate('/')} );
 
-            //  const response = await axios.post('/api/password/reset/confirm/', {
-            //  const response = await axios.post('/reset/'+params.uidb64+"/"+params.token, {
-
-            //   uidb64:params.uidb64,// props.match.params.uidb64,
-            //   token: params.token,//props.match.params.token,//props.match.param.id
-            //    password: data.password,
-            //    confirmPassword: data.confirmPassword,
-            //  });
-            // handle success
-            // dispatch(SetFormLogin());
-
+           
 
         } catch (error) {
-            // setError(error.response.data.detail);
         }
     };
     // Password toggle handler
@@ -93,7 +63,6 @@ const Reset: React.FC = (): JSX.Element => {
         setPasswordShown(!passwordShown);
     };
     return (
-        // this.state.reset ? <Redirect to={'/login'}/> :
         <form id="resetPasswordPage" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
             <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Reset password</h1>
             {/* <!-- Password input --> */}

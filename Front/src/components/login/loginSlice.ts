@@ -65,19 +65,15 @@ export const resetAsync = createAsyncThunk(
     uidb64,
     token,
     password,
-    confirmPassword,
   }: {
-    uidb64: string,// props.match.params.uidb64,
-    token: string,//props.match.params.token,//props.match.param.id
+    uidb64: string,
+    token: string,
     password: string,
-    confirmPassword: string,
   }) => {
-    // console.log(email)
     const response = await reset(
       uidb64,
       token,
       password,
-      confirmPassword,
     );
     return response;
   }

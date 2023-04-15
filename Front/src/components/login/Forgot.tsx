@@ -4,16 +4,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { SetFormReset ,forgotAsync} from './loginSlice';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 
 const Forgot = () => {
-  //   const [email, setEmail] = useState("");
-  //   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //     event.preventDefault();
-  //     // Send a password reset link to the user's email
-  //   };
   const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
   type UserResetForm = {
     email: string;
@@ -36,12 +33,10 @@ const Forgot = () => {
   });
   const onReset = (data: UserResetForm) => {
     console.log(JSON.stringify(data, null, 2));
+    setIsLoading(true);
     // Send a password reset link to the user's email
-    dispatch(forgotAsync({ email: data.email}));
-    // dispatch(SetFormReset());
-
-    // dispatch(regAsync({ user: { first_name: data.firstName, last_name: data.lastName, password: data.password, username: data.userName, email: data.email }, profile: { jobTitle: data.jobTitle, roleLevel: data.role, department: data.department, realID: data.id } }));
-  };
+    dispatch(forgotAsync({ email: data.email})).then((res) => {setIsLoading(false);} );
+     };
   return (
     <form id="resetPasswordForm" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
       <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Forgot password</h1>
@@ -51,7 +46,7 @@ const Forgot = () => {
         <label className="form-label" htmlFor="resetEmail" style={{ marginLeft: "0px" }}>Email</label>
       </div>
       <div className="col text-center">
-        <button type='submit' className="btn btn-primary" >Submit</button>
+        <button type='submit' className="btn btn-primary" > {isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'Submit'}</button>
       </div>
     </form>
   );
