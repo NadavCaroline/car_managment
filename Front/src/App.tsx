@@ -19,6 +19,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { isLogged, loginWithRefreshAsync, logout, userAccess, userRefresh } from './components/login/loginSlice';
 
 import { Login } from './components/login/Login';
+import { getOrdersAsync } from './components/orders/OrdersSlice';
 
 function App() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
@@ -50,7 +51,6 @@ function App() {
   useEffect(() => {
     access && setdecoded(jwt_decode(access))
   }, [access])
-
 
   return (
     logged ?
