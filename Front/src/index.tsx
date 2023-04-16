@@ -55,6 +55,21 @@ root.render(
                         <Route path="/allUsers" element={<Users />} />
                         <Route path="/maintenanceTypes" element={<MaintenanceType />} />
                         <Route path="/notifications" element={<Notifications />} />
+                        <Route path="/myOrders" element={<MyOrders/>} />
+                        <Route path="/login" element={<Login/>} />
+                        <Route path="/profile" element={<Profile/>} />
+                        <Route path="/logs" element={<Logs/>} />
+                        <Route path="/Cars" element={<Cars/>} />
+                        <Route path="/makeOrder" element={<MakeOrder/>} />
+                        <Route path="/maintenance" element={<Maintenance/>} />
+                        <Route path="/drivings" element={<Drivings/>} />
+                        <Route path="/departements" element={<Departments/>} />                        
+                        <Route path="/allUsers" element={<Users/>} />
+                        <Route path="/maintenanceTypes" element={<MaintenanceType/>} />
+                        <Route path="/notifications" element={<Notifications/>} />
+                        <Route path="/forgot" element={<Forgot/>} />
+                        <Route path="/reset/:uidb64/:token" element={<Reset/>} />
+                        {/* <Route path="/reset/:id" element={<Reset/>} /> */}
                     </Route>
                 </Routes>
             </BrowserRouter>
