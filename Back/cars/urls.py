@@ -17,6 +17,7 @@ urlpatterns = [
     path('allusers/<id>', views.AllUsersView.as_view()),
     path('cars', views.CarsView.as_view()),
     path('allCars', views.AllCarsView.as_view()),
+    path('allCars/<id>', views.AllCarsView.as_view()),
     path('cars/<id>', views.CarsView.as_view()),
     path('departments', views.DepartmentsView.as_view()),
     path('departments/<id>', views.DepartmentsView.as_view()),

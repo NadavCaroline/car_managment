@@ -150,6 +150,6 @@ class CarMaintenanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarMaintenance
         fields = ['id', 'car', 'car_name', 'maintenanceDate',
-                  'maintenanceFile', 'testDate', 'testFile',
-                  'mekifFile', 'hovaFile', 'kilometer']
+                  'file1', 'file2', 'shift',
+                  'maintenanceType', 'kilometer']
 

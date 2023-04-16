@@ -34,11 +34,8 @@
     "react-bootstrap-time-picker": "^2.0.1",
     "react-datepicker": "^4.10.0",
     "react-dom": "^18.2.0",
-<<<<<<< HEAD
     "react-hook-form": "^7.43.9",
-=======
     "react-icons": "^4.8.0",
->>>>>>> allUsers-ft
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.2",
     "react-scripts": "5.0.1",

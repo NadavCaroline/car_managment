@@ -137,6 +137,23 @@ class AllCarsView(APIView):
         serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data)
 
+    def post(self, request):
+        serializer = CreateCarsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, id):
+        my_model = Cars.objects.get(id=int(id))
+        serializer = CarsSerializer(my_model, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @permission_classes([IsAuthenticated])
 class AvaliableOrdersView(APIView):
@@ -218,8 +235,6 @@ class CarOrdersView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, id):
-        print(id)
-        print(request.data)
         my_model = CarOrders.objects.get(id=int(id))
         my_model.ended = True
         model_dict = model_to_dict(my_model)
