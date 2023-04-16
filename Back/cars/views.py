@@ -75,6 +75,38 @@ def register(request):
 
 
 @permission_classes([IsAuthenticated])
+class AllProfilesView(APIView):
+    def get(self, request):
+        profiles = Profile.objects.all()
+        serializer = ProfileSerializer(profiles, many=True)
+        return Response(serializer.data)
+
+    def patch(self, request, id):
+        my_model = Profile.objects.get(id=int(id))
+        serializer = CreateProfileSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes([IsAuthenticated])
+class AllUsersView(APIView):
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    def patch(self, request, id):
+        my_model = User.objects.get(id=int(id))
+        serializer = UserSerializer(my_model, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes([IsAuthenticated])
 class ProfileView(APIView):
     def get(self, request):
         user = request.user

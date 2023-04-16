@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from .models import (Profile,
                      Cars,
                      CarMaintenance,
@@ -94,11 +95,18 @@ class CreateShiftsSerializer(serializers.ModelSerializer):
 
 #################  READ ONLY SERIALIZERS ##################
 
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
 class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['id', 'user_name', 'realID', 'roleLevel',
+        fields = ['id','user', 'user_name', 'realID', 'roleLevel',
                   'jobTitle', 'dep_name', 'department']
 
 
@@ -144,3 +152,4 @@ class CarMaintenanceSerializer(serializers.ModelSerializer):
         fields = ['id', 'car', 'car_name', 'maintenanceDate',
                   'maintenanceFile', 'testDate', 'testFile',
                   'mekifFile', 'hovaFile', 'kilometer']
+

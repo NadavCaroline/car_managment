@@ -23,5 +23,5 @@ npm install --save react-toastify
 npm install react-hook-form    
 npm install @hookform/resolvers
 npm i yup
-
+npm install react-icons
 npm start

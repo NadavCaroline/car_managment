@@ -20,6 +20,7 @@ import { isLogged, loginWithRefreshAsync, logout, userAccess, userRefresh } from
 
 import { Login } from './components/login/Login';
 import { getOrdersAsync } from './components/orders/OrdersSlice';
+import { adminSelector, getProfileAsync, profileSelector } from './components/profile/profileSlicer';
 
 function App() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
@@ -28,8 +29,11 @@ function App() {
   const logged = useAppSelector(isLogged)
   const access = useAppSelector(userAccess)
   const refresh = useAppSelector(userRefresh)
+  const profile = useAppSelector(profileSelector)
   const [decoded, setdecoded] = useState<any>("")
-
+  const isAdmin = useAppSelector(adminSelector)
+  
+  // Checks if the tokens are not expired
   useEffect(() => {
     if (localStorage.hasOwnProperty('access')) {
       const decodedToken: any = jwtDecode(localStorage.getItem('access')!);
@@ -48,9 +52,15 @@ function App() {
     }
   }, [])
 
+  // Decode the access token
   useEffect(() => {
     access && setdecoded(jwt_decode(access))
   }, [access])
+  
+  // Checks if the user has access to admin features
+  useEffect(() => {
+    dispatch(getProfileAsync(access))
+  }, [])
 
   return (
     logged ?
@@ -58,10 +68,13 @@ function App() {
         <div dir='rtl'>
           < header >
             <nav className="navbar navbar-expand-lg navbar-light " style={{ backgroundColor: 'rgb(19, 125, 141)' }}>
-              <a className="navbar-brand text-info font-weight-bolder">
-                <img src={Logo} alt="Logo" width="36" height="36" className="vertical-align-middle" />
-                <span className="navbar-brand"> {decoded.username} </span>
-              </a>
+              <div className="navbar-brand text-info font-weight-bolder">
+                <a href='/'>
+                  <img src={Logo} alt="Logo" width="36" height="36" className="vertical-align-middle" />
+                </a>
+                {/* <a href={'/profile'} className="navbar-brand" > {decoded.username}</a> */}
+                <a href='/profile' className="navbar-brand" > {decoded.username} </a>
+              </div>
               <button className="custom-toggler navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded={!isNavCollapsed ? true : false} aria-label="Toggle navigation" onClick={handleNavCollapse}>
                 <span className="navbar-toggler-icon"></span>
               </button>
@@ -71,6 +84,8 @@ function App() {
                 <a className="nav-link " href="/maintenance">טיפולי רכב</a>
                 <a className="nav-link " href="/drivings">ניהול נסיעות</a>
                 {/* רק מנהל מחלקה יכול לראות את התפריטים הבאים */}
+                {
+                  isAdmin && 
                 <Dropdown >
                   <Dropdown.Toggle variant="transparent" style={{ color: "white !important" }} id="dropdown-basic">
                     פעולות מנהל     </Dropdown.Toggle>
@@ -86,6 +101,7 @@ function App() {
 
                   </Dropdown.Menu>
                 </Dropdown>
+                }
               </div>
               <div className="item justify-content-end">
                 <a href="/Notifications" style={{ paddingRight: "1.5em", paddingLeft: "1em" }}>
@@ -96,7 +112,7 @@ function App() {
               <div className=" justify-content-end">
                 <button className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>Logout</button>
               </div>
-             
+
             </nav>
 
             {/* <nav className="navbar navbar-expand-lg navbar-light" style={{backgroundColor:'#42C1C5' }}>
