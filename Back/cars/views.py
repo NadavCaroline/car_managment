@@ -26,13 +26,14 @@ def register(request):
     print(request.data)
     # print(type(request.data['profile']['rolelvel']))
 
-    msg=""
+    msg = ""
     if User.objects.filter(username=request.data['user']['username']).exists():
-        msg={"status":"error","msg":"משתמש כבר קיים"}
+        msg = {"status": "error", "msg": "משתמש כבר קיים"}
     elif Profile.objects.filter(realID=request.data['profile']['realID']).exists():
-        msg={"status":"error","msg":"תעודת זהות כבר קיימת במערכת"}
-    else: 
-        department = Departments.objects.get(id=request.data['profile']['department'])
+        msg = {"status": "error", "msg": "תעודת זהות כבר קיימת במערכת"}
+    else:
+        department = Departments.objects.get(
+            id=request.data['profile']['department'])
         role = Roles.objects.get(id=request.data['profile']['roleLevel'])
 
         user = User.objects.create_user(
@@ -41,24 +42,57 @@ def register(request):
             username=request.data['user']['username'],
             email=request.data['user']['email'],
             password=request.data['user']['password'],
-            is_superuser=True if role.id==3 else False
-                    
+            is_superuser=True if role.id == 3 else False
+
         )
         user.is_active = True
         user.is_staff = True
         user.save()
-    
+
         profile = Profile.objects.create(
             user=user,
             jobTitle=request.data['profile']['jobTitle'],
-            roleLevel= Roles.objects.get(id= request.data['profile']['roleLevel']),
+            roleLevel=Roles.objects.get(
+                id=request.data['profile']['roleLevel']),
             department=department,
             realID=request.data['profile']['realID'],
-            )
+        )
         profile.save()
-        msg={"status":"success","msg":"משתמש נוצר בהצלחה"}
+        msg = {"status": "success", "msg": "משתמש נוצר בהצלחה"}
 
     return Response(msg)
+
+
+@permission_classes([IsAuthenticated])
+class AllProfilesView(APIView):
+    def get(self, request):
+        profiles = Profile.objects.all()
+        serializer = ProfileSerializer(profiles, many=True)
+        return Response(serializer.data)
+
+    def patch(self, request, id):
+        my_model = Profile.objects.get(id=int(id))
+        serializer = CreateProfileSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes([IsAuthenticated])
+class AllUsersView(APIView):
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    def patch(self, request, id):
+        my_model = User.objects.get(id=int(id))
+        serializer = UserSerializer(my_model, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes([IsAuthenticated])

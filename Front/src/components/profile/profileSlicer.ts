@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
 import { ProfileModel } from '../../models/Profile';
-import { getAllProfiles, getProfile } from './profileAPI';
+import { getAllProfiles, getProfile, updateProfile } from './profileAPI';
 
 
 export interface profileState {
     profile: ProfileModel
     allProfiles: ProfileModel[]
+    isAdmin: boolean
 }
 
 const initialState: profileState = {
@@ -19,7 +20,8 @@ const initialState: profileState = {
         user_name: '',
         dep_name: ''
     },
-    allProfiles: []
+    allProfiles: [],
+    isAdmin: false
 };
 
 
@@ -37,7 +39,13 @@ export const getAllProfilesAsync = createAsyncThunk(
         return response;
     }
 );
-
+export const updateProfileAsync = createAsyncThunk(
+    'profile/updateProfile',
+    async ({ token, profile }: { token: string, profile: ProfileModel }) => {
+        const response = await updateProfile(token, profile);
+        return response;
+    }
+);
 export const profileSlice = createSlice({
     name: 'profile',
     initialState,
@@ -46,18 +54,17 @@ export const profileSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(getProfileAsync.fulfilled, (state, action) => {
-                console.log(action.payload)
+                action.payload.roleLevel >= 2 && (state.isAdmin = true)
                 state.profile = action.payload;
             })
             .addCase(getAllProfilesAsync.fulfilled, (state, action) => {
-                console.log(action.payload)
                 state.allProfiles = action.payload;
             });
     },
 });
-
 export const { } = profileSlice.actions;
 export const profileSelector = (state: RootState) => state.profile.profile;
 export const allProfileSelector = (state: RootState) => state.profile.allProfiles;
+export const adminSelector = (state: RootState) => state.profile.isAdmin;
 
 export default profileSlice.reducer;

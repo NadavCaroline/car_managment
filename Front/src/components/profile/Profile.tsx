@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { userToken } from '../login/loginSlice'
+import { userAccess } from '../login/loginSlice'
 import { getProfileAsync, profileSelector } from './profileSlicer'
 
 const Profile = () => {
     const dispatch = useAppDispatch()
     const profile = useAppSelector(profileSelector)
-    const token = useAppSelector(userToken)
+    const token = useAppSelector(userAccess)
 
     useEffect(() => {
         dispatch(getProfileAsync(token))
@@ -15,18 +15,18 @@ const Profile = () => {
 
     return (
         <div>
-            <h1>Your Profile</h1>
+            <h1>הפרופיל שלך</h1>
             <div>
-                Name: {profile.user_name}
+                שם מלא: {profile.user_name}
             </div>
             <div>
-                Department:  {profile.dep_name}
+                מחלקה:  {profile.dep_name}
             </div>
             <div>
-                Job Title: {profile.jobTitle}
+                תפקיד: {profile.jobTitle}
             </div>
             <div>
-                ID: {profile.realID}
+                תעודת זהות: {profile.realID}
             </div>
         </div>
     )

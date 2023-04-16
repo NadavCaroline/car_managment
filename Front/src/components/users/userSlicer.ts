@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { getUsers } from './usersAPI';
+import { getUsers, updateUser } from './usersAPI';
+import { UserModel } from '../../models/User';
 
 
 export interface usersState {
-    users: any[]
+    users: UserModel[]
 }
 
 const initialState: usersState = {
@@ -19,7 +20,13 @@ export const getUsersAsync = createAsyncThunk(
         return response;
     }
 );
-
+export const updateUserAsync = createAsyncThunk(
+    'users/updateUser',
+    async ({token, user}: {token: string, user: UserModel}) => {
+        const response = await updateUser(token, user);
+        return response;
+    }
+);
 
 export const usersSlice = createSlice({
     name: 'users',
@@ -29,7 +36,6 @@ export const usersSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(getUsersAsync.fulfilled, (state, action) => {
-                console.log(action.payload)
                 state.users = action.payload;
             });
     },

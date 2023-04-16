@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { carsSelector, getAllCarsAsync, getCarsAsync } from './carsSlice';
-import { userToken } from '../login/loginSlice';
+import { userAccess, userToken } from '../login/loginSlice';
 import { getProfileAsync, profileSelector } from '../profile/profileSlicer';
 import { MY_SERVER } from '../../env';
 
 export function Cars() {
   const cars = useAppSelector(carsSelector);
   const dispatch = useAppDispatch();
-  const token = useAppSelector(userToken)
+  const token = useAppSelector(userAccess)
   const profile = useAppSelector(profileSelector)
   useEffect(() => {
     dispatch(getProfileAsync(token)) 
@@ -18,6 +18,9 @@ export function Cars() {
 
   return (
     <div style={{marginTop: '10px'}}>
+      <div>
+        <button onClick={()=>console.log("הוספת מכונית")}>הוספת מכונית</button>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
         {cars.map(car =>
           <div key={car.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem' }}>
