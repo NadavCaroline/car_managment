@@ -32,7 +32,7 @@ function App() {
   const profile = useAppSelector(profileSelector)
   const [decoded, setdecoded] = useState<any>("")
   const isAdmin = useAppSelector(adminSelector)
-  
+
   // Checks if the tokens are not expired
   useEffect(() => {
     if (localStorage.hasOwnProperty('access')) {
@@ -41,12 +41,10 @@ function App() {
         localStorage.removeItem('access')
         dispatch(loginWithRefreshAsync(refresh))
       }
-    }
-    else {
+    } else {
       if (refresh) {
         dispatch(loginWithRefreshAsync(refresh))
-      }
-      else {
+      } else {
         dispatch(logout())
       }
     }
@@ -56,11 +54,16 @@ function App() {
   useEffect(() => {
     access && setdecoded(jwt_decode(access))
   }, [access])
-  
+
+  // Gets the profile to see if admin
+  const getProfile = async() => {
+  const x =  await dispatch(getProfileAsync(access))
+  }
+
   // Checks if the user has access to admin features
   useEffect(() => {
-    dispatch(getProfileAsync(access))
-  }, [])
+    getProfile()
+  }, [logged])
 
   return (
     logged ?
@@ -83,25 +86,24 @@ function App() {
                 <a className="nav-link " href="/makeOrder">הזמנת רכב</a>
                 <a className="nav-link " href="/maintenance">טיפולי רכב</a>
                 <a className="nav-link " href="/drivings">ניהול נסיעות</a>
+
                 {/* רק מנהל מחלקה יכול לראות את התפריטים הבאים */}
-                {
-                  isAdmin && 
-                <Dropdown >
-                  <Dropdown.Toggle variant="transparent" style={{ color: "white !important" }} id="dropdown-basic">
-                    פעולות מנהל     </Dropdown.Toggle>
-
-                  <Dropdown.Menu >
-                    <Dropdown.Item style={{ textAlign: "right" }} href="/departements">מחלקות</Dropdown.Item>
-                    <Dropdown.Item style={{ textAlign: "right" }} href="/allUsers">משתמשים</Dropdown.Item>
-                    <Dropdown.Item style={{ textAlign: "right" }} href="/Cars">רכבים</Dropdown.Item>
-                    <Dropdown.Item style={{ textAlign: "right" }} href="/maintenanceTypes">סוגי טיפולי רכב</Dropdown.Item>
-                    <Dropdown.Item style={{ textAlign: "right" }} href="/shifts">ניהול תורנויות</Dropdown.Item>
-                    <Dropdown.Item style={{ textAlign: "right" }} href="/reports">דוחות</Dropdown.Item>
-                    <Dropdown.Item style={{ textAlign: "right" }} href="/logs">מעקב פעולות</Dropdown.Item>
-
-                  </Dropdown.Menu>
-                </Dropdown>
+                {isAdmin &&
+                  <Dropdown >
+                    <Dropdown.Toggle variant="transparent" style={{ color: "white !important" }} id="dropdown-basic">
+                      פעולות מנהל     </Dropdown.Toggle>
+                    <Dropdown.Menu >
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/departements">מחלקות</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/allUsers">משתמשים</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/Cars">רכבים</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/maintenanceTypes">סוגי טיפולי רכב</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/shifts">ניהול תורנויות</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/reports">דוחות</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/logs">מעקב פעולות</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
                 }
+
               </div>
               <div className="item justify-content-end">
                 <a href="/Notifications" style={{ paddingRight: "1.5em", paddingLeft: "1em" }}>
@@ -110,7 +112,7 @@ function App() {
                 </a>
               </div>
               <div className=" justify-content-end">
-                <button className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>Logout</button>
+                <a href='/' className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>Logout</a>
               </div>
 
             </nav>

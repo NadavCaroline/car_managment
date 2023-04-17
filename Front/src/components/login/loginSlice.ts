@@ -110,7 +110,6 @@ export const loginSlice = createSlice({
     },
     dontRemember: (state) => {
       state.remember = false
-
     },
     SetError: (state) => {
       state.error = ""
@@ -128,7 +127,6 @@ export const loginSlice = createSlice({
       state.formToShow = "login";
     },
   },
-
   extraReducers: (builder) => {
     builder
       .addCase(regAsync.fulfilled, (state, action) => {
@@ -139,7 +137,6 @@ export const loginSlice = createSlice({
         else if (action.payload.status === "error") {
           state.error = action.payload.msg;
         }
-
       })
       .addCase(loginWithRefreshAsync.fulfilled, (state, action) => {
         state.access = action.payload.access;
@@ -165,7 +162,6 @@ export const loginSlice = createSlice({
       //   state.error = action.error.message ?? 'An error occurred.';
       // });
       .addCase(forgotAsync.fulfilled, (state, action) => {
-        console.log(action);
         if (action.payload.status === "success") {
           state.msg = action.payload.msg;
           SetFormReset();
@@ -173,10 +169,8 @@ export const loginSlice = createSlice({
         else if (action.payload.status === "error") {
           state.error = action.payload.msg;
         }
-
       })
       .addCase(resetAsync.fulfilled, (state, action) => {
-        console.log(action);
         if (action.payload.status === "success") {
           state.msg = action.payload.msg;
           SetFormLogin();
