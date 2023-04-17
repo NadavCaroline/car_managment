@@ -3,6 +3,7 @@ npx create-react-app my-app
 cd my-app
 
 npm i axios
+npm install bootstrap react-bootstrap-rtl
 npm install react-bootstrap bootstrap
 npm install react-router-dom@6
 npm install --save react-toastify  or    npm i react-toastify@9.0.3

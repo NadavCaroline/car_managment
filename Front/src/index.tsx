@@ -11,7 +11,9 @@ import { MyOrders } from './components/orders/MyOrders';
 // import { Login } from './components/Login';
 // import Profile from './components/Profile';
 import 'bootstrap';
-import 'bootstrap/dist/css/bootstrap.css';
+
+import 'bootstrap/dist/css/bootstrap.rtl.min.css';
+// import 'bootstrap/dist/css/bootstrap.css';
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/js/bootstrap.bundle';
 import { Login } from './components/login/Login';

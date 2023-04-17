@@ -63,13 +63,13 @@ const Reset: React.FC = (): JSX.Element => {
         setPasswordShown(!passwordShown);
     };
     return (
-        <form id="resetPasswordPage" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
-            <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Reset password</h1>
+        <form dir="rtl" id="resetPasswordPage" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+            <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >איפוס סיסמא</h1>
             {/* <!-- Password input --> */}
             <div className="input-group mb-3">
                 <div className="form-floating">
                     <input type={passwordShown ? "text" : "password"} {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} placeholder="Password" id="passwordReset" />
-                    <label htmlFor="floatingPassword">Password</label>
+                    <label htmlFor="floatingPassword">סיסמא</label>
                     <div className="invalid-feedback">{errors.password?.message}</div>
                 </div>
                 <span onClick={togglePassword} className="input-group-text">
@@ -84,7 +84,7 @@ const Reset: React.FC = (): JSX.Element => {
             <div className="input-group mb-3">
                 <div className="form-floating">
                     <input type={passwordShown ? "text" : "password"} {...register('confirmPassword')} className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`} placeholder="Confirm Password" id="confirmPasswordReset" />
-                    <label htmlFor="confirmPassword">Confirm Password</label>
+                    <label htmlFor="confirmPassword">אימות סיסמא</label>
                     <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
                 </div>
                 <span onClick={togglePassword} className="input-group-text">

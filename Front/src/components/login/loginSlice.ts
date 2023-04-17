@@ -129,6 +129,10 @@ export const loginSlice = createSlice({
     SetFormLogin: (state) => {
       state.formToShow = "login";
     },
+    SetFormRegister: (state) => {
+      state.formToShow = "register";
+    },
+    
   },
 
   extraReducers: (builder) => {
@@ -137,6 +141,7 @@ export const loginSlice = createSlice({
         console.log(action);
         if (action.payload.status === "success") {
           state.msg = action.payload.msg;
+          SetFormLogin();
         }
         else if (action.payload.status === "error") {
           state.error = action.payload.msg;
@@ -192,7 +197,7 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { logout, remember, dontRemember, SetError, SetMsg, SetFormForgot, SetFormLogin, SetFormReset } = loginSlice.actions;
+export const { logout, remember, dontRemember, SetError, SetMsg, SetFormForgot, SetFormLogin, SetFormReset,SetFormRegister } = loginSlice.actions;
 export const loginError = (state: RootState) => state.login.error;
 export const loginMsg = (state: RootState) => state.login.msg;
 export const userAccess = (state: RootState) => state.login.access;
