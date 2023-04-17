@@ -196,7 +196,6 @@ const MakeOrder = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
         {availableCars.map(car =>
           <div key={car.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem' }}>
-
             <div style={{ textAlign: 'center' }}>
               מחלקה: {car.dep_name}<br />
               יצרן: {car.make}<br />
