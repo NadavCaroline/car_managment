@@ -10,13 +10,15 @@ export interface OrderState {
   availableCars: CarModel[]
   notAvilable: CarModel[]
   orderDetails: any[]
+  activeOrder: boolean
 }
 
 const initialState: OrderState = {
-  orders: [], // The orders of the user.
-  availableCars: [], // The available cars in a specific date.
-  notAvilable: [], // The taken cars in a specific date.
-  orderDetails: [] // The details about the taken cars - Date and hour.
+  orders: [],
+  availableCars: [],
+  notAvilable: [],
+  orderDetails: [],
+  activeOrder: false
 };
 
 export const getOrdersAsync = createAsyncThunk(
@@ -61,6 +63,7 @@ export const myOrderSlice = createSlice({
     builder
       .addCase(getOrdersAsync.fulfilled, (state, action) => {
         state.orders = action.payload
+        state.activeOrder = state.orders.find(order => new Date(order.fromDate).getTime() <= new Date().getTime() && new Date(order.toDate).getTime() >= new Date().getTime() && order.ended === false) ? true : false
       })
       .addCase(addOrderAsync.fulfilled, (state, action) => {
         state.orders.push(action.payload)
@@ -82,4 +85,5 @@ export const ordersSelector = (state: RootState) => state.myOrder.orders;
 export const availableCarsSelector = (state: RootState) => state.myOrder.availableCars;
 export const notAvilableSelector = (state: RootState) => state.myOrder.notAvilable;
 export const orderDetailsSelector = (state: RootState) => state.myOrder.orderDetails;
+export const isActiveOrderSelector = (state: RootState) => state.myOrder.activeOrder;
 export default myOrderSlice.reducer;

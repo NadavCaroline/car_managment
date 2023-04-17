@@ -180,17 +180,17 @@ class Drivings(models.Model):
     endKilometer = models.IntegerField(null=True)
     comments = models.CharField(max_length=200, blank=True)
     startImg1 = models.ImageField( upload_to='images/',
-        null=True, blank=True, default='/placeholder.png')
+        null=True, blank=True)
     startImg2 = models.ImageField(upload_to='images/',
-        null=True, blank=True, default='/placeholder.png')
+        null=True, blank=True)
     startImg3 = models.ImageField(upload_to='images/',
-        null=True, blank=True, default='/placeholder.png')
+        null=True, blank=True)
     endImg1 = models.ImageField(upload_to='images/',
-        null=True, blank=True, default='/placeholder.png')
+        null=True, blank=True)
     endImg2 = models.ImageField(upload_to='images/',
-        null=True, blank=True, default='/placeholder.png')
+        null=True, blank=True)
     endImg3 = models.ImageField(upload_to='images/',
-        null=True, blank=True, default='/placeholder.png')
+        null=True, blank=True)
 
     @property
     def car_name(self):
