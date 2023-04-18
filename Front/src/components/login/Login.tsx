@@ -34,8 +34,8 @@ export function Login() {
   const [passwordShown, setPasswordShown] = useState(false);
   const formToShow = useAppSelector(sformToShow);
   const outlet = useOutlet();
-  console.log("outlet");
-  console.log(outlet);
+  // console.log("outlet");
+  // console.log(outlet);
   // const isComponentInOutlet =  false;//outlet?.('my-outlet') !== null;
 
   type UserLoginForm = {
