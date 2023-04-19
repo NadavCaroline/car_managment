@@ -1,10 +1,18 @@
 import axios from 'axios';
-
-const DEPS_SERVER = 'http://127.0.0.1:8000/departments'
+import { DepModel } from '../../models/Deps';
+import { MY_SERVER } from '../../env';
 
 
 export const getDeps = async (token: string) => {
-  return await axios.get(DEPS_SERVER, {
+  return await axios.get(MY_SERVER + 'departments', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  }).then((res) => res.data);
+}
+
+export const addDep = async (token: string, dep: DepModel) => {
+  return await axios.post(MY_SERVER + 'departments', dep, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
