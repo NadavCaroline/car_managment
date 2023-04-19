@@ -11,7 +11,9 @@ import { MyOrders } from './components/orders/MyOrders';
 // import { Login } from './components/Login';
 // import Profile from './components/Profile';
 import 'bootstrap';
-import 'bootstrap/dist/css/bootstrap.css';
+
+import 'bootstrap/dist/css/bootstrap.rtl.min.css';
+// import 'bootstrap/dist/css/bootstrap.css';
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/js/bootstrap.bundle';
 import { Login } from './components/login/Login';
@@ -23,15 +25,13 @@ import Maintenance from './components/maintenance/Maintenance';
 import Departments from './components/deps/Departments';
 import { Drivings } from './components/drivings/Drivings';
 import Users from './components/users/Users';
-import MaintenanceType from './components/maintenance/MaintenanceType';
+import MaintenanceType from './components/maintenanceType/MaintenanceType';
 import Notifications from './components/notifications/Notifications';
 import { useAppSelector } from './app/hooks';
 import { ordersSelector } from './components/orders/OrdersSlice';
-
 import Forgot from './components/login/Forgot';
 import Reset from './components/login/Reset';
-
-
+import Shifts from './components/shifts/Shifts';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -57,7 +57,6 @@ root.render(
                         <Route path="/allUsers" element={<Users />} />
                         <Route path="/maintenanceTypes" element={<MaintenanceType />} />
                         <Route path="/notifications" element={<Notifications />} />
-                        <Route path="/myOrders" element={<MyOrders />} />
                         <Route path="/logs" element={<Logs />} />
                         {/* <Route path="/reset/:id" element={<Reset/>} /> */}
                     </Route>

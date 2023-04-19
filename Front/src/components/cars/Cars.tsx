@@ -49,12 +49,17 @@ export function Cars() {
   const handlePostRequest = () => {
     const car: CarModel = {
       licenseNum: licenseNum,
+      nickName:'',
       make: make,
       model: model,
       color: color,
       year: year,
+      garageName:'',
+      garagePhone:'',
       department: department,
-      image: carImage
+      image: carImage,
+      isDisabled:'0'
+      
     }
     dispatch(addCarsAsync({ token: token, car: car }))
   }

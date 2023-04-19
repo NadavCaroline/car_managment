@@ -133,6 +133,7 @@ class ProfileView(APIView):
 @permission_classes([IsAuthenticated])
 class AllCarsView(APIView):
     def get(self, request):
+        #get all Cars also car that are disabled
         cars = Cars.objects.all()
         serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data)
@@ -196,9 +197,9 @@ class CarsView(APIView):
         user = request.user
         cars = Cars.objects.all()
         # The next row filters the cars_model list to contain only the
-        # cars matching the user's department id.
+        # cars matching the user's department id and is not disabled
         cars = list(filter(lambda car: (car.department.id ==
-                    user.profile.department.id), cars))
+                    user.profile.department.id and car.isDisabled==False ), cars))
         serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data)
 

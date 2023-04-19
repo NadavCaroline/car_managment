@@ -38,15 +38,15 @@ const Forgot = () => {
     dispatch(forgotAsync({ email: data.email})).then((res) => {setIsLoading(false);} );
      };
   return (
-    <form id="resetPasswordForm" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
-      <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >Forgot password</h1>
+    <form dir="rtl" id="resetPasswordForm" onSubmit={handleSubmit(onReset)} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+      <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >שכחתי סיסמא</h1>
       <div className="form-floating mb-2">
         <input type="email" id="resetEmail"   {...register('email')} className={`form-control ${errors.email ? 'is-invalid' : ''}`} placeholder="Email" />
         <div className="invalid-feedback">{errors.email?.message}</div>
-        <label className="form-label" htmlFor="resetEmail" style={{ marginLeft: "0px" }}>Email</label>
+        <label className="form-label" htmlFor="resetEmail" style={{ marginLeft: "0px" }}>אימייל</label>
       </div>
       <div className="col text-center">
-        <button type='submit' className="btn btn-primary" > {isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'Submit'}</button>
+        <button type='submit' className="btn btn-primary" > {isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'שלח'}</button>
       </div>
     </form>
   );
