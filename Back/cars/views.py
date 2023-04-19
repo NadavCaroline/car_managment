@@ -10,16 +10,15 @@ from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from .serializers import *
-
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode    
 from django.utils.encoding import force_bytes
+from .helper import write_to_log
 
 @api_view(['GET'])
 def index(r):
     return Response('index')
-
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -80,6 +79,7 @@ class AllProfilesView(APIView):
         serializer = CreateProfileSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
+
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -369,7 +369,6 @@ class DepartmentsView(APIView):
         serializer = CreateDepartmentsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

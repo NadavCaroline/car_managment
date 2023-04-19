@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
 import { DepModel } from '../../models/Deps';
-import { getDeps } from './depsAPI';
+import { addDep, getDeps } from './depsAPI';
 
 
 export interface depsState {
@@ -21,6 +21,14 @@ export const getDepsAsync = createAsyncThunk(
     }
 );
 
+export const addDepAsync = createAsyncThunk(
+    'dep/addDep',
+    async ({token, dep}: {token: string, dep: DepModel}) => {
+        const response = await addDep(token, dep);
+        return response;
+    }
+);
+
 export const depsSlice = createSlice({
     name: 'dep',
     initialState,
@@ -30,6 +38,9 @@ export const depsSlice = createSlice({
         builder
             .addCase(getDepsAsync.fulfilled, (state, action) => {
                 state.deps = action.payload;
+            })
+            .addCase(addDepAsync.fulfilled, (state, action) => {
+                state.deps.push(action.payload);
             });
     },
 });

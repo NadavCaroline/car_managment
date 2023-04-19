@@ -76,7 +76,6 @@ function App() {
                 <a href='/'>
                   <img src={Logo} alt="Logo" width="36" height="36" className="vertical-align-middle" />
                 </a>
-                {/* <a href={'/profile'} className="navbar-brand" > {decoded.username}</a> */}
                 <a href='/profile' className="navbar-brand" > {decoded.username} </a>
               </div>
               <button className="custom-toggler navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded={!isNavCollapsed ? true : false} aria-label="Toggle navigation" onClick={handleNavCollapse}>
