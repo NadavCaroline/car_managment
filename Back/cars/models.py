@@ -134,7 +134,6 @@ class CarMaintenance(models.Model):
     # mekifFile = models.FileField( upload_to='mekif/', max_length=200, blank=True)
     # hovaFile = models.FileField(upload_to='hova/', max_length=200, blank=True)
 
-    
     @property
     def car_name(self):
         return self.car.make + ' ' + self.car.model
@@ -145,8 +144,6 @@ class CarMaintenance(models.Model):
 
     def __str__(self):
         return str(self.car.model) + " : " + str(self.maintenanceDate)
-
-
 
 
 
@@ -165,7 +162,6 @@ class Logs(models.Model):
     def user_name(self):
         return self.user.first_name + ' ' + self.user.last_name
     
-
     def __str__(self):
         return str(self.logDate) + ' ' + self.user_name + ' ' + self.car_name
 
