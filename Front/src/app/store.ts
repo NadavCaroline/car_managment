@@ -6,7 +6,9 @@ import loginReducer  from '../components/login/loginSlice';
 import  logReducer  from '../components/logs/logsSlice';
 import  myOrderReducer  from '../components/orders/OrdersSlice';
 import  profileReducer  from '../components/profile/profileSlicer';
-
+import  shiftReducer  from '../components/shifts/shiftsSlice';
+// import  maintena  from 'maintenanceTypesSlic' '../components/maintenanceTypes/maintenanceTypesSlice';
+// import MaintenanceTypeReducer from '../components/maintenanceType/MaintenanceTypeSlice';
 export const store = configureStore({
   reducer: {
     myOrder: myOrderReducer,
@@ -16,6 +18,8 @@ export const store = configureStore({
     profile: profileReducer,
     dep: depsReducer,
     log: logReducer,
+    shifts: shiftReducer,
+    // maintenanceTypes: maintenanceTypeReducer,
   },
 });
 

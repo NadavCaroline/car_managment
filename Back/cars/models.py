@@ -58,9 +58,6 @@ class Cars(models.Model):
     @property
     def dep_name(self):
         return self.department.name
-
-
-
     def __str__(self):
         return self.model
 
@@ -111,11 +108,14 @@ class Shifts(models.Model):
 
     @property
     def car_name(self):
-        return self.car.make + ' ' + self.car.model
+        return self.car.licenseNum+''+self.car.nickName
 
     @property
-    def user_name(self):
-        return self.user.first_name + ' ' + self.user.last_name
+    def user_name1(self):
+        return self.user1.first_name + ' ' + self.user1.last_name
+    @property
+    def user_name2(self):
+        return self.user2.first_name + ' ' + self.user2.last_name
     
     @property
     def maintenance_name(self):

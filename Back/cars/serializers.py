@@ -105,9 +105,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 class CarsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cars
-        fields = ['id', 'licenseNum', 'make', 'model',
-                  'color', 'year', 'department', 'dep_name', 'image']
-
+        fields = ['id', 'licenseNum','nickName', 'make', 'model',
+                  'color', 'year','garageName','garagePhone' ,'department','dep_name','isDisabled',  'image']
 
 class CarOrdersSerializer(serializers.ModelSerializer):
     class Meta:
