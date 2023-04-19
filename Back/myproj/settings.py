@@ -134,11 +134,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'car_manager',
         'USER': 'postgres',
-        'PASSWORD': 'qwer1234',
+        'PASSWORD': '123',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
+
 
 
 # Password validation

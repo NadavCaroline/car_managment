@@ -25,15 +25,13 @@ import Maintenance from './components/maintenance/Maintenance';
 import Departments from './components/deps/Departments';
 import { Drivings } from './components/drivings/Drivings';
 import Users from './components/users/Users';
-import MaintenanceType from './components/maintenance/MaintenanceType';
+import MaintenanceType from './components/maintenanceType/MaintenanceType';
 import Notifications from './components/notifications/Notifications';
 import { useAppSelector } from './app/hooks';
 import { ordersSelector } from './components/orders/OrdersSlice';
-
 import Forgot from './components/login/Forgot';
 import Reset from './components/login/Reset';
-
-
+import Shifts from './components/shifts/Shifts';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -71,6 +69,7 @@ root.render(
                         <Route path="/notifications" element={<Notifications/>} />
                         <Route path="/forgot" element={<Forgot/>} />
                         <Route path="/reset/:uidb64/:token" element={<Reset/>} />
+                        <Route path="/shifts" element={<Shifts/>} />
                         {/* <Route path="/reset/:id" element={<Reset/>} /> */}
                     </Route>
                 </Routes>

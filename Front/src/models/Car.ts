@@ -1,11 +1,15 @@
 export default interface CarModel {
     id?: number
-    licenseNum?: string
-    make?: string
-    model?: string
-    color?: string
-    year?: string
-    department?: string
-    dep_name?: string
-    image?: File | null
+    licenseNum: string
+    nickName:string
+    make: string
+    model: string
+    color: string
+    year:  string
+    garageName:string
+    garagePhone:string
+    department : string
+    dep_name: string
+    image : File | null
+    isDisabled:string
 }

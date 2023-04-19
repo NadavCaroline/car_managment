@@ -2,7 +2,6 @@ import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class Departments(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=30)
@@ -43,10 +42,14 @@ class Profile(models.Model):
 class Cars(models.Model):
     id = models.BigAutoField(primary_key=True)
     licenseNum = models.CharField(max_length=20)
+    nickName= models.CharField(max_length=20, null=True)
     make = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
     color = models.CharField(max_length=20)
     year = models.CharField(max_length=20)
+    garageName= models.CharField(max_length=20, null=True)
+    garagePhone= models.CharField(max_length=12, null=True)
+    isDisabled= models.BooleanField(default=False)
     department = models.ForeignKey(
         Departments, on_delete=models.PROTECT,  null=True)
     image = models.ImageField(null=True, blank=True,
@@ -55,9 +58,6 @@ class Cars(models.Model):
     @property
     def dep_name(self):
         return self.department.name
-
-
-
     def __str__(self):
         return self.model
 
@@ -89,28 +89,33 @@ class CarOrders(models.Model):
         # return str(self.orderDate)
         return self.user_name + " : " + self.car_name
     
+#  מוסך,שטיפת רכב 
 class MaintenanceTypes(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    numofdays=models.IntegerField( default=365)
-
+ 
     def __str__(self):
         return self.name
 
 class Shifts(models.Model):
     id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user1 = models.ForeignKey(User, on_delete=models.CASCADE, null=True,related_name='user1')
+    user2 = models.ForeignKey(User, on_delete=models.CASCADE, null=True,related_name='user2')# רק במקרה של מוסף נרדש שתי אנשים
     car = models.ForeignKey(Cars, on_delete=models.CASCADE, null=True)
     shiftDate = models.DateField()
     maintenanceType = models.ForeignKey(MaintenanceTypes, on_delete=models.CASCADE, null=True)
+    comments = models.CharField(max_length=200, blank=True)
 
     @property
     def car_name(self):
-        return self.car.make + ' ' + self.car.model
+        return self.car.licenseNum+''+self.car.nickName
 
     @property
-    def user_name(self):
-        return self.user.first_name + ' ' + self.user.last_name
+    def user_name1(self):
+        return self.user1.first_name + ' ' + self.user1.last_name
+    @property
+    def user_name2(self):
+        return self.user2.first_name + ' ' + self.user2.last_name
     
     @property
     def maintenance_name(self):
@@ -119,16 +124,28 @@ class Shifts(models.Model):
 
     def __str__(self):
         return self.user_name + ': ' + self.car_name + ' ' + self.maintenance_name
-
+    
+#  רשיון רכב,ביטוח חובה,ביטוח מקיף, טיפול רכב(מוסך) 
+class FileTypes(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+    fileFolderName=models.CharField(max_length=50)
+ 
+    def __str__(self):
+        return self.name
+    
 class CarMaintenance(models.Model):
     id = models.BigAutoField(primary_key=True)
     car = models.ForeignKey(Cars, on_delete=models.CASCADE, null=True)
-    maintenanceDate = models.DateField()
-    file1 = models.FileField(upload_to='maintenance/', max_length=200, blank=True)
-    file2 = models.FileField(upload_to='maintenance/', max_length=200, blank=True)
-    shift = models.ForeignKey(Shifts, on_delete=models.CASCADE, null=True)
-    maintenanceType = models.ForeignKey(MaintenanceTypes, on_delete=models.CASCADE, null=True)
-    kilometer = models.IntegerField()
+    maintenanceDate = models.DateTimeField(default=datetime.datetime.now())
+    fileMaintenance = models.FileField(upload_to='maintenance/', max_length=200, blank=True)
+    fileType = models.ForeignKey(FileTypes, on_delete=models.CASCADE, null=True)
+    expirationDate=models.DateField(null=True)#יש להסיר DEFAULT
+    nextMaintenancekilometer = models.IntegerField( null=True)# רק בטיפול רכב 
+    comments = models.CharField(max_length=200, blank=True)
+
+    # shift = models.ForeignKey(Shifts, on_delete=models.CASCADE, null=True)
+    # maintenanceType = models.ForeignKey(MaintenanceTypes, on_delete=models.CASCADE, null=True)
     # maintenanceFile = models.FileField(upload_to='maintenance/', max_length=200, blank=True)
     # testFile = models.FileField(upload_to='car_test/', max_length=200, blank=True)
     # mekifFile = models.FileField( upload_to='mekif/', max_length=200, blank=True)
@@ -138,9 +155,9 @@ class CarMaintenance(models.Model):
     @property
     def car_name(self):
         return self.car.make + ' ' + self.car.model
-    @property
-    def nextmainenancedate(self):
-        return self.maintenanceDate.date() + datetime.timedelta(days=self.maintenanceType.numofdays)   
+    # @property
+    # def nextmainenancedate(self):
+    #     return self.maintenanceDate.date() + datetime.timedelta(days=self.maintenanceType.numofdays)   
 
 
     def __str__(self):
@@ -210,5 +227,24 @@ class Drivings(models.Model):
     
     def __str__(self):
         return self.user_name + " - " + self.car_name
+class Accidents(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    car = models.ForeignKey(Cars, on_delete=models.CASCADE, null=True)
+    dateReported = models.DateTimeField(default=datetime.datetime.now())
+    Img1 = models.ImageField(upload_to='images/',
+        null=True, blank=True)
+    comments = models.CharField(max_length=200, blank=True)
 
+
+    @property
+    def car_name(self):
+        return self.car.make + ' ' + self.car.model
+
+    @property
+    def user_name(self):
+        return self.user.first_name + ' ' + self.user.last_name
+
+    def __str__(self):
+        return str(self.dateReported) + ' ' + self.user_name + ' ' + self.car_name
 
