@@ -46,8 +46,8 @@ root.render(
                         <Route path="/myOrders" element={<MyOrders />} />
                         <Route path="/login" element={<Login />} >
                             <Route path="login/forgot" element={<Forgot />} />
-                            <Route path="login/reset/:uidb64/:token" element={<Reset />} />
                         </Route>
+                        <Route path="/reset/:uidb64/:token" element={<Reset />} />
                         <Route path="/logs" element={<Logs />} />
                         <Route path="/Cars" element={<Cars />} />
                         <Route path="/makeOrder" element={<MakeOrder />} />
