@@ -203,6 +203,12 @@ select.invalid {
   color:white;
   background-color: rgb(19, 125, 141);
 }
+.avatar {
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
 
 
 

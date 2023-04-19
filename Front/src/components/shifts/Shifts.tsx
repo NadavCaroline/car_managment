@@ -16,8 +16,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { MY_SERVER } from '../../env';
 import CarModel from '../../models/Car';
-
-
+import AvatarMan from '../../images/img_avatar-man.png';
+import AvatarGirl from '../../images/img_avatar-girl.png';
 
 const Shifts = () => {
     const dispatch = useAppDispatch()
@@ -30,6 +30,8 @@ const Shifts = () => {
     const profile = useAppSelector(profileSelector)
     const [selected, setSelected] = useState<HTMLElement | null>(null);
     const [selectedUser, setSelectedUser] = useState<string[]>([]);
+    const [maintenanceType, setMaintenanceType] = useState("")
+
 
 
 
@@ -80,26 +82,26 @@ const Shifts = () => {
         //enabled to select only one div
         if (selected === element) {
             setSelected(null);
-          } else {
+        } else {
             if (selected) {
-              selected.classList.remove('selectedDiv');
+                selected.classList.remove('selectedDiv');
             }
             element.classList.add('selectedDiv');
             setSelected(element);
-          }
+        }
     }
     function handleTwoDivClick(event: React.MouseEvent<HTMLDivElement>) {
         const element = event.currentTarget;
         const id = element.id;
         if (selectedUser.includes(id)) {
-          setSelectedUser(selectedUser.filter((item) => item !== id));
-          element.classList.remove('selectedDiv');
+            setSelectedUser(selectedUser.filter((item) => item !== id));
+            element.classList.remove('selectedDiv');
         } else if (selectedUser.length < 2) {
-          setSelectedUser([...selectedUser, id]);
-          element.classList.add('selectedDiv');
+            setSelectedUser([...selectedUser, id]);
+            element.classList.add('selectedDiv');
         }
-      }
-   
+    }
+
     return (
         <div>
             <ToastContainer
@@ -119,8 +121,8 @@ const Shifts = () => {
                         <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >תורנויות</h1>
                         {/* <!-- maintenanceType select --> */}
                         <div className="form-floating mb-2">
-                            <select id="selectMaintenanceType"  {...register('maintenanceType')} className={`form-select ${errors.maintenanceType ? 'is-invalid' : ''}`} defaultValue={''} >
-                                <option value="" disabled>בחר סוג תורנות...</option>
+                            <select id="selectMaintenanceType" onChange={(e) => { setMaintenanceType(e.target.value); }} className={`form-select ${errors.maintenanceType ? 'is-invalid' : ''}`} defaultValue={''} >
+                                <option value="" disabled  >בחר סוג תורנות...</option>
                                 {listMaintenanceType.map(item => (
                                     <option value={item.id} key={item.id}>{item.name}</option>
                                 ))}
@@ -128,10 +130,11 @@ const Shifts = () => {
                             <div className="invalid-feedback"> {errors.maintenanceType?.message}</div>
                             <label className="form-label" htmlFor="selectMaintenanceType" style={{ marginLeft: "0px" }}>סוג תורנות</label>
                         </div>
-                         {/* <!-- car div --> */}
+                        {/* <!-- car div --> */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
                             {cars.map(car =>
                                 <div key={car.id} onClick={(event) => handleOneDivClick(event.currentTarget)}  className="notSelectedDiv" >
+                                 {/* <div id={`myDivCar-${car.id}`}  key={car.id} onClick={(event) =>{maintenanceType=="2"? handleOneDivClick(event.currentTarget):handleTwoDivClick(event)}} className="notSelectedDiv" > */}
 
                                     <div style={{ textAlign: 'center' }}>
                                         <h3>  {car.nickName} - {car.licenseNum}</h3>
@@ -156,6 +159,24 @@ const Shifts = () => {
                             <label className="form-label" htmlFor="selectCars" style={{ marginLeft: "0px" }}>רכב</label>
                         </div> */}
                         {/* <!-- user1 select --> */}
+                         {/* <!-- car div --> */}
+                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
+                            {cars.map(car =>
+                            // אם נבחר מוסך לאפשר לבחור שתי עובדים
+                                 <div id={`myDivUser-${car.id}`}  key={car.id} onClick={(event) =>{maintenanceType=="2"? handleOneDivClick(event.currentTarget):handleTwoDivClick(event)}} className="notSelectedDiv" >
+                                    <div style={{ textAlign: 'center' }}>
+                                    <h3> עובד {car.id} </h3>
+                                    <img src={AvatarMan} alt="Avatar" className="avatar" />
+                                        {/* <h3>  {car.nickName} - {car.licenseNum}</h3>
+                                        מחלקה: {car.dep_name}<br />
+                                        יצרן: {car.make}<br />
+                                        דגם: {car.model}<br />
+                                        צבע: {car.color}<br />
+                                        שנה: {car.year}   <br /> */}
+                                        {/* <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br /> */}
+                                    </div>
+                                </div>)}
+                        </div>
                         <div className="form-floating mb-2">
                             <select id="selectUser1"  {...register('user1')} className={`form-select ${errors.user1 ? 'is-invalid' : ''}`} defaultValue={''} >
                                 <option value="" disabled>בחר עובד...</option>
