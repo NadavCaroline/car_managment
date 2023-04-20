@@ -172,6 +172,8 @@ class AvaliableOrdersView(APIView):
             # This row checks wether there is alreay and order on the dates the user entered.
             if (order.toDate.replace(tzinfo=None) <= toDate and order.toDate.replace(tzinfo=None) >= fromDate) or (order.fromDate.replace(tzinfo=None) <= toDate and order.fromDate.replace(tzinfo=None) >= fromDate):
                 cars_black_list.add(order.car)
+                print("******************************")
+                print(order.fromDate)
                 order_details.append({"fromDate": datetime.fromisoformat(str(order.fromDate)).strftime(
                     "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).strftime("%Y-%m-%d %H:%M:%S"), "carID": order.car.id})
             else:
@@ -188,6 +190,7 @@ class AvaliableOrdersView(APIView):
         serializer = CarsSerializer(list(cars), many=True)
         black_list_serializer = CarsSerializer(
             list(cars_black_list), many=True)
+        print({"orderDetails": order_details})
         return Response({"available": serializer.data, "notAvilable": black_list_serializer.data, "orderDetails": order_details})
 
 
