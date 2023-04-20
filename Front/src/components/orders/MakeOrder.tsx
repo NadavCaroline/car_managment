@@ -229,7 +229,7 @@ const MakeOrder = () => {
                   <h4>פרטי הזמנה</h4>
                   <div>
                     <hr />
-                    {orderDetails && orderDetails.map((order, i) => <div key={i}>
+                    {orderDetails && orderDetails.filter(order => order.car === car.id).map((order, i) => <div key={i}>
                       מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
                       {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) &&
                         <div>
@@ -249,8 +249,10 @@ const MakeOrder = () => {
         <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <div style={{ position: "relative", padding: "32px", width: "400px", height: "300px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px" }}>
             <img src={MY_SERVER + selectedCar.image} style={{ width: '150px', height: '100px' }} alt={selectedCar.model} /><br /><br />
+            <form>
             יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} />
             <button type={'submit'} onClick={() => handleOrder()}>הזמן</button>
+            </form>
           </div>
         </div>
       }

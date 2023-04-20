@@ -1,5 +1,5 @@
 from datetime import datetime
-import json
+import pytz
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from rest_framework.response import Response
@@ -172,10 +172,8 @@ class AvaliableOrdersView(APIView):
             # This row checks wether there is alreay and order on the dates the user entered.
             if (order.toDate.replace(tzinfo=None) <= toDate and order.toDate.replace(tzinfo=None) >= fromDate) or (order.fromDate.replace(tzinfo=None) <= toDate and order.fromDate.replace(tzinfo=None) >= fromDate):
                 cars_black_list.add(order.car)
-                print("******************************")
-                print(order.fromDate)
-                order_details.append({"fromDate": datetime.fromisoformat(str(order.fromDate)).strftime(
-                    "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).strftime("%Y-%m-%d %H:%M:%S"), "carID": order.car.id})
+                order_details.append({"car":order.car.id, "fromDate": datetime.fromisoformat(str(order.fromDate)).astimezone(pytz.timezone('Israel')).strftime(
+                    "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).astimezone(pytz.timezone('Israel')).strftime("%Y-%m-%d %H:%M:%S"), "carID": order.car.id})
             else:
                 available_cars.add(order.car)
         cars = available_cars.difference(cars_black_list)
