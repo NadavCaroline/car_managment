@@ -78,6 +78,10 @@ const MakeOrder = () => {
     setrefreshFlag(!refreshFlag)
   }
 
+  // useEffect(() => {
+  //  console.log(orderDetails)
+  // }, [])
+  
   // Keep in mind, the timezone in israel is 2 hours ahead.
   const handleDateTimeVar = () => {
     const [startday, startmonth, startyear] = formatedStartDate.split('-').map(Number);
@@ -86,8 +90,8 @@ const MakeOrder = () => {
     const [endhours, endminutes, endseconds] = formatedEndTime.split(':').map(Number);
 
     if (!isAllDay) {
-      const start_date = new Date(startyear, startmonth - 1, startday, starthours + 2, startminutes, startseconds)
-      const end_date = new Date(endyear, endmonth - 1, endday, endhours + 2, endminutes, endseconds)
+      const start_date = new Date(startyear, startmonth - 1, startday, starthours, startminutes, startseconds)
+      const end_date = new Date(endyear, endmonth - 1, endday, endhours, endminutes, endseconds)
       setfromDate(start_date)
       settoDate(end_date)
       setdatesFlag(!datesFlag)
@@ -118,6 +122,7 @@ const MakeOrder = () => {
   }, [datesFlag, formatedStartTime, formatedEndTime])
 
   const handleOrder = () => {
+    // console.log({ orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false })
     dispatch(addOrderAsync({ token: token, order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false } }))
     setselectedCar(null)
   }
@@ -224,7 +229,7 @@ const MakeOrder = () => {
                   <h4>פרטי הזמנה</h4>
                   <div>
                     <hr />
-                    {orderDetails && orderDetails.map((order, i) => <div key={i}>
+                    {orderDetails && orderDetails.filter(order => order.car === car.id).map((order, i) => <div key={i}>
                       מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
                       {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) &&
                         <div>
@@ -244,8 +249,10 @@ const MakeOrder = () => {
         <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <div style={{ position: "relative", padding: "32px", width: "400px", height: "300px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px" }}>
             <img src={MY_SERVER + selectedCar.image} style={{ width: '150px', height: '100px' }} alt={selectedCar.model} /><br /><br />
+            <form>
             יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} />
             <button type={'submit'} onClick={() => handleOrder()}>הזמן</button>
+            </form>
           </div>
         </div>
       }

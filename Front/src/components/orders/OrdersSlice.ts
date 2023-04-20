@@ -66,6 +66,7 @@ export const myOrderSlice = createSlice({
         state.activeOrder = state.orders.find(order => new Date(order.fromDate).getTime() <= new Date().getTime() && new Date(order.toDate).getTime() >= new Date().getTime() && order.ended === false) ? true : false
       })
       .addCase(addOrderAsync.fulfilled, (state, action) => {
+        console.log(action.payload)
         state.orders.push(action.payload)
       })
       .addCase(orderEndedAsync.fulfilled, (state, action) => {
@@ -73,6 +74,7 @@ export const myOrderSlice = createSlice({
         temp.ended = true
       })
       .addCase(checkOrderDatesAsync.fulfilled, (state, action) => {
+        console.log(action.payload)
         state.availableCars = action.payload.available
         state.notAvilable = action.payload.notAvilable
         state.orderDetails = action.payload.orderDetails
