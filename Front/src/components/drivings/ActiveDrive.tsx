@@ -30,8 +30,6 @@ const ActiveDrive = () => {
     const [activeDrive, setactiveDrive] = useState<DriveModel | null>(null)
     const [comments, setcomments] = useState("")
     const [activeDriveFlag, setactiveDriveFlag] = useState(false)
-    const [selectedDrive, setselectedDrive] = useState<DriveModel | null>(null)
-
     // Handles image 1 upload
     const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
         setstartSelectedFile1(e.target!.files![0])
@@ -163,45 +161,46 @@ const ActiveDrive = () => {
     // Handles the auto fill of the start/end date of a drive
     // if the user didn't start/end the drive
     useEffect(() => {
-
         if (orders && drives) {
-            if ((orders[orders.length - 1]?.ended === false) && (new Date().getTime() > new Date(orders[orders.length - 1].toDate).getTime())) {
-                console.log("First if")
-                if (orders[orders.length - 1]?.id === drives[drives.length - 1].order) {
-                    console.log("Second if - The drive is active")
-
-                    dispatch(endDriveAsync({
-                        token: token, drive: drives[drives.length - 1]
-                    }))
-                    dispatch(orderEndedAsync({
-                        token: token,
-                        id: orders[orders.length - 1].id!
-                    }))
-                    setactiveDrive(null)
-                    setIsRunning(false)
-                    localStorage.removeItem('isRunning')
-                    localStorage.removeItem('activeDrive')
+            // const activeOrder = orders.find(o => o.id === drives[drives.length -1].order)
+            if (activeOrder) {
+                if ((activeOrder.ended === false) || (new Date().getTime() > new Date(activeOrder.toDate).getTime())) {
+                    console.log("The Drive Has To End")
+                    if (activeDrive) {
+                        console.log("The Drive Is Active")
+                        dispatch(endDriveAsync({
+                            token: token, drive: drives[drives.length - 1]
+                        }))
+                        dispatch(orderEndedAsync({
+                            token: token,
+                            id: activeOrder.id!
+                        }))
+                        localStorage.removeItem('isRunning')
+                        localStorage.removeItem('activeDrive')
+                        setactiveDrive(null)
+                        setIsRunning(false)
+                    } else {
+                        console.log("The drive isn't active")
+                        console.log(activeOrder.id!)
+                        dispatch(startDriveAsync({
+                            token: token, drive: {
+                                user: decoded.user_id,
+                                order: activeOrder.id,
+                            }
+                        }))
+                        dispatch(endDriveAsync({
+                            token: token,
+                            drive: drives[drives.length - 1]
+                        }))
+                        dispatch(orderEndedAsync({
+                            token: token,
+                            id: activeOrder.id!
+                        }))
+                    }
                 } else {
-                    console.log("Else - The drive isn't active")
-                    console.log(orders[orders.length - 1].id!)
-                    dispatch(startDriveAsync({
-                        token: token, drive: {
-                            user: decoded.user_id,
-                            order: orders[orders.length - 1]?.id,
-                        }
-                    }))
-                    dispatch(endDriveAsync({
-                        token: token, drive: drives[drives.length - 1]
-                    }))
-                    dispatch(orderEndedAsync({
-                        token: token,
-                        id: orders[orders.length - 1].id!
-                    }))
+                    console.log("Everything Works Fine")
                 }
-            } else {
-                console.log("First Else")
             }
-
         }
     }, [orders.length, drives.length])
 
@@ -211,7 +210,9 @@ const ActiveDrive = () => {
                 <div>
                     <h1>נסיעה פעילה</h1>
                     <hr />
-                    הנסיעה התחילה
+                    <h3>
+                        הנסיעה התחילה
+                    </h3>
 
                     <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
                     בשעה: {activeDrive?.startDate!.toString().slice(11, 16)}<br />
@@ -248,7 +249,6 @@ const ActiveDrive = () => {
                 <div>
                     {(activeOrder && !activeOrder?.ended) &&
                         <div>
-                            <hr />
                             <h3>הזמנה פעילה</h3>
                             <div> {activeOrder.car_name}</div><br />
                             <div>{activeOrder.ended}</div>

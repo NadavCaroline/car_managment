@@ -14,10 +14,10 @@ export function Drivings() {
 
   return (
     <div >
-      <h1>נסיעות קודמות</h1>
-      <PreviousDrives/>
+      <ActiveDrive />
       <div>
-        <ActiveDrive/>
+        <h1>נסיעות קודמות</h1>
+        <PreviousDrives />
       </div>
 
     </div>
