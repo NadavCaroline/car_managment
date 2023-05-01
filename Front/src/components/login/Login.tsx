@@ -88,6 +88,7 @@ export function Login() {
     draggable: true,
     progress: undefined,
     theme: "colored",
+    rtl:true,
   });
 
   const message = (value: string) => toast.success(value, {
@@ -100,6 +101,7 @@ export function Login() {
     draggable: true,
     progress: undefined,
     theme: "colored",
+    rtl:true,
   });
 
   useEffect(() => {

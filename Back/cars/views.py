@@ -16,6 +16,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .helper import write_to_log
 
+
 @api_view(['GET'])
 def index(r):
     return Response('index')
@@ -98,7 +99,15 @@ class AllUsersView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
+@permission_classes([IsAuthenticated])
+class UsersOfDep(APIView):
+    def get(self, request):
+        user = request.user
+        users = User.objects.all()
+        users = list(filter(lambda user: (user.profile.department.id ==user.profile.department.id ), users))
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
 
 @permission_classes([IsAuthenticated])
 class ProfileView(APIView):
@@ -285,11 +294,34 @@ class ShiftsView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = CreateShiftsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            serializer = CreateShiftsSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                userMain = request.user
+                user1 = User.objects.get(id=int(request.data["user1"]))
+                username1=user1.first_name+" "+user1.last_name  
+                maintenanceType=MaintenanceTypes.objects.get(id=int(request.data["maintenanceType"]))
+                subject=' תורנות '+maintenanceType.name
+                if  request.data["user2"]=='':  
+                    username2=""
+                    message = f"שלום {username1 },\n\nהנך משובץ לתורנות {maintenanceType.name}\n\n בתאריך: {request.data['shiftDate']}\n\n הערות:\n\n{request.data['comments']}"
+                    send_mail(subject, message, None, [userMain.email,user1.email], fail_silently=False)
+
+                else:
+                    user2= User.objects.get(id=int(request.data["user2"]))
+                    username2=   user2.first_name+" "+user2.last_name
+                    message = f"שלום {username1 },{ username2}\n\nהנכם משובצים לתורנות {maintenanceType.name}\n\n בתאריך:{request.data['shiftDate']}\n\n הערות:\n\n{request.data['comments']}"
+                    send_mail(subject, message, None, [userMain.email,user1.email,user2.email], fail_silently=False)
+
+               
+                # message = f"Hello {user.username},\n\nPlease click on the following link to reset your password:\n\n{reset_url}\n\nThanks,\nYour website team"
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            # Handle the exception
+            # msg={"status":"error","msg":str(e)} 
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes([IsAuthenticated])

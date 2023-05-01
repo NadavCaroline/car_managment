@@ -1,27 +1,21 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { ShiftModel } from '../../models/Shift';
+import ShiftModel from '../../models/Shift';
 // import { getShifts } from './shiftsAPI' ;
-import { getShifts } from './shiftsAPI';
+import { getShifts, addShift } from './shiftsAPI';
 
 export interface shiftsState {
-    shifts: ShiftModel
+    shifts: ShiftModel[]
+    error: string | null
+    msg:string | null
+
+
 }
 
 const initialState: shiftsState = {
-    shifts: {
-        id: 0,
-        user1:'',
-        user_name1: '',
-        user2:'',
-        user_name2: '',
-        car: '',
-        car_name: '',
-        shiftDate:'',
-        maintenanceType: '',
-        maintenance_name:'',
-        comments:''
-    }
+    shifts: [],
+    error: "",
+    msg:""
 };
 
 
@@ -32,21 +26,50 @@ export const getshiftsAsync = createAsyncThunk(
         return response;
     }
 );
+export const addShiftAsync = createAsyncThunk(
+    'myCars/addShift',
+    async ({ token, shift }: { token: string, shift: ShiftModel }) => {
+        const response = await addShift(token, shift);
+        return response;
+    }
+);
 
 export const shiftsSlice = createSlice({
     name: 'shifts',
     initialState,
     reducers: {
+        SetError: (state, action: PayloadAction<string>) => {
+            state.error = action.payload;
+        },
+        SetMsg: (state) => {
+            state.msg = ""
+        },
     },
     extraReducers: (builder) => {
         builder
             .addCase(getshiftsAsync.fulfilled, (state, action) => {
                 state.shifts = action.payload;
                 // state.shifts = action.payload;
+            })
+            .addCase(addShiftAsync.fulfilled, (state, action) => {
+                if (action.payload.status === 201) {
+                    state.shifts.push(action.payload.data)
+                    state.msg = "תורנות נוצרה בהצלחה"
+                    //console.log(action)
+                }
+                else if (action.payload.status === 401) {
+                    state.error = '';
+                }
+            })
+            .addCase(addShiftAsync.rejected, (state, action) => {
+                console.log(action.error.message)
+                state.error = action.error.message ?? ''
+                
             });
     },
 });
-
-export const { } = shiftsSlice.actions;
+export const { SetError,SetMsg } = shiftsSlice.actions;
+export const shiftError = (state: RootState) => state.shifts.error;
+export const shiftMessage = (state: RootState) => state.shifts.msg;
 export const shiftSelector = (state: RootState) => state.shifts.shifts;
 export default shiftsSlice.reducer;

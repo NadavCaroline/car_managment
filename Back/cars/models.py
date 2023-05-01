@@ -93,6 +93,8 @@ class CarOrders(models.Model):
 class MaintenanceTypes(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
+    imgLogo = models.ImageField( upload_to='images/',
+        null=True, blank=True)
  
     def __str__(self):
         return self.name

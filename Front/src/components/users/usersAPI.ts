@@ -9,6 +9,13 @@ export const getUsers = async (token: string) => {
     }
   }).then((res) => res.data);
 }
+export const getUsersOfDep = async (token: string) => {
+  return await axios.get(MY_SERVER + 'usersOfDep', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  }).then((res) => res.data);
+}
 
 export const updateUser = async (token: string, user: UserModel) => {
   console.log(token)

@@ -13,6 +13,7 @@ urlpatterns = [
     path('profile', views.ProfileView.as_view()),
     path('allprofiles', views.AllProfilesView.as_view()),
     path('allprofiles/<id>', views.AllProfilesView.as_view()),
+    path('usersOfDep', views.UsersOfDep.as_view()),
     path('allusers', views.AllUsersView.as_view()),
     path('allusers/<id>', views.AllUsersView.as_view()),
     path('cars', views.CarsView.as_view()),
