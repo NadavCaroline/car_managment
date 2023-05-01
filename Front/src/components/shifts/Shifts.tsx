@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { userToken } from '../login/loginSlice'
 import { ToastContainer, toast } from 'react-toastify';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
 import { MaintenanceTypeModel } from '../../models/MaintenanceType'
 import { getmaintenanceTypeAsync } from '../maintenanceType/maintenanceTypeSlice';
 import { carsSelector, getAllCarsAsync, getCarsAsync } from '../cars/carsSlice';
-import { addShiftAsync, shiftError, SetError, shiftMessage, SetMsg } from '../shifts/shiftsSlice';
+import { addShiftAsync, shiftError, SetError, shiftMessage, SetMsg, getshiftsAsync, shiftSelector } from '../shifts/shiftsSlice';
 import { getUsersOfDepAsync, usersSelector } from '../users/userSlicer'
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import dayjs from 'dayjs';
@@ -17,16 +14,14 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { MY_SERVER } from '../../env';
-import CarModel from '../../models/Car';
 import ShiftModel from '../../models/Shift';
 import AvatarMan from '../../images/img_avatar-man.png';
-import AvatarGirl from '../../images/img_avatar-girl.png';
-
 
 const Shifts = () => {
     const dispatch = useAppDispatch()
     const [listMaintenanceType, setListMaintenanceTypes] = useState<MaintenanceTypeModel[]>([]);
     const cars = useAppSelector(carsSelector);
+    const shifts = useAppSelector(shiftSelector);
     const token = useAppSelector(userToken)
     const users = useAppSelector(usersSelector)
     const [selectedCar, setSelectedCar] = useState<HTMLElement | null>(null);
@@ -36,6 +31,7 @@ const Shifts = () => {
     const [comments, setComments] = useState("")
     const errorMessage = useAppSelector(shiftError)
     const successMessage = useAppSelector(shiftMessage)
+    const [searchTerm, setsearchTerm] = useState("")
 
     const messageError = (value: string) => toast.error(value, {
         position: "top-left",
@@ -47,7 +43,7 @@ const Shifts = () => {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        rtl:true,
+        rtl: true,
     });
 
     const message = (value: string) => toast.success(value, {
@@ -60,7 +56,7 @@ const Shifts = () => {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        rtl:true,
+        rtl: true,
     });
 
     useEffect(() => {
@@ -74,52 +70,23 @@ const Shifts = () => {
             message(successMessage)
         dispatch(SetMsg())
     }, [successMessage])
-    // type ShiftsForm = {
-    //     user1: string;
-    //     user_name1: string;
-    //     user2: string;
-    //     user_name2: string;
-    //     car: string;
-    //     car_name: string;
-    //     shiftDate: string;
-    //     maintenanceType: string;
-    //     maintenance_name: string;
-    //     comments: string;
-    // };
-    // const validationSchema = Yup.object().shape({
-    //     user1: Yup.string()
-    //         .required('נא לבחור עובד'),
-    //     car: Yup.string()
-    //         .required('נא לבחור רכב'),
-    //     shiftDate: Yup.string()
-    //         .required('נא להכניס תאריך תורנות'),
-    //     maintenanceType: Yup.string()
-    //         .required('נא לבחור סוג תורנות '),
-    // });
 
-    // const {
-    //     register,
-    //     handleSubmit,
-    //     formState: { errors }
-    // } = useForm<ShiftsForm>({
-    //     resolver: yupResolver(validationSchema)
-    // });
     useEffect(() => {
         dispatch(getCarsAsync(token))
         dispatch(getmaintenanceTypeAsync(token)).then((res) => setListMaintenanceTypes(res.payload))
         dispatch(getUsersOfDepAsync(token))
+        dispatch(getshiftsAsync(token))
         // dispatch(getRolesAsync()).then((res) => setListRoles(res.payload))
-
     }, [])
 
     useEffect(() => {
         resetSelectedUser();
     }, [maintenanceType])
 
-    // const onSubmitShifts = (data: ShiftsForm) => {
-    //     console.log(JSON.stringify(data, null, 2));
-    //     // dispatch(regAsync({ user: { first_name: data.firstName, last_name: data.lastName, password: data.password, username: data.userName, email: data.email }, profile: { jobTitle: data.jobTitle, roleLevel: data.role, department: data.department, realID: data.id } }));
-    // };
+    // Gets the shifts from the server
+    useEffect(() => {
+        dispatch(getshiftsAsync(token))
+    }, [shifts.length])
 
     const onSubmitShifts = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -154,8 +121,6 @@ const Shifts = () => {
 
         }
         dispatch(addShiftAsync({ token: token, shift: shift }))
-
-
     };
 
     function handleCarDivClick(element: HTMLElement): void {
@@ -172,8 +137,6 @@ const Shifts = () => {
         }
     }
     function handleMaintenanceDivClick(element: HTMLElement): void {
-        // element.classList.toggle('selectedDiv');
-        //enabled to select only one div
         if (maintenanceType === element) {
             setMaintenanceType(null);
             maintenanceType.classList.remove('selectedDiv');
@@ -191,12 +154,9 @@ const Shifts = () => {
             const div = document.getElementById(selectedUserDiv);
             div?.classList.remove('selectedDiv');
         });
-        // let test  = getElementById(elementId: string): HTMLElement | null;
         setSelectedUser([]);
-
-
-
     }
+
     function handleDivUserClick(event: React.MouseEvent<HTMLDivElement>, numOfClick: number) {
         const element = event.currentTarget;
         const id = element.id;
@@ -217,10 +177,6 @@ const Shifts = () => {
     }
     const handleStartDateChange = (date: Dayjs | null) => {
         setselectedStartDate(date)
-        // setformatedStartDate(date!.format('DD-MM-YYYY'))
-        // setselectedEndDate(date)
-        // setformatedEndDate(date!.format('DD-MM-YYYY'))
-        // setrefreshFlag(!refreshFlag)
     }
     return (
         <div>
@@ -236,8 +192,7 @@ const Shifts = () => {
             />
             <div className="row mt-3" style={{ direction: "ltr" }}>
                 <div className="mx-auto col-10 col-md-8 col-lg-6">
-
-                    <form dir="rtl" id="formShifts" onSubmit={onSubmitShifts} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+                    <form dir="rtl" id="formAddShifts" onSubmit={onSubmitShifts} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                         <div style={{ width: '400px', marginRight: '5px' }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DemoContainer components={['DatePicker', 'MobileTimePicker']}>
@@ -263,16 +218,7 @@ const Shifts = () => {
                                     </div>
                                 </div>)}
                         </div>
-                        {/* <div className="form-floating mb-2">
-                            <select id="selectMaintenanceType" onChange={(e) => { setMaintenanceType(e.target.value); }} className={`form-select ${errors.maintenanceType ? 'is-invalid' : ''}`} defaultValue={''} >
-                                <option value="" disabled  >בחר סוג תורנות...</option>
-                                {listMaintenanceType.map(item => (
-                                    <option value={item.id} key={item.id}>{item.name}</option>
-                                ))}
-                            </select>
-                            <div className="invalid-feedback"> {errors.maintenanceType?.message}</div>
-                            <label className="form-label" htmlFor="selectMaintenanceType" style={{ marginLeft: "0px" }}>סוג תורנות</label>
-                        </div> */}
+
                         <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >רכב</h1>
                         {/* <!-- car div --> */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
@@ -307,12 +253,54 @@ const Shifts = () => {
                         {/* <!-- Comment input --> */}
                         <div className="form-floating mb-2">
                             <textarea onChange={(e) => setComments(e.target.value)} id="shiftcomment" rows={3} placeholder="הערות"></textarea>
-                            {/* <div className="invalid-feedback">{errors.comments?.message}</div> */}
-                            {/* <label className="form-label" htmlFor="shiftcomment" style={{ marginLeft: "0px" }}>הערות</label> */}
                         </div>
-
-
                         <button type='submit' className="btn btn-primary btn-block mb-3">שמור תורנות</button>
+                    </form>
+                    <form dir="rtl" id="formShifts" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+                        <div style={{ marginTop: '10px' }}>
+                            <input placeholder='חיפוש לפי ' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
+                            <table style={{ marginLeft: "auto", marginRight: "auto", marginTop: '10px' }}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>סוג תורנות</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>תאריך תורנות</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>רכב</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>עובד 1</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>עובד 2</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>הערות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {shifts && shifts.filter(shift => shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                                        shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) 
+                                        ).map(shift =>
+                                            <tr key={shift.id}  style={{ cursor: 'pointer' }}>
+                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.maintenance_name}</td>
+                                                <td style={{ border: '1px solid black', padding: '5px' }}>{dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY') }</td>
+                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.car_name}</td >
+                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name1}</td>
+                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name2}</td>
+                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.comments}</td>
+                                            </tr>
+                                        )}
+                                </tbody>
+                            </table>
+                        </div >
+                        {/* <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
+                            {shifts.map(shift =>
+                                <div id={`divShift-${shift.id}`} key={shift.id}  >
+                                    <div style={{ textAlign: 'center' }}>
+                                        סוג תורנות: <h6>  {shift.maintenanceType} </h6>
+                                        תאריך תורנות : <h6>  {shift.shiftDate} </h6>
+                                        רכב: <h6>  {shift.car_name} </h6>
+                                        1 עובד  : <h6>  {shift.user_name1} </h6>
+                                        2 עובד  : <h6>  {shift.user_name2} </h6>
+                                        הערות  : <h6>  {shift.comments} </h6>
+                                    </div>
+                                </div>)}
+                        </div> */}
                     </form>
                 </div>
             </div>

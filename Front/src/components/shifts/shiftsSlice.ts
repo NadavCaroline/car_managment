@@ -49,13 +49,11 @@ export const shiftsSlice = createSlice({
         builder
             .addCase(getshiftsAsync.fulfilled, (state, action) => {
                 state.shifts = action.payload;
-                // state.shifts = action.payload;
             })
             .addCase(addShiftAsync.fulfilled, (state, action) => {
                 if (action.payload.status === 201) {
                     state.shifts.push(action.payload.data)
-                    state.msg = "תורנות נוצרה בהצלחה"
-                    //console.log(action)
+                    state.msg = "תורנות נוצרה ונשלחה בהצלחה"
                 }
                 else if (action.payload.status === 401) {
                     state.error = '';
@@ -64,7 +62,6 @@ export const shiftsSlice = createSlice({
             .addCase(addShiftAsync.rejected, (state, action) => {
                 console.log(action.error.message)
                 state.error = action.error.message ?? ''
-                
             });
     },
 });

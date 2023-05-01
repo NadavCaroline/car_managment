@@ -141,10 +141,9 @@ class DrivingsSerializer(serializers.ModelSerializer):
 class ShiftsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shifts
-        # fields = ['id', 'user', 'user_name', 'car', 'car_name',
-                #   'shiftDate', 'maintenanceType', 'maintenance_name']
         fields = ['id', 'user1','user_name1', 'user2','user_name2', 'car','car_name', 'shiftDate',
                    'maintenanceType', 'maintenance_name','comments']
+        ordering = ['-shiftDate']
 
 class CarMaintenanceSerializer(serializers.ModelSerializer):
     class Meta:

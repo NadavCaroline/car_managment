@@ -289,7 +289,7 @@ class MaintenanceTypesView(APIView):
 class ShiftsView(APIView):
     def get(self, request):
         my_model = Shifts.objects.all()
-        print(my_model)
+        # print(my_model)
         serializer = ShiftsSerializer(my_model, many=True)
         return Response(serializer.data)
 
@@ -303,26 +303,26 @@ class ShiftsView(APIView):
                 username1=user1.first_name+" "+user1.last_name  
                 maintenanceType=MaintenanceTypes.objects.get(id=int(request.data["maintenanceType"]))
                 subject=' תורנות '+maintenanceType.name
+                shiftDate=datetime.fromisoformat(str(request.data['shiftDate'])).strftime("%d/%m/%Y")
+                emails=[]
                 if  request.data["user2"]=='':  
                     username2=""
-                    message = f"שלום {username1 },\n\nהנך משובץ לתורנות {maintenanceType.name}\n\n בתאריך: {request.data['shiftDate']}\n\n הערות:\n\n{request.data['comments']}"
-                    send_mail(subject, message, None, [userMain.email,user1.email], fail_silently=False)
-
+                    message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת לתורנות <b>{maintenanceType.name}</b><br> בתאריך: {shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
+                    emails=[userMain.email,user1.email]     
                 else:
                     user2= User.objects.get(id=int(request.data["user2"]))
                     username2=   user2.first_name+" "+user2.last_name
-                    message = f"שלום {username1 },{ username2}\n\nהנכם משובצים לתורנות {maintenanceType.name}\n\n בתאריך:{request.data['shiftDate']}\n\n הערות:\n\n{request.data['comments']}"
-                    send_mail(subject, message, None, [userMain.email,user1.email,user2.email], fail_silently=False)
+                    message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים לתורנות <b>{maintenanceType.name}</b><br> בתאריך:{shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
+                    emails=[userMain.email,user1.email,user2.email]
+                    
+                html_message = '<div dir="rtl">{}</div>'.format(message)
+                send_mail(subject, message, None, emails, fail_silently=False,html_message=html_message)
 
-               
-                # message = f"Hello {user.username},\n\nPlease click on the following link to reset your password:\n\n{reset_url}\n\nThanks,\nYour website team"
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             # Handle the exception
-            # msg={"status":"error","msg":str(e)} 
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
 
 @permission_classes([IsAuthenticated])
 class LogsView(APIView):

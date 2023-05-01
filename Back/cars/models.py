@@ -110,14 +110,17 @@ class Shifts(models.Model):
 
     @property
     def car_name(self):
-        return self.car.licenseNum+''+self.car.nickName
+        return self.car.licenseNum+' '+self.car.nickName
 
     @property
     def user_name1(self):
         return self.user1.first_name + ' ' + self.user1.last_name
     @property
     def user_name2(self):
-        return self.user2.first_name + ' ' + self.user2.last_name
+        if self.user2:
+            return self.user2.first_name + ' ' + self.user2.last_name
+        else:
+            return ""
     
     @property
     def maintenance_name(self):
@@ -125,7 +128,7 @@ class Shifts(models.Model):
     
 
     def __str__(self):
-        return self.user_name + ': ' + self.car_name + ' ' + self.maintenance_name
+        return   self.car_name + ' ' + self.maintenance_name
     
 #  רשיון רכב,ביטוח חובה,ביטוח מקיף, טיפול רכב(מוסך) 
 class FileTypes(models.Model):
