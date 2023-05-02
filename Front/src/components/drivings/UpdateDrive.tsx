@@ -110,123 +110,20 @@ const UpdateDrive = (props: any) => {
                 token: token,
                 drive: updateDriveModel
             }))
+        dispatch(getDrivesAsync(token))
         props.setselectedDrive(null)
     }
 
     return (
         // We Check if the drive has fields to update, or maybe it is empty, and the user needs to send new data
         <div >
-            {(props.selectedDrive && props.selectedDrive.fromDate) ?
-            // The first case, in which the car has data besides the user and order id.
+                // The second case, in which the user need to fill the fields, because they don't exist.
+            <div>
                 <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <div style={{ position: "relative", padding: "32px", width: "420px", height: "400px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px", textAlign: "left" }}>
                         <button style={{ position: "absolute", top: "0", right: "0" }} onClick={() => props.setselectedDrive(null)}>X</button>
-
-                        <button type='submit' onClick={() => handleDriveUpdate()}>שמור</button>
-                        <img src={MY_SERVER + props.selectedDrive?.car_image} style={{ width: '150px', height: '100px' }} alt={props.selectedDrive?.car_name} /><br /><br />
-                        {props.selectedDrive.startDate!.toString().slice(0, 10) === props.selectedDrive.endDate!.toString().slice(0, 10) ?
-                            <div>
-                                בתאריך: <input type='date' placeholder={props.selectedDrive.startDate!.toString().slice(0, 10)} onChange={(e) => setstartDate(e.target.value)} /><br />
-                            </div> :
-                            <div>
-                                מתאריך: <input type='date' placeholder={props.selectedDrive.startDate!.toString().slice(0, 10)} onChange={(e) => setstartDate(e.target.value)} /> <br />
-                                עד תאריך:<input type='date' placeholder={props.selectedDrive.endDate!.toString().slice(0, 10)} onChange={(e) => setendDate(e.target.value)} /><br />
-                            </div>
-                        }
-                        משעה:<input type='time' placeholder={props.selectedDrive.startDate!.toString().slice(11, 16)} onChange={(e) => setstartTime(e.target.value)} /> <br />
-                        עד שעה:<input type='time' placeholder={props.selectedDrive.endDate!.toString().slice(11, 16)} onChange={(e) => setendTime(e.target.value)} /> <br />
-                        קילומטראז' התחלתי:<input placeholder={Number(props.selectedDrive.startKilometer).toLocaleString()} onChange={(e) => setstartKilo(e.target.value)} /><br />
-                        קילומטראז' סופי: <input placeholder={Number(props.selectedDrive.endKilometer).toLocaleString()} onChange={(e) => setendKilo(e.target.value)} /><br />
-                        הערות:<input placeholder={props.selectedDrive.comments ? props.selectedDrive.comments : 'אין הערות'} onChange={(e) => setcomments(e.target.value)} /> <br />
-
-                        {props.selectedDrive.startImg1 &&
-                            <div>
-                                <hr />
-                                <h6>תמונת תחילת נסיעה ראשונה</h6>
-                                <img src={MY_SERVER + props.selectedDrive.startImg1} style={{ width: '150px', height: '100px' }} />
-                                <input type='file' onChange={handleFile1Change} />
-                                {startSelectedFile1 &&
-                                    <div>
-                                        <img src={URL.createObjectURL(startSelectedFile1)}
-                                            alt={startSelectedFile1.name}
-                                            style={{ width: '150px', height: '100px' }} /><br />
-                                    </div>}
-                            </div>}
-                        {props.selectedDrive.startImg2 &&
-                            <div>
-                                <hr />
-                                <h6>תמונת תחילת נסיעה שניה</h6>
-                                <img src={MY_SERVER + props.selectedDrive.startImg2} style={{ width: '150px', height: '100px' }} />
-                                <input type='file' onChange={handleFile2Change} />
-                                {startSelectedFile2 &&
-                                    <div>
-                                        <img src={URL.createObjectURL(startSelectedFile2)}
-                                            alt={startSelectedFile2.name}
-                                            style={{ width: '150px', height: '100px' }} /><br />
-                                    </div>}
-                            </div>}
-                        {props.selectedDrive.startImg3 &&
-                            <div>
-                                <hr />
-                                <h6>תמונת תחילת נסיעה שלישית</h6>
-                                <img src={MY_SERVER + props.selectedDrive.startImg3} style={{ width: '150px', height: '100px' }} />
-                                <input type='file' onChange={handleFile3Change} />
-                                {startSelectedFile3 &&
-                                    <div>
-                                        <img src={URL.createObjectURL(startSelectedFile3)}
-                                            alt={startSelectedFile3.name}
-                                            style={{ width: '150px', height: '100px' }} /><br />
-                                    </div>}
-                            </div>}
-                        {props.selectedDrive.endImg1 &&
-                            <div>
-                                <hr />
-                                <h6>תמונת סוף נסיעה ראשונה</h6>
-                                <img src={MY_SERVER + props.selectedDrive.endImg1} style={{ width: '150px', height: '100px' }} />
-                                <input type='file' onChange={handleendFile1Change} />
-                                {endSelectedFile1 &&
-                                    <div>
-                                        <img src={URL.createObjectURL(endSelectedFile1)}
-                                            alt={endSelectedFile1.name}
-                                            style={{ width: '150px', height: '100px' }} /><br />
-                                    </div>}
-
-                            </div>}
-                        {props.selectedDrive.endImg2 &&
-                            <div>
-                                <hr />
-                                <h6>תמונת סוף נסיעה שניה</h6>
-                                <img src={MY_SERVER + props.selectedDrive.endImg2} style={{ width: '150px', height: '100px' }} />
-                                <input type='file' onChange={handleendFile2Change} />
-                                {endSelectedFile2 &&
-                                    <div>
-                                        <img src={URL.createObjectURL(endSelectedFile2)}
-                                            alt={endSelectedFile2.name}
-                                            style={{ width: '150px', height: '100px' }} /><br />
-                                    </div>}
-                            </div>}
-                        {props.selectedDrive.endImg3 &&
-                            <div>
-                                <hr />
-                                <h6>תמונת סוף נסיעה שלישית</h6>
-                                <img src={MY_SERVER + props.selectedDrive.endImg3} style={{ width: '150px', height: '100px' }} />
-                                <input type='file' onChange={handleendFile3Change} />
-                                {endSelectedFile3 &&
-                                    <div>
-                                        <img src={URL.createObjectURL(endSelectedFile3)}
-                                            alt={endSelectedFile3.name}
-                                            style={{ width: '150px', height: '100px' }} /><br />
-                                    </div>}
-                            </div>}
-                    </div>
-                </div> :
-                // The second case, in which the user need to fill the fields, because they don't exist.
-                <div>
-                    <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                        <div style={{ position: "relative", padding: "32px", width: "420px", height: "400px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px", textAlign: "left" }}>
-                            <button style={{ position: "absolute", top: "0", right: "0" }} onClick={() => props.setselectedDrive(null)}>X</button>
-
-                            <button type='submit' onClick={() => handleDriveUpdate()}>שמור</button>
+                        <form onSubmit={() => handleDriveUpdate()}>
+                            <button type='submit'>שמור</button>
                             <img src={MY_SERVER + props.selectedDrive?.car_image} style={{ width: '150px', height: '100px' }} alt={props.selectedDrive?.car_name} /><br /><br />
                             <div>
                                 מתאריך: <input type='date' onChange={(e) => setstartDate(e.target.value)} /> <br />
@@ -318,10 +215,11 @@ const UpdateDrive = (props: any) => {
                                                 style={{ width: '150px', height: '100px' }} /><br />
                                         </div>}
                                 </div>}
-                        </div>
+                        </form>
                     </div>
-                </div>}
-        </div>
+                </div>
+            </div>
+        </div >
     )
 }
 

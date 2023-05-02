@@ -67,7 +67,7 @@ const ActiveDrive = () => {
     }
     // Gets the end kilometer of the car of the active order, according to the report of the last drive
     const handleStartKilometer = () => {
-        const lastDrive = allDrives.filter(drive => drive.endKilometer && (drive.car_name === activeOrder?.car_name)).pop()
+        const lastDrive = allDrives.filter(drive => drive.endKilometer && (drive.order === activeOrder?.id)).pop()
         lastDrive ? setstartKilometer(String(lastDrive?.endKilometer)) : setstartKilometer("")
     }
 
@@ -163,46 +163,49 @@ const ActiveDrive = () => {
     useEffect(() => {
         if (orders && drives) {
             // const activeOrder = orders.find(o => o.id === drives[drives.length -1].order)
-            if (activeOrder) {
-                if ((activeOrder.ended === false) || (new Date().getTime() > new Date(activeOrder.toDate).getTime())) {
-                    console.log("The Drive Has To End")
-                    if (activeDrive) {
-                        console.log("The Drive Is Active")
-                        dispatch(endDriveAsync({
-                            token: token, drive: drives[drives.length - 1]
-                        }))
-                        dispatch(orderEndedAsync({
-                            token: token,
-                            id: activeOrder.id!
-                        }))
-                        localStorage.removeItem('isRunning')
-                        localStorage.removeItem('activeDrive')
-                        setactiveDrive(null)
-                        setIsRunning(false)
-                    } else {
-                        console.log("The drive isn't active")
-                        console.log(activeOrder.id!)
-                        dispatch(startDriveAsync({
-                            token: token, drive: {
-                                user: decoded.user_id,
-                                order: activeOrder.id,
-                            }
-                        }))
-                        dispatch(endDriveAsync({
-                            token: token,
-                            drive: drives[drives.length - 1]
-                        }))
-                        dispatch(orderEndedAsync({
-                            token: token,
-                            id: activeOrder.id!
-                        }))
-                    }
-                } else {
-                    console.log("Everything Works Fine")
+            if ((activeOrder?.ended === false) || (new Date().getTime() > new Date(activeOrder?.toDate!).getTime())) {
+                console.log("The Drive Has To End")
+                if (activeDrive) {
+                    console.log("The Drive Is Active")
+                    dispatch(endDriveAsync({
+                        token: token, drive: drives[drives.length - 1]
+                    }))
+                    dispatch(orderEndedAsync({
+                        token: token,
+                        id: activeOrder?.id!
+                    }))
+                    localStorage.removeItem('isRunning')
+                    localStorage.removeItem('activeDrive')
+                    setactiveDrive(null)
+                    setIsRunning(false)
+                    dispatch(getDrivesAsync(token))
                 }
             }
+            else if (orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)) {
+                let active = orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)
+                console.log("The drive isn't active")
+                console.log(active)
+                dispatch(startDriveAsync({
+                    token: token, drive: {
+                        user: decoded.user_id,
+                        order: active?.id,
+                    } 
+                }))
+                dispatch(endDriveAsync({
+                    token: token,
+                    drive: drives[drives.length - 1]
+                }))
+                dispatch(orderEndedAsync({
+                    token: token,
+                    id: active?.id!
+                }))
+                dispatch(getDrivesAsync(token))
+                dispatch(getOrdersAsync(token))                
+            } else {
+                console.log("Everything Works Fine")
+            }
         }
-    }, [orders.length, drives.length])
+    }, [orders.length])
 
     return (
         <div>
