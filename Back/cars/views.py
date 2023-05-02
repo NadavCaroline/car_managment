@@ -15,6 +15,7 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode    
 from django.utils.encoding import force_bytes
 from .helper import write_to_log
+from django.db.models import Count
 
 
 @api_view(['GET'])
@@ -106,6 +107,23 @@ class UsersOfDep(APIView):
         user = request.user
         users = User.objects.all()
         users = list(filter(lambda user: (user.profile.department.id ==user.profile.department.id ), users))
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+    
+@permission_classes([IsAuthenticated])
+class UsersOfDepByCountShift(APIView):
+    def get(self, request):
+        usermain = request.user
+        users = User.objects.annotate(count_shifts=Count('user1'))
+        users2 = User.objects.annotate(count_shifts=Count('user2'))
+       
+        for obj1 in users:
+            obj2 = users2.get(pk=obj1.pk) # Match objects by primary key
+            obj1.count_shifts += obj2.count_shifts # Add values from other queryset
+            obj1.save() # Save updated object to database
+        # userOrdered=users.order_by('count_shifts')
+        usersAll = list(filter(lambda user: (user.profile.department.id ==usermain.profile.department.id ), users))
+        
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
