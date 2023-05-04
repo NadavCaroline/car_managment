@@ -107,7 +107,7 @@ class Shifts(models.Model):
     shiftDate = models.DateField()
     maintenanceType = models.ForeignKey(MaintenanceTypes, on_delete=models.CASCADE, null=True)
     comments = models.CharField(max_length=200, blank=True)
-
+    
     @property
     def car_name(self):
         return self.car.licenseNum+' '+self.car.nickName
@@ -129,6 +129,11 @@ class Shifts(models.Model):
 
     def __str__(self):
         return   self.car_name + ' ' + self.maintenance_name
+    
+    class Meta:
+        constraints = [
+                models.UniqueConstraint(fields=['shiftDate', 'car','maintenanceType'], name='my_shift_pk')
+            ]
     
 #  רשיון רכב,ביטוח חובה,ביטוח מקיף, טיפול רכב(מוסך) 
 class FileTypes(models.Model):

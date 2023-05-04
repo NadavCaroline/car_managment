@@ -16,6 +16,13 @@ export const getUsersOfDep = async (token: string) => {
     }
   }).then((res) => res.data);
 }
+export const getUsersOfDepByShifts = async (token: string) => {
+  return await axios.get(MY_SERVER + 'usersOfDepByShifts', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  }).then((res) => res.data);
+}
 
 export const updateUser = async (token: string, user: UserModel) => {
   console.log(token)

@@ -111,7 +111,7 @@ class UsersOfDep(APIView):
         return Response(serializer.data)
     
 @permission_classes([IsAuthenticated])
-class UsersOfDepByCountShift(APIView):
+class UsersOfDepByShifts(APIView):
     def get(self, request):
         usermain = request.user
         users = User.objects.annotate(count_shifts=Count('user1'))
@@ -123,8 +123,9 @@ class UsersOfDepByCountShift(APIView):
             obj1.save() # Save updated object to database
         # userOrdered=users.order_by('count_shifts')
         usersAll = list(filter(lambda user: (user.profile.department.id ==usermain.profile.department.id ), users))
-        
-        serializer = UserSerializer(users, many=True)
+        sorted_users = sorted(usersAll, key=lambda u: u.count_shifts)  # sort the users by username
+
+        serializer = CustomUserSerializer(sorted_users, many=True)
         return Response(serializer.data)
 
 @permission_classes([IsAuthenticated])
@@ -340,7 +341,12 @@ class ShiftsView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             # Handle the exception
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+            if "duplicate key" in str(e):
+                 return Response( "תורנות כבר קיימת",status=status.HTTP_208_ALREADY_REPORTED)
+            else:
+                 return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    
 
 @permission_classes([IsAuthenticated])
 class LogsView(APIView):

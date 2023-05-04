@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
 import ShiftModel from '../../models/Shift';
+
 // import { getShifts } from './shiftsAPI' ;
 import { getShifts, addShift } from './shiftsAPI';
 
@@ -51,16 +52,19 @@ export const shiftsSlice = createSlice({
                 state.shifts = action.payload;
             })
             .addCase(addShiftAsync.fulfilled, (state, action) => {
-                if (action.payload.status === 201) {
+                if (action.payload.status === 201) {//successfull created
                     state.shifts.push(action.payload.data)
                     state.msg = "תורנות נוצרה ונשלחה בהצלחה"
+                }
+                else if (action.payload.status === 208) {//already exists
+                    state.error = action.payload.data;
                 }
                 else if (action.payload.status === 401) {
                     state.error = '';
                 }
+                
             })
             .addCase(addShiftAsync.rejected, (state, action) => {
-                console.log(action.error.message)
                 state.error = action.error.message ?? ''
             });
     },

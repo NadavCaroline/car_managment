@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { getUsers, updateUser,getUsersOfDep } from './usersAPI';
+import { getUsers, updateUser,getUsersOfDep, getUsersOfDepByShifts } from './usersAPI';
 import { UserModel } from '../../models/User';
 
 
@@ -34,6 +34,13 @@ export const getUsersOfDepAsync = createAsyncThunk(
         return response;
     }
 );
+export const getUsersOfDepByShiftsAsync = createAsyncThunk(
+    'users/getUsersOfDepByShifts',
+    async (token: string) => {
+        const response = await getUsersOfDepByShifts(token);
+        return response;
+    }
+);
 
 export const usersSlice = createSlice({
     name: 'users',
@@ -46,6 +53,9 @@ export const usersSlice = createSlice({
                 state.users = action.payload;
             })
             .addCase(getUsersOfDepAsync.fulfilled, (state, action) => {
+                state.users = action.payload;
+            })
+            .addCase(getUsersOfDepByShiftsAsync.fulfilled, (state, action) => {
                 state.users = action.payload;
             });
     },

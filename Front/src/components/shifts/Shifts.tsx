@@ -6,7 +6,7 @@ import { MaintenanceTypeModel } from '../../models/MaintenanceType'
 import { getmaintenanceTypeAsync } from '../maintenanceType/maintenanceTypeSlice';
 import { carsSelector, getAllCarsAsync, getCarsAsync } from '../cars/carsSlice';
 import { addShiftAsync, shiftError, SetError, shiftMessage, SetMsg, getshiftsAsync, shiftSelector } from '../shifts/shiftsSlice';
-import { getUsersOfDepAsync, usersSelector } from '../users/userSlicer'
+import { getUsersOfDepByShiftsAsync, usersSelector } from '../users/userSlicer'
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
@@ -58,6 +58,17 @@ const Shifts = () => {
         theme: "colored",
         rtl: true,
     });
+    const resetForm = () =>  {
+        setselectedStartDate(null)
+        setMaintenanceType(null)
+        setSelectedUser([]);
+        setSelectedCar(null)
+        const elements = document.querySelectorAll('.selectedDiv');
+        elements.forEach((el) => {
+                el.classList.remove('selectedDiv');
+        });
+       
+    };
 
     useEffect(() => {
         if (errorMessage && errorMessage !== "")
@@ -66,15 +77,17 @@ const Shifts = () => {
     }, [errorMessage])
 
     useEffect(() => {
-        if (successMessage && successMessage !== "")
+        if (successMessage && successMessage !== ""){
             message(successMessage)
+            resetForm()
+        }
         dispatch(SetMsg())
     }, [successMessage])
-
+    
     useEffect(() => {
         dispatch(getCarsAsync(token))
         dispatch(getmaintenanceTypeAsync(token)).then((res) => setListMaintenanceTypes(res.payload))
-        dispatch(getUsersOfDepAsync(token))
+        dispatch(getUsersOfDepByShiftsAsync(token))
         dispatch(getshiftsAsync(token))
         // dispatch(getRolesAsync()).then((res) => setListRoles(res.payload))
     }, [])
@@ -86,6 +99,7 @@ const Shifts = () => {
     // Gets the shifts from the server
     useEffect(() => {
         dispatch(getshiftsAsync(token))
+        dispatch(getUsersOfDepByShiftsAsync(token))
     }, [shifts.length])
 
     const onSubmitShifts = (e: React.FormEvent<HTMLFormElement>) => {
@@ -243,7 +257,8 @@ const Shifts = () => {
                                 <div id={`divUser-${user.id}`} key={user.id} onClick={(event) => { maintenanceType?.id === "divMaintenance-2" ? handleDivUserClick(event, 1) : handleDivUserClick(event, 2) }} className="notSelectedDiv" >
                                     <div style={{ textAlign: 'center' }}>
                                         <h3> {user.first_name} {user.last_name} </h3>
-                                        <img src={AvatarMan} alt="Avatar" className="avatar" />
+                                        <img src={AvatarMan} alt="Avatar" className="avatar" /><br></br>
+                                         מספר תורנויות {user.count_shifts} 
                                     </div>
                                 </div>)}
                         </div>

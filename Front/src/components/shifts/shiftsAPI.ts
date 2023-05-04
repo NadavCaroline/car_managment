@@ -16,7 +16,9 @@ export const addShift = async (token: string, shift:ShiftModel) => {
       
       'Authorization': `Bearer ${token}`
     }
-  }).then((res) => res);
+  }).then((res) => {
+    console.log(res.data);
+    return res});
     
 }
 

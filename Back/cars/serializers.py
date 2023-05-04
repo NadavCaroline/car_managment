@@ -100,7 +100,15 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+class CustomUserSerializer(serializers.ModelSerializer):
+    count_shifts = serializers.IntegerField()
 
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'count_shifts')
+        # ordering = ['count_shifts']
+    def get_ordered(self):
+        return User.objects.order_by('count_shifts')
 
 class ProfileSerializer(serializers.ModelSerializer):
 
