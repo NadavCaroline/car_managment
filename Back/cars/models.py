@@ -132,7 +132,10 @@ class Shifts(models.Model):
     
     class Meta:
         constraints = [
-                models.UniqueConstraint(fields=['shiftDate', 'car','maintenanceType'], name='my_shift_pk')
+                models.UniqueConstraint(fields=['shiftDate', 'car','maintenanceType'], name='my_shift_pk'),
+                # models.UniqueConstraint(fields=['shiftDate', 'user1'], name='shift-user1_pk'),
+                # models.UniqueConstraint(fields=['shiftDate', 'user2'], name='shift-user2_pk')
+
             ]
     
 #  רשיון רכב,ביטוח חובה,ביטוח מקיף, טיפול רכב(מוסך) 

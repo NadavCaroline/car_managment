@@ -16,6 +16,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { MY_SERVER } from '../../env';
 import ShiftModel from '../../models/Shift';
 import AvatarMan from '../../images/img_avatar-man.png';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+
 
 const Shifts = () => {
     const dispatch = useAppDispatch()
@@ -32,6 +36,8 @@ const Shifts = () => {
     const errorMessage = useAppSelector(shiftError)
     const successMessage = useAppSelector(shiftMessage)
     const [searchTerm, setsearchTerm] = useState("")
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const messageError = (value: string) => toast.error(value, {
         position: "top-left",
@@ -134,7 +140,8 @@ const Shifts = () => {
             comments: comments
 
         }
-        dispatch(addShiftAsync({ token: token, shift: shift }))
+        setIsLoading(true);
+        dispatch(addShiftAsync({ token: token, shift: shift })).then((res) => {setIsLoading(false);} );
     };
 
     function handleCarDivClick(element: HTMLElement): void {
@@ -258,7 +265,7 @@ const Shifts = () => {
                                     <div style={{ textAlign: 'center' }}>
                                         <h3> {user.first_name} {user.last_name} </h3>
                                         <img src={AvatarMan} alt="Avatar" className="avatar" /><br></br>
-                                         מספר תורנויות {user.count_shifts} 
+                                          תורנויות שבוצעו {user.count_shifts} 
                                     </div>
                                 </div>)}
                         </div>
@@ -269,7 +276,7 @@ const Shifts = () => {
                         <div className="form-floating mb-2">
                             <textarea onChange={(e) => setComments(e.target.value)} id="shiftcomment" rows={3} placeholder="הערות"></textarea>
                         </div>
-                        <button type='submit' className="btn btn-primary btn-block mb-3">שמור תורנות</button>
+                        <button type='submit' className="btn btn-primary btn-block mb-3">{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'שמור תורנות'}</button>
                     </form>
                     <form dir="rtl" id="formShifts" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                         <div style={{ marginTop: '10px' }}>

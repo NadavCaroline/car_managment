@@ -15,7 +15,7 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode    
 from django.utils.encoding import force_bytes
 from .helper import write_to_log
-from django.db.models import Count
+from django.db.models import Count,Q
 
 
 @api_view(['GET'])
@@ -314,6 +314,14 @@ class ShiftsView(APIView):
 
     def post(self, request):
         try:
+            user1=request.data['user1']
+            user2=request.data['user2']
+            if ( user1  and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'],user1=user1)).exclude(car=request.data['car']).exists() or
+                Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'],user2=user1)).exclude(car=request.data['car']).exists()) or
+                user2  and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'],user1=user2)).exclude(car=request.data['car']).exists() or
+                Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'],user2=user2)).exclude(car=request.data['car']).exists())):
+                                    
+                return Response("למשתמש כבר קיים תורנות בתאריך הנבחר",status=status.HTTP_208_ALREADY_REPORTED)
             serializer = CreateShiftsSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -342,7 +350,8 @@ class ShiftsView(APIView):
         except Exception as e:
             # Handle the exception
             if "duplicate key" in str(e):
-                 return Response( "תורנות כבר קיימת",status=status.HTTP_208_ALREADY_REPORTED)
+                # if "my_shift_pk"   in str(e):
+                return Response( "תורנות כבר קיימת",status=status.HTTP_208_ALREADY_REPORTED)
             else:
                  return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
