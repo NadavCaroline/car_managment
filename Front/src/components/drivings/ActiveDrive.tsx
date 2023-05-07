@@ -164,9 +164,7 @@ const ActiveDrive = () => {
         if (orders && drives) {
             // const activeOrder = orders.find(o => o.id === drives[drives.length -1].order)
             if ((activeOrder?.ended === false) || (new Date().getTime() > new Date(activeOrder?.toDate!).getTime())) {
-                console.log("The Drive Has To End")
                 if (activeDrive) {
-                    console.log("The Drive Is Active")
                     dispatch(endDriveAsync({
                         token: token, drive: drives[drives.length - 1]
                     }))
@@ -183,17 +181,11 @@ const ActiveDrive = () => {
             }
             else if (orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)) {
                 let active = orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)
-                console.log("The drive isn't active")
-                console.log(active)
                 dispatch(startDriveAsync({
                     token: token, drive: {
                         user: decoded.user_id,
                         order: active?.id,
                     } 
-                }))
-                dispatch(endDriveAsync({
-                    token: token,
-                    drive: drives[drives.length - 1]
                 }))
                 dispatch(orderEndedAsync({
                     token: token,
@@ -201,8 +193,6 @@ const ActiveDrive = () => {
                 }))
                 dispatch(getDrivesAsync(token))
                 dispatch(getOrdersAsync(token))                
-            } else {
-                console.log("Everything Works Fine")
             }
         }
     }, [orders.length])

@@ -12,13 +12,15 @@ from django.contrib.auth.models import User
 from .serializers import *
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode    
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .helper import write_to_log
+
 
 @api_view(['GET'])
 def index(r):
     return Response('index')
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -27,15 +29,16 @@ class MyTokenObtainPairView(TokenObtainPairView):
 @api_view(['POST'])
 def register(request):
     try:
-        msg=""
+        msg = ""
         if User.objects.filter(username=request.data['user']['username']).exists():
-            msg={"status":"error","msg":"משתמש כבר קיים"}
+            msg = {"status": "error", "msg": "משתמש כבר קיים"}
         elif Profile.objects.filter(realID=request.data['profile']['realID']).exists():
-            msg={"status":"error","msg":"תעודת זהות כבר קיימת במערכת"}
+            msg = {"status": "error", "msg": "תעודת זהות כבר קיימת במערכת"}
         elif User.objects.filter(email=request.data['user']['email']).exists():
-            msg={"status":"error","msg":"מייל כבר קיים במערכת"}
-        else: 
-            department = Departments.objects.get(id=request.data['profile']['department'])
+            msg = {"status": "error", "msg": "מייל כבר קיים במערכת"}
+        else:
+            department = Departments.objects.get(
+                id=request.data['profile']['department'])
             role = Roles.objects.get(id=request.data['profile']['roleLevel'])
 
             user = User.objects.create_user(
@@ -44,26 +47,26 @@ def register(request):
                 username=request.data['user']['username'],
                 email=request.data['user']['email'],
                 password=request.data['user']['password'],
-                is_superuser=True if role.id==3 else False
-                        
+                is_superuser=True if role.id == 3 else False
+
             )
             user.is_active = True
             user.is_staff = True
             user.save()
-        
+
             profile = Profile.objects.create(
                 user=user,
                 jobTitle=request.data['profile']['jobTitle'],
                 roleLevel=role,
                 department=department,
                 realID=request.data['profile']['realID'],
-                )
+            )
             profile.save()
             write_to_log('info', 'משתמש נוצר')
-            msg={"status":"success","msg":"משתמש נוצר בהצלחה"}
+            msg = {"status": "success", "msg": "משתמש נוצר בהצלחה"}
     except Exception as e:
         # Handle the exception
-        msg={"status":"error","msg":str(e)}
+        msg = {"status": "error", "msg": str(e)}
         # error_message = str(e)
     return Response(msg)
 
@@ -136,7 +139,7 @@ class ProfileView(APIView):
 @permission_classes([IsAuthenticated])
 class AllCarsView(APIView):
     def get(self, request):
-        #get all Cars also car that are disabled
+        # get all Cars also car that are disabled
         cars = Cars.objects.all()
         serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data)
@@ -154,7 +157,8 @@ class AllCarsView(APIView):
         serializer = CarsSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('warning', 'מכונית עברה עריכה', user=request.user, car=my_model)
+            write_to_log('warning', 'מכונית עברה עריכה',
+                         user=request.user, car=my_model)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -175,7 +179,7 @@ class AvaliableOrdersView(APIView):
             # This row checks wether there is alreay and order on the dates the user entered.
             if (order.toDate.replace(tzinfo=None) <= toDate and order.toDate.replace(tzinfo=None) >= fromDate) or (order.fromDate.replace(tzinfo=None) <= toDate and order.fromDate.replace(tzinfo=None) >= fromDate):
                 cars_black_list.add(order.car)
-                order_details.append({"car":order.car.id, "fromDate": datetime.fromisoformat(str(order.fromDate)).astimezone(pytz.timezone('Israel')).strftime(
+                order_details.append({"car": order.car.id, "fromDate": datetime.fromisoformat(str(order.fromDate)).astimezone(pytz.timezone('Israel')).strftime(
                     "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).astimezone(pytz.timezone('Israel')).strftime("%Y-%m-%d %H:%M:%S"), "carID": order.car.id})
             else:
                 available_cars.add(order.car)
@@ -203,7 +207,7 @@ class CarsView(APIView):
         # The next row filters the cars_model list to contain only the
         # cars matching the user's department id and is not disabled
         cars = list(filter(lambda car: (car.department.id ==
-                    user.profile.department.id and car.isDisabled==False ), cars))
+                    user.profile.department.id and car.isDisabled == False), cars))
         serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data)
 
@@ -238,10 +242,11 @@ class CarOrdersView(APIView):
         serializer = CreateCarOrdersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('info', 'הזמנה בוצעה', user=request.user, car=car_model)      
+            write_to_log('info', 'הזמנה בוצעה',
+                         user=request.user, car=car_model)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # End order - change the ended attribute to be True
     def put(self, request, id):
         my_model = CarOrders.objects.get(id=int(id))
@@ -331,7 +336,8 @@ def updateDrive(request, id):
     serializer = CreateDrivingsSerializer(my_model, data=request.data)
     if serializer.is_valid():
         serializer.save()
-        write_to_log('warning', 'פרטי נסיעה עברו עריכה', user=request.user, car=my_model.order.car)      
+        write_to_log('warning', 'פרטי נסיעה עברו עריכה',
+                     user=request.user, car=my_model.order.car)
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -351,22 +357,29 @@ class DrivingsView(APIView):
         if serializer.is_valid():
             serializer.save()
             if auto_start:
-                write_to_log('info', 'משתמש התחיל נסיעה', user=request.user, car=order_model.car)
+                write_to_log('info', 'משתמש התחיל נסיעה',
+                             user=request.user, car=order_model.car)
             else:
-                write_to_log('warning', 'משתמש שכח להתחיל נסיעה', user=request.user, car=order_model.car)
+                write_to_log('warning', 'משתמש שכח להתחיל/לסיים נסיעה',
+                             user=request.user, car=order_model.car)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, id):
-        auto_end = request.POST.get('endDate')
+    def patch(self, request, id):
+        print("*"*40)
+        print(request.data)
+        auto_end = request.PATCH.get('endDate')
+        print(auto_end)
         my_model = Drivings.objects.get(id=id)
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
             if auto_end:
-                write_to_log('info', 'משתמש סיים נסיעה', user=request.user, car=my_model.order.car)
+                write_to_log('info', 'משתמש סיים נסיעה',
+                             user=request.user, car=my_model.order.car)
             else:
-                write_to_log('warning', 'משתמש שכח לסיים נסיעה', user=request.user, car=my_model.order.car)
+                write_to_log('warning', 'משתמש שכח לסיים נסיעה',
+                             user=request.user, car=my_model.order.car)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -375,7 +388,7 @@ class RolesView(APIView):
     def get(self, request):
         my_model = Roles.objects.all()
         serializer = CreateRolesSerializer(my_model, many=True)
-        
+
         return Response(serializer.data)
 
 
@@ -391,50 +404,52 @@ class DepartmentsView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class ForgotView(APIView):
     def post(self, request):
         try:
-            msg=""
-            email =request.data["email"]
+            msg = ""
+            email = request.data["email"]
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
                 user = None
-                msg={"status":"error","msg":"מייל לא קיים במערכת"}
+                msg = {"status": "error", "msg": "מייל לא קיים במערכת"}
             if user:
                 token = default_token_generator.make_token(user)
-                reset_url="http://localhost:3000/reset/"+urlsafe_base64_encode(force_bytes(user.pk))+"/"+token
+                reset_url = "http://localhost:3000/reset/" + \
+                    urlsafe_base64_encode(force_bytes(user.pk))+"/"+token
                 # reset_url = request.build_absolute_uri(reverse('password_reset_confirm', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(user.pk)), 'token': token}))
                 message = f"Hello {user.username},\n\nPlease click on the following link to reset your password:\n\n{reset_url}\n\nThanks,\nYour website team"
-                send_mail('Password reset request', message, None, [user.email], fail_silently=False)
-                msg={"status":"success","msg":"מייל נשלח בהצלחה עם קישור לאיפוס סיסמא"}
+                send_mail('Password reset request', message,
+                          None, [user.email], fail_silently=False)
+                msg = {"status": "success",
+                       "msg": "מייל נשלח בהצלחה עם קישור לאיפוס סיסמא"}
         except Exception as e:
             # Handle the exception
-            msg={"status":"error","msg":str(e)}
+            msg = {"status": "error", "msg": str(e)}
         return Response(msg)
-    
+
 
 class ResetView(APIView):
-    def post(self,request, uidb64, token):
-        msg=""
+    def post(self, request, uidb64, token):
+        msg = ""
         try:
-            try: 
+            try:
                 uid = urlsafe_base64_decode(uidb64).decode()
                 user = User.objects.get(pk=uid)
             except (TypeError, ValueError, OverflowError, User.DoesNotExist):
                 user = None
-                msg={"status":"error","msg":"uid has an invalid value"}
+                msg = {"status": "error", "msg": "uid has an invalid value"}
 
             if user and default_token_generator.check_token(user, token):
                 user.set_password(request.data["password"])
                 user.save()
-                msg={"status":"success","msg":"סיסמא חדשה עודכנה בהצלחה"}
+                msg = {"status": "success", "msg": "סיסמא חדשה עודכנה בהצלחה"}
             else:
-                msg={"status":"error","msg":"The token is not valid"}
+                msg = {"status": "error", "msg": "The token is not valid"}
         except Exception as e:
             # Handle the exception
-            msg={"status":"error","msg":str(e)}
+            msg = {"status": "error", "msg": str(e)}
         return Response(msg)
-    
-    
