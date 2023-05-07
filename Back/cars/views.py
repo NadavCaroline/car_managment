@@ -375,6 +375,7 @@ class RolesView(APIView):
     def get(self, request):
         my_model = Roles.objects.all()
         serializer = CreateRolesSerializer(my_model, many=True)
+        
         return Response(serializer.data)
 
 
