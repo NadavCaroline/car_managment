@@ -358,9 +358,10 @@ const Shifts = () => {
                         </div>
                         <button type='submit' className="btn btn-primary btn-block mb-3">{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'שמור תורנות'}</button>
                     </form>
-                    <form dir="rtl" id="formShifts" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+                    <form dir="rtl" id="formShifts" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}> 
                         <div style={{ marginTop: '10px' }}>
-                            <input placeholder='חיפוש לפי ' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
+                            <input placeholder='חיפוש לפי ' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} /> 
+                            <h1> תורנויות עתידיות </h1><hr />
                             <table style={{ marginLeft: "auto", marginRight: "auto", marginTop: '10px' }}>
                                 <thead>
                                     <tr>
@@ -374,9 +375,38 @@ const Shifts = () => {
                                 </thead>
                                 <tbody>
 
-                                    {shifts && shifts.filter(shift => shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                                    {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) && new Date(shift.shiftDate!).getDate() >= new Date().getDate()
+                                    ).map(shift =>
+                                        <tr key={shift.id} style={{ cursor: 'pointer' }}>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.maintenance_name}</td>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}</td>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.car_name}</td >
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name1}</td>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name2}</td>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.comments}</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                            <h1> תורנויות קודמות </h1><hr />
+                            <table style={{ marginLeft: "auto", marginRight: "auto", marginTop: '10px' }}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>סוג תורנות</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>תאריך תורנות</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>רכב</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>עובד 1</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>עובד 2</th>
+                                        <th style={{ border: '1px solid black', padding: '5px' }}>הערות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                                        shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) &&  new Date(shift.shiftDate!).getDate() < new Date().getDate()
                                     ).map(shift =>
                                         <tr key={shift.id} style={{ cursor: 'pointer' }}>
                                             <td style={{ border: '1px solid black', padding: '5px' }}>{shift.maintenance_name}</td>
@@ -390,19 +420,7 @@ const Shifts = () => {
                                 </tbody>
                             </table>
                         </div >
-                        {/* <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
-                            {shifts.map(shift =>
-                                <div id={`divShift-${shift.id}`} key={shift.id}  >
-                                    <div style={{ textAlign: 'center' }}>
-                                        סוג תורנות: <h6>  {shift.maintenanceType} </h6>
-                                        תאריך תורנות : <h6>  {shift.shiftDate} </h6>
-                                        רכב: <h6>  {shift.car_name} </h6>
-                                        1 עובד  : <h6>  {shift.user_name1} </h6>
-                                        2 עובד  : <h6>  {shift.user_name2} </h6>
-                                        הערות  : <h6>  {shift.comments} </h6>
-                                    </div>
-                                </div>)}
-                        </div> */}
+                       
                     </form>
                 </div>
             </div>

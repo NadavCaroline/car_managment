@@ -307,9 +307,11 @@ class MaintenanceTypesView(APIView):
 @permission_classes([IsAuthenticated])
 class ShiftsView(APIView):
     def get(self, request):
-        my_model = Shifts.objects.all()
-        # print(my_model)
-        serializer = ShiftsSerializer(my_model, many=True)
+        user = request.user
+        shifts = Shifts.objects.all()
+        if(user.profile.roleLevel==1):# filter by user if user is not admin
+            shifts= Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id)) 
+        serializer = ShiftsSerializer(shifts, many=True)
         return Response(serializer.data)
 
     def post(self, request):
