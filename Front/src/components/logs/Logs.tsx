@@ -27,15 +27,17 @@ const Logs = () => {
               <th style={{ border: '1px solid black', padding: '5px' }}>משתמש</th>
               <th style={{ border: '1px solid black', padding: '5px' }}>מכונית</th>
               <th style={{ border: '1px solid black', padding: '5px' }}>פעולה</th>
+              <th style={{ border: '1px solid black', padding: '5px' }}>רמה</th>
             </tr>
           </thead>
           <tbody>
             {logs.map(log =>
               <tr key={log.id}>
                 <td style={{ border: '1px solid black', padding: '5px' }}>{log.logDate}</td>
-                <td style={{ border: '1px solid black', padding: '5px' }}>{log.user_name}</td>
-                <td style={{ border: '1px solid black', padding: '5px' }}>{log.car_name}</td >
+                <td style={{ border: '1px solid black', padding: '5px' }}>{log.user_name  ? log.user_name: "N/A"}</td>
+                <td style={{ border: '1px solid black', padding: '5px' }}>{log.car_name ? log.car_name: "N/A"}</td >
                 <td style={{ border: '1px solid black', padding: '5px' }}>{log.action}</td>
+                <td style={{ border: '1px solid black', padding: '5px' }}>{log.level}</td>
               </tr>
             )}
           </tbody>

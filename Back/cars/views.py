@@ -59,6 +59,7 @@ def register(request):
                 realID=request.data['profile']['realID'],
                 )
             profile.save()
+            write_to_log('info', 'משתמש נוצר')
             msg={"status":"success","msg":"משתמש נוצר בהצלחה"}
     except Exception as e:
         # Handle the exception
@@ -79,7 +80,8 @@ class AllProfilesView(APIView):
         serializer = CreateProfileSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
-
+            print("********************")
+            # write_to_log('info', 'פרופיל משתמש עבר עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -96,6 +98,7 @@ class AllUsersView(APIView):
         serializer = UserSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            write_to_log('info', 'פרטי משתמש עברו עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -141,9 +144,8 @@ class AllCarsView(APIView):
         serializer = CreateCarsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            write_to_log('info', 'מכונית התווספה', user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
@@ -151,6 +153,7 @@ class AllCarsView(APIView):
         serializer = CarsSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            write_to_log('warning', 'מכונית עברה עריכה', user=request.user, car=my_model)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -202,21 +205,21 @@ class CarsView(APIView):
         serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = CreateCarsSerializer(
-            data=request.data, context={'department': request.department})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def post(self, request):
+    #     serializer = CreateCarsSerializer(
+    #         data=request.data, context={'department': request.department})
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, id):
-        my_model = Cars.objects.get(id=int(id))
-        serializer = CreateCarsSerializer(my_model, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def put(self, request, id):
+    #     my_model = Cars.objects.get(id=int(id))
+    #     serializer = CreateCarsSerializer(my_model, data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes([IsAuthenticated])
@@ -227,13 +230,17 @@ class CarOrdersView(APIView):
         serializer = CarOrdersSerializer(user_orders, many=True)
         return Response(serializer.data)
 
+    # Make an order
     def post(self, request):
+        car_model = Cars.objects.get(id=request.data['car'])
         serializer = CreateCarOrdersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            write_to_log('info', 'הזמנה בוצעה', user=request.user, car=car_model)      
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    # End order - change the ended attribute to be True
     def put(self, request, id):
         my_model = CarOrders.objects.get(id=int(id))
         my_model.ended = True
@@ -298,12 +305,12 @@ class LogsView(APIView):
         serializer = LogsSerializer(my_model, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = CreateLogsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     def post(self, request):
+#         serializer = CreateLogsSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes([IsAuthenticated])
@@ -314,7 +321,7 @@ class AllDrivingsView(APIView):
         return Response(serializer.data)
 
 
-# Responsible for the manual update of a drive
+# Responsible for the manual update of the drive's info
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateDrive(request, id):
@@ -322,6 +329,7 @@ def updateDrive(request, id):
     serializer = CreateDrivingsSerializer(my_model, data=request.data)
     if serializer.is_valid():
         serializer.save()
+        write_to_log('warning', 'פרטי נסיעה עברו עריכה', user=request.user, car=my_model.order.car)      
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -335,18 +343,28 @@ class DrivingsView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        auto_start = request.POST.get('startDate')
+        order_model = CarOrders.objects.get(id=request.POST.get('order'))
         serializer = CreateDrivingsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            if auto_start:
+                write_to_log('info', 'משתמש התחיל נסיעה', user=request.user, car=order_model.car)
+            else:
+                write_to_log('warning', 'משתמש שכח להתחיל נסיעה', user=request.user, car=order_model.car)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, id):
+        auto_end = request.POST.get('endDate')
         my_model = Drivings.objects.get(id=id)
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
-        print(serializer.error_messages)
         if serializer.is_valid():
             serializer.save()
+            if auto_end:
+                write_to_log('info', 'משתמש סיים נסיעה', user=request.user, car=my_model.order.car)
+            else:
+                write_to_log('warning', 'משתמש שכח לסיים נסיעה', user=request.user, car=my_model.order.car)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -368,7 +386,6 @@ class DepartmentsView(APIView):
         serializer = CreateDepartmentsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -376,7 +393,7 @@ class ForgotView(APIView):
     def post(self, request):
         try:
             msg=""
-            email =request.data["email"];
+            email =request.data["email"]
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:

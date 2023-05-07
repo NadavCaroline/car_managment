@@ -231,8 +231,13 @@ const MakeOrder = () => {
                           עד תאריך: {order.toDate!.toString().slice(0, 10)}<br />
                         </div>
                       }
+                    
+                    {order.isAllDay}
+                      {!order.isAllDay ? 
                       <div> משעה: {order.fromDate!.toString().slice(11, 16)}<br />
-                        עד שעה: {order.toDate!.toString().slice(11, 16)}</div>
+                        עד שעה: {order.toDate!.toString().slice(11, 16)}</div> :
+                        <div>כל היום</div>
+                    }
                     </div>)}
                   </div>
                 </div>
