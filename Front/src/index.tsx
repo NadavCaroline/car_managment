@@ -58,7 +58,7 @@ root.render(
                         <Route path="/maintenanceTypes" element={<MaintenanceType />} />
                         <Route path="/notifications" element={<Notifications />} />
                         <Route path="/logs" element={<Logs />} />
-                        <Route path="/shifts" element={<Shifts />} />
+                        <Route path="/shifts" element={<Shifts/>} />
                         {/* <Route path="/reset/:id" element={<Reset/>} /> */}
                     </Route>
                 </Routes>
