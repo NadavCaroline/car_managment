@@ -40,8 +40,8 @@ const Users = () => {
   }, [selectedUser])
 
   const handleUpdateUserData = () => {
-    updateUserModel.id = selectedUser?.id
-    updateProfileModel.id = selectedUserProfile?.id
+    // updateUserModel.id = selectedUser?.id
+    // updateProfileModel.id = selectedUserProfile?.id
     newFirstName && (updateUserModel.first_name = newFirstName)
     newLastName && (updateUserModel.last_name = newLastName)
     newUserName && (updateUserModel.username = newUserName)
@@ -49,9 +49,14 @@ const Users = () => {
     newId && (updateProfileModel.realID = Number(newId))
     selectedDep && (updateProfileModel.department = departments.filter(dep => dep.name === selectedDep)[0].id)
     newTitle && (updateProfileModel.jobTitle = newTitle)
-
-    dispatch(updateUserAsync({ token: token, user: updateUserModel }))
-    dispatch(updateProfileAsync({ token: token, profile: updateProfileModel }))
+    if (updateUserModel) {
+      updateUserModel.id = selectedUser?.id
+    }
+    if (updateProfileModel) {
+      updateProfileModel.id = selectedUserProfile?.id
+    }
+    updateUserModel &&  dispatch(updateUserAsync({ token: token, user: updateUserModel }))
+    updateProfileModel &&  dispatch(updateProfileAsync({ token: token, profile: updateProfileModel }))
   }
 
   const handleeditExit = () => {

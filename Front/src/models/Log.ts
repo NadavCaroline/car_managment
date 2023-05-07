@@ -1,4 +1,5 @@
 export interface LogModel {
+    level: string
     id?: number
     logDate: string
     user: string

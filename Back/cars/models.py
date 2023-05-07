@@ -166,6 +166,7 @@ class CarMaintenance(models.Model):
 
 class Logs(models.Model):
     id = models.BigAutoField(primary_key=True)
+    level = models.CharField(max_length=10)
     logDate = models.DateTimeField(default=datetime.datetime.now())
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     car = models.ForeignKey(Cars, on_delete=models.CASCADE, null=True)
@@ -180,7 +181,7 @@ class Logs(models.Model):
         return self.user.first_name + ' ' + self.user.last_name
     
     def __str__(self):
-        return str(self.logDate) + ' ' + self.user_name + ' ' + self.car_name
+        return ' Level: '+ self.level+ ' Date:'+ str(self.logDate) + ' action: '+ self.action
 
 
 class Drivings(models.Model):
