@@ -18,6 +18,9 @@ import ShiftModel from '../../models/Shift';
 import AvatarMan from '../../images/img_avatar-man.png';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Carousel from 'better-react-carousel'
+// import Carousel from "react-multi-carousel";
+// import "react-multi-carousel/lib/styles.css";
 
 
 
@@ -38,7 +41,25 @@ const Shifts = () => {
     const [searchTerm, setsearchTerm] = useState("")
     const [isLoading, setIsLoading] = useState(false);
 
-
+    // const responsive = {
+    //     superLargeDesktop: {
+    //       // the naming can be any, depends on you.
+    //       breakpoint: { max: 4000, min: 3000 },
+    //       items: 5
+    //     },
+    //     desktop: {
+    //       breakpoint: { max: 3000, min: 1024 },
+    //       items: 3
+    //     },
+    //     tablet: {
+    //       breakpoint: { max: 1024, min: 464 },
+    //       items: 2
+    //     },
+    //     mobile: {
+    //       breakpoint: { max: 464, min: 0 },
+    //       items: 1
+    //     }
+    // };
     const messageError = (value: string) => toast.error(value, {
         position: "top-left",
         //autoClose: 5000,
@@ -64,16 +85,16 @@ const Shifts = () => {
         theme: "colored",
         rtl: true,
     });
-    const resetForm = () =>  {
+    const resetForm = () => {
         setselectedStartDate(null)
         setMaintenanceType(null)
         setSelectedUser([]);
         setSelectedCar(null)
         const elements = document.querySelectorAll('.selectedDiv');
         elements.forEach((el) => {
-                el.classList.remove('selectedDiv');
+            el.classList.remove('selectedDiv');
         });
-       
+
     };
 
     useEffect(() => {
@@ -83,13 +104,13 @@ const Shifts = () => {
     }, [errorMessage])
 
     useEffect(() => {
-        if (successMessage && successMessage !== ""){
+        if (successMessage && successMessage !== "") {
             message(successMessage)
             resetForm()
         }
         dispatch(SetMsg())
     }, [successMessage])
-    
+
     useEffect(() => {
         dispatch(getCarsAsync(token))
         dispatch(getmaintenanceTypeAsync(token)).then((res) => setListMaintenanceTypes(res.payload))
@@ -141,7 +162,7 @@ const Shifts = () => {
 
         }
         setIsLoading(true);
-        dispatch(addShiftAsync({ token: token, shift: shift })).then((res) => {setIsLoading(false);} );
+        dispatch(addShiftAsync({ token: token, shift: shift })).then((res) => { setIsLoading(false); });
     };
 
     function handleCarDivClick(element: HTMLElement): void {
@@ -211,9 +232,68 @@ const Shifts = () => {
                 pauseOnHover
                 theme="colored"
             />
+
             <div className="row mt-3" style={{ direction: "ltr" }}>
-                <div className="mx-auto col-10 col-md-8 col-lg-6">
+                {/* <div className="mx-auto col-10 col-md-8 col-lg-6"> */}
+                <div className="mx-auto col-10 col-md-8">
                     <form dir="rtl" id="formAddShifts" onSubmit={onSubmitShifts} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+
+                        <Carousel
+                            cols={4}
+                            rows={1}
+                            gap={10}
+                            scrollSnap={true}
+                            showDots={true}
+                            step={4}
+                        >
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=1" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=2" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=3" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=4" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=5" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                
+                                <img width="100%" src="https://picsum.photos/800/600?random=6" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=7" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=8" />
+                            </Carousel.Item>
+                        </Carousel>
+                        {/* <Carousel  step={3} cols={4} rows={1} gap={10} scrollSnap={true}  showDots={true} >
+                            <Carousel.Item>
+                                {/* <img width="100%" src="https://picsum.photos/800/600?random=1" /> */}
+                        {/* </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=2" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=5" />
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=6" />
+                                <br></br>
+                                hello
+                            </Carousel.Item>
+                            <Carousel.Item>
+                                <img width="100%" src="https://picsum.photos/800/600?random=8" />
+                                <br></br>
+                                nice
+                            </Carousel.Item> */}
+
+                        {/* </Carousel>  */}
                         <div style={{ width: '400px', marginRight: '5px' }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DemoContainer components={['DatePicker', 'MobileTimePicker']}>
@@ -265,7 +345,7 @@ const Shifts = () => {
                                     <div style={{ textAlign: 'center' }}>
                                         <h3> {user.first_name} {user.last_name} </h3>
                                         <img src={AvatarMan} alt="Avatar" className="avatar" /><br></br>
-                                          תורנויות שבוצעו {user.count_shifts} 
+                                        תורנויות שבוצעו {user.count_shifts}
                                     </div>
                                 </div>)}
                         </div>
@@ -296,17 +376,17 @@ const Shifts = () => {
 
                                     {shifts && shifts.filter(shift => shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) 
-                                        ).map(shift =>
-                                            <tr key={shift.id}  style={{ cursor: 'pointer' }}>
-                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.maintenance_name}</td>
-                                                <td style={{ border: '1px solid black', padding: '5px' }}>{dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY') }</td>
-                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.car_name}</td >
-                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name1}</td>
-                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name2}</td>
-                                                <td style={{ border: '1px solid black', padding: '5px' }}>{shift.comments}</td>
-                                            </tr>
-                                        )}
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
+                                    ).map(shift =>
+                                        <tr key={shift.id} style={{ cursor: 'pointer' }}>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.maintenance_name}</td>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}</td>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.car_name}</td >
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name1}</td>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name2}</td>
+                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.comments}</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div >
