@@ -310,9 +310,23 @@ class ShiftsView(APIView):
         user = request.user
         shifts = Shifts.objects.all()
         if(user.profile.roleLevel.id==1):# filter by user if user is not admin
-            shifts= Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id)) 
+            shifts= Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id))
+        shifts=shifts.order_by('-shiftDate')
+ 
         serializer = ShiftsSerializer(shifts, many=True)
         return Response(serializer.data)
+    
+    def put(self, request, id):
+        try:
+            my_model = Shifts.objects.get(id=int(id))
+            my_model.isDone=request.data['isDone']
+            model_dict = model_to_dict(my_model)
+            serializer = CreateShiftsSerializer(my_model, data=model_dict)
+            if serializer.is_valid():
+                serializer.save()
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         try:

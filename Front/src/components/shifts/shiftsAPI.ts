@@ -21,6 +21,16 @@ export const addShift = async (token: string, shift:ShiftModel) => {
     return res});
     
 }
+export const shiftDone = async (token: string, id: number) => {
+
+  return axios.put(MY_SERVER + 'shifts/' + id,
+  {isDone: true},
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((res) => res.data);
+}
 
 
 

@@ -11,4 +11,5 @@ export default interface ShiftModel {
     maintenance_name?: string
     maintenance_logo?:string
     comments:string
+    isDone?:boolean
 }

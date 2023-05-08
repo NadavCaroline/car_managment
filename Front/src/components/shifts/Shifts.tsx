@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { MaintenanceTypeModel } from '../../models/MaintenanceType'
 import { getmaintenanceTypeAsync } from '../maintenanceType/maintenanceTypeSlice';
 import { carsSelector, getAllCarsAsync, getCarsAsync } from '../cars/carsSlice';
-import { addShiftAsync, shiftError, SetError, shiftMessage, SetMsg, getshiftsAsync, shiftSelector } from '../shifts/shiftsSlice';
+import { addShiftAsync, shiftError, SetError, shiftMessage, SetMsg, getshiftsAsync, shiftSelector, shiftDoneAsync } from '../shifts/shiftsSlice';
 import { getUsersOfDepByShiftsAsync, usersSelector } from '../users/userSlicer'
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import dayjs from 'dayjs';
@@ -40,7 +40,6 @@ const Shifts = () => {
     const [numItems, setNumItems] = useState(2);
     const [showForm, setShowForm] = useState(false);
     const isAdmin = useAppSelector(adminSelector)
-    const [done, setDone] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -224,9 +223,15 @@ const Shifts = () => {
     const handleStartDateChange = (date: Dayjs | null) => {
         setselectedStartDate(date)
     }
-    const DoneClick = () => {
-        setDone(true);
-      }
+    const DoneClick = (id: number) => {
+        dispatch(shiftDoneAsync({
+            token: token,
+            id: id
+        }))
+        // dispatch(addShiftAsync({ token: token, shift: shift })).then((res) => { setIsLoading(false); });
+        // dispatch(getshiftsAsync(token))
+        // setDone(true);
+    }
     return (
         <div>
             <ToastContainer
@@ -289,7 +294,7 @@ const Shifts = () => {
                             </Carousel>
                             <h4 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >רכב </h4>
                             {/* <!-- car div --> */}
-                            <Carousel indicators={false} touch={true} interval={null}>
+                            <Carousel indicators={false} touch={true} interval={null} >
                                 {[...Array(Math.ceil(cars.length / numItems))].map((_, i) => (
                                     <Carousel.Item key={i} className="px-3">
                                         <div className="row text-center">
@@ -297,7 +302,7 @@ const Shifts = () => {
                                                 .slice(i * numItems, i * numItems + numItems)
                                                 .map((car, j) => (
                                                     <div className="col-lg-3 col-md-4 col-sm-6">
-                                                        <Card id={`divCar-${car.id}`} key={car.id} onClick={(event) => handleCarDivClick(event.currentTarget)} className="notSelectedDiv" style={{ margin: '10px auto' }}>
+                                                        <Card id={`divCar-${car.id}`} key={car.id} onClick={(event) => handleCarDivClick(event.currentTarget)} className="notSelectedDiv" style={{ margin: '10px auto',height: '90%' }}>
                                                             <Card.Body>
                                                                 <Card.Title> {car.nickName} - {car.licenseNum}</Card.Title>
                                                                 <Card.Text>
@@ -357,13 +362,13 @@ const Shifts = () => {
                             <input placeholder='חיפוש' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
                             <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תורנויות עתידיות</h3><hr />
                             <Container>
-                                <Row xs={1} md={2} lg={3}>
+                                <Row className="align-items-stretch" xs={1} md={2} lg={3} >
                                     {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) && new Date(shift.shiftDate!).getDate() >= new Date().getDate()
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) && (dayjs(shift!.shiftDate, 'YYYY-MM-DD').isSame(dayjs().format('YYYY-MM-DD'), 'day') || dayjs(shift!.shiftDate, 'YYYY-MM-DD').isAfter(dayjs().format('YYYY-MM-DD'), 'day'))
                                     ).map(shift =>
                                         <Col style={{ marginBottom: '10px' }}>
-                                            <Card className='text-center'>
+                                            <Card className='h-100 text-center'>
                                                 {/* <Card.Img variant="top" src="https://via.placeholder.com/350x150" /> */}
                                                 <Card.Body >
                                                     <Card.Title> {dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}<br></br>{shift.maintenance_name}</Card.Title>
@@ -374,7 +379,10 @@ const Shifts = () => {
                                                         {shift.user_name2}<br></br>
                                                         {shift.comments}
                                                     </Card.Text>
-                                                    <Badge className="ms-2 bg-success">בוצע</Badge>
+                                                    {!shift.isDone && <Button id={shift.id?.toString()} variant="danger" onClick={() => shift.id !== undefined ? DoneClick(shift.id) : null}>
+                                                        סמן כבוצע
+                                                    </Button>}
+                                                    {shift.isDone && <Badge className="ms-2 bg-success">בוצע</Badge>}
                                                 </Card.Body>
                                             </Card>
                                         </Col>
@@ -384,13 +392,13 @@ const Shifts = () => {
                             </Container>
                             <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תורנויות קודמות</h3><hr />
                             <Container>
-                                <Row xs={1} md={2} lg={3}>
+                                <Row className="align-items-stretch" xs={1} md={2} lg={3}>
                                     {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) && new Date(shift.shiftDate!).getDate() < new Date().getDate()
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) &&  dayjs(shift!.shiftDate, 'YYYY-MM-DD').isBefore(dayjs().format('YYYY-MM-DD'), 'day')
                                     ).map(shift =>
                                         <Col mb={4}>
-                                            <Card className='text-center'>
+                                            <Card className='h-100 text-center'>
                                                 {/* <Card.Img variant="top" src="https://via.placeholder.com/350x150" /> */}
                                                 <Card.Body >
                                                     <Card.Title> {dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}<br></br>{shift.maintenance_name}</Card.Title>
@@ -401,10 +409,10 @@ const Shifts = () => {
                                                         {shift.user_name2}<br></br>
                                                         {shift.comments}
                                                     </Card.Text>
-                                                    {!done  && <Button variant="danger" onClick={DoneClick}>
-                                                      סמן כבוצע
+                                                    {!shift.isDone && <Button id={shift.id?.toString()} variant="danger" onClick={() => shift.id !== undefined ? DoneClick(shift.id) : null}>
+                                                        סמן כבוצע
                                                     </Button>}
-                                                    {done && <Badge className="ms-2 bg-success">בוצע</Badge>}
+                                                    {shift.isDone && <Badge className="ms-2 bg-success">בוצע</Badge>}
                                                 </Card.Body>
                                             </Card>
                                         </Col>

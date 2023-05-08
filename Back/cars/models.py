@@ -107,6 +107,8 @@ class Shifts(models.Model):
     shiftDate = models.DateField()
     maintenanceType = models.ForeignKey(MaintenanceTypes, on_delete=models.CASCADE, null=True)
     comments = models.CharField(max_length=200, blank=True)
+    isDone = models.BooleanField(default=False)
+
     
     @property
     def car_name(self):

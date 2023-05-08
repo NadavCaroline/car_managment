@@ -3,12 +3,12 @@ import { RootState, AppThunk } from '../../app/store';
 import ShiftModel from '../../models/Shift';
 
 // import { getShifts } from './shiftsAPI' ;
-import { getShifts, addShift } from './shiftsAPI';
+import { getShifts, addShift, shiftDone } from './shiftsAPI';
 
 export interface shiftsState {
     shifts: ShiftModel[]
     error: string | null
-    msg:string | null
+    msg: string | null
 
 
 }
@@ -16,7 +16,7 @@ export interface shiftsState {
 const initialState: shiftsState = {
     shifts: [],
     error: "",
-    msg:""
+    msg: ""
 };
 
 
@@ -28,9 +28,16 @@ export const getshiftsAsync = createAsyncThunk(
     }
 );
 export const addShiftAsync = createAsyncThunk(
-    'myCars/addShift',
+    'shifts/addShift',
     async ({ token, shift }: { token: string, shift: ShiftModel }) => {
         const response = await addShift(token, shift);
+        return response;
+    }
+);
+export const shiftDoneAsync = createAsyncThunk(
+    'shifts/shiftDone',
+    async ({ token, id }: { token: string, id: number }) => {
+        const response = await shiftDone(token, id);
         return response;
     }
 );
@@ -62,14 +69,19 @@ export const shiftsSlice = createSlice({
                 else if (action.payload.status === 401) {
                     state.error = '';
                 }
-                
+
             })
+
             .addCase(addShiftAsync.rejected, (state, action) => {
                 state.error = action.error.message ?? ''
+            })
+            .addCase(shiftDoneAsync.fulfilled, (state, action) => {
+                let temp = state.shifts.filter(shift => shift.id === action.payload.id)[0]
+                temp.isDone = true
             });
     },
 });
-export const { SetError,SetMsg } = shiftsSlice.actions;
+export const { SetError, SetMsg } = shiftsSlice.actions;
 export const shiftError = (state: RootState) => state.shifts.error;
 export const shiftMessage = (state: RootState) => state.shifts.msg;
 export const shiftSelector = (state: RootState) => state.shifts.shifts;
