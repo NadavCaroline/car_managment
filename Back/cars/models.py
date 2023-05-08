@@ -125,6 +125,9 @@ class Shifts(models.Model):
     @property
     def maintenance_name(self):
         return self.maintenanceType.name
+    @property
+    def maintenance_logo(self):
+        return self.maintenanceType.imgLogo.name
     
 
     def __str__(self):

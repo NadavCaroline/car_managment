@@ -150,7 +150,7 @@ class ShiftsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shifts
         fields = ['id', 'user1','user_name1', 'user2','user_name2', 'car','car_name', 'shiftDate',
-                   'maintenanceType', 'maintenance_name','comments']
+                   'maintenanceType', 'maintenance_name','maintenance_logo','comments']
         ordering = ['-shiftDate']
 
 class CarMaintenanceSerializer(serializers.ModelSerializer):

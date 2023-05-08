@@ -18,9 +18,8 @@ import ShiftModel from '../../models/Shift';
 import AvatarMan from '../../images/img_avatar-man.png';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Carousel, Card, Stack, Button } from "react-bootstrap";
+import { Carousel, Card, Container, Row, Col, Badge, Button } from "react-bootstrap";
 import { adminSelector, getProfileAsync, profileSelector } from '../profile/profileSlicer';
-
 
 const Shifts = () => {
     const dispatch = useAppDispatch()
@@ -41,7 +40,7 @@ const Shifts = () => {
     const [numItems, setNumItems] = useState(2);
     const [showForm, setShowForm] = useState(false);
     const isAdmin = useAppSelector(adminSelector)
-
+    const [done, setDone] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -110,7 +109,7 @@ const Shifts = () => {
         if (successMessage && successMessage !== "") {
             message(successMessage)
             resetForm()
-            setShowForm(false); 
+            setShowForm(false);
         }
         dispatch(SetMsg())
     }, [successMessage])
@@ -225,6 +224,9 @@ const Shifts = () => {
     const handleStartDateChange = (date: Dayjs | null) => {
         setselectedStartDate(date)
     }
+    const DoneClick = () => {
+        setDone(true);
+      }
     return (
         <div>
             <ToastContainer
@@ -244,8 +246,8 @@ const Shifts = () => {
                 {/* <div className="mx-auto col-10 col-md-8 col-lg-6"> */}
                 {/* <div className="mx-auto col-10 col-md-8"> */}
                 <div className="mx-auto col-10">
-                {isAdmin && <button onClick={() => setShowForm(!showForm)} style={{ marginRight: "10px" }} className="btn btn-primary btn-block mb-3">הוספת תורנות</button>}
-                    { showForm &&
+                    {isAdmin && <button onClick={() => setShowForm(!showForm)} style={{ marginRight: "10px" }} className="btn btn-primary btn-block mb-3">הוספת תורנות</button>}
+                    {showForm &&
                         <form dir="rtl" id="formAddShifts" onSubmit={onSubmitShifts} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                             <h4 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תאריך תורנות</h4>
                             <div style={{ marginRight: "10px" }}>
@@ -352,65 +354,65 @@ const Shifts = () => {
                     }
                     <form dir="rtl" id="formShifts" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                         <div style={{ marginTop: '10px' }}>
-                            <input placeholder='חיפוש לפי ' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
-                            <h1> תורנויות עתידיות </h1><hr />
-                            <table style={{ marginLeft: "auto", marginRight: "auto", marginTop: '10px' }}>
-                                <thead>
-                                    <tr>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>סוג תורנות</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>תאריך תורנות</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>רכב</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>עובד 1</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>עובד 2</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>הערות</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
+                            <input placeholder='חיפוש' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
+                            <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תורנויות עתידיות</h3><hr />
+                            <Container>
+                                <Row xs={1} md={2} lg={3}>
                                     {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) && new Date(shift.shiftDate!).getDate() >= new Date().getDate()
                                     ).map(shift =>
-                                        <tr key={shift.id} style={{ cursor: 'pointer' }}>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.maintenance_name}</td>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}</td>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.car_name}</td >
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name1}</td>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name2}</td>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.comments}</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                            <h1> תורנויות קודמות </h1><hr />
-                            <table style={{ marginLeft: "auto", marginRight: "auto", marginTop: '10px' }}>
-                                <thead>
-                                    <tr>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>סוג תורנות</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>תאריך תורנות</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>רכב</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>עובד 1</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>עובד 2</th>
-                                        <th style={{ border: '1px solid black', padding: '5px' }}>הערות</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                                        <Col style={{ marginBottom: '10px' }}>
+                                            <Card className='text-center'>
+                                                {/* <Card.Img variant="top" src="https://via.placeholder.com/350x150" /> */}
+                                                <Card.Body >
+                                                    <Card.Title> {dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}<br></br>{shift.maintenance_name}</Card.Title>
+                                                    <img src={MY_SERVER + shift.maintenance_logo} style={{ width: '50px', height: '50px' }} alt={"imglogo"} />
+                                                    <Card.Text>
+                                                        {shift.car_name}<br></br>
+                                                        {shift.user_name1}<br></br>
+                                                        {shift.user_name2}<br></br>
+                                                        {shift.comments}
+                                                    </Card.Text>
+                                                    <Badge className="ms-2 bg-success">בוצע</Badge>
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
 
+                                    )}
+                                </Row>
+                            </Container>
+                            <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תורנויות קודמות</h3><hr />
+                            <Container>
+                                <Row xs={1} md={2} lg={3}>
                                     {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) && new Date(shift.shiftDate!).getDate() < new Date().getDate()
                                     ).map(shift =>
-                                        <tr key={shift.id} style={{ cursor: 'pointer' }}>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.maintenance_name}</td>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}</td>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.car_name}</td >
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name1}</td>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.user_name2}</td>
-                                            <td style={{ border: '1px solid black', padding: '5px' }}>{shift.comments}</td>
-                                        </tr>
+                                        <Col mb={4}>
+                                            <Card className='text-center'>
+                                                {/* <Card.Img variant="top" src="https://via.placeholder.com/350x150" /> */}
+                                                <Card.Body >
+                                                    <Card.Title> {dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}<br></br>{shift.maintenance_name}</Card.Title>
+                                                    <img src={MY_SERVER + shift.maintenance_logo} style={{ width: '50px', height: '50px' }} alt={"imglogo"} />
+                                                    <Card.Text>
+                                                        {shift.car_name}<br></br>
+                                                        {shift.user_name1}<br></br>
+                                                        {shift.user_name2}<br></br>
+                                                        {shift.comments}
+                                                    </Card.Text>
+                                                    {!done  && <Button variant="danger" onClick={DoneClick}>
+                                                      סמן כבוצע
+                                                    </Button>}
+                                                    {done && <Badge className="ms-2 bg-success">בוצע</Badge>}
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+
                                     )}
-                                </tbody>
-                            </table>
+
+                                </Row>
+                            </Container>
                         </div >
 
                     </form>

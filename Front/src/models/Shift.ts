@@ -9,5 +9,6 @@ export default interface ShiftModel {
     shiftDate?: string
     maintenanceType: string
     maintenance_name?: string
+    maintenance_logo?:string
     comments:string
 }
