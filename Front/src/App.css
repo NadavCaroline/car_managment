@@ -190,7 +190,7 @@ select.invalid {
   border: 2px solid rgb(19, 125, 141);
   border-radius: 7px;
   padding: '.5rem';
-  cursor: 'pointer';
+  cursor: 'pointer' !important;
 }
 .selectedDiv { 
   outline: none;
@@ -199,9 +199,9 @@ select.invalid {
   /* box-shadow:0px 0px 0px 3px rgba(15, 62, 106,.4);  */
   /* box-shadow: 0 0 10px #9ecaed; */
   padding: '.5rem';
-  cursor: 'pointer';
+  cursor: 'pointer' !important;
   color:white;
-  background-color: rgb(19, 125, 141);
+  background-color: rgb(19, 125, 141) !important;
 }
 .avatar {
   vertical-align: middle;
@@ -209,6 +209,7 @@ select.invalid {
   height: 50px;
   border-radius: 50%;
 }
+
 
 
 

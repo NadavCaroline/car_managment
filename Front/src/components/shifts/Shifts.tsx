@@ -18,10 +18,8 @@ import ShiftModel from '../../models/Shift';
 import AvatarMan from '../../images/img_avatar-man.png';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Carousel from 'better-react-carousel'
-// import Carousel from "react-multi-carousel";
-// import "react-multi-carousel/lib/styles.css";
-
+import { Carousel, Card, Stack, Button } from "react-bootstrap";
+import { adminSelector, getProfileAsync, profileSelector } from '../profile/profileSlicer';
 
 
 const Shifts = () => {
@@ -40,26 +38,31 @@ const Shifts = () => {
     const successMessage = useAppSelector(shiftMessage)
     const [searchTerm, setsearchTerm] = useState("")
     const [isLoading, setIsLoading] = useState(false);
+    const [numItems, setNumItems] = useState(2);
+    const [showForm, setShowForm] = useState(false);
+    const isAdmin = useAppSelector(adminSelector)
 
-    // const responsive = {
-    //     superLargeDesktop: {
-    //       // the naming can be any, depends on you.
-    //       breakpoint: { max: 4000, min: 3000 },
-    //       items: 5
-    //     },
-    //     desktop: {
-    //       breakpoint: { max: 3000, min: 1024 },
-    //       items: 3
-    //     },
-    //     tablet: {
-    //       breakpoint: { max: 1024, min: 464 },
-    //       items: 2
-    //     },
-    //     mobile: {
-    //       breakpoint: { max: 464, min: 0 },
-    //       items: 1
-    //     }
-    // };
+
+    useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            if (width < 576) {
+                setNumItems(1);
+            } else if (width < 768) {
+                setNumItems(2);
+            } else if (width < 992) {
+                setNumItems(3);
+            } else {
+                setNumItems(4);
+            }
+        };
+        window.addEventListener("resize", handleResize);
+        handleResize();
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+
+
     const messageError = (value: string) => toast.error(value, {
         position: "top-left",
         //autoClose: 5000,
@@ -107,6 +110,7 @@ const Shifts = () => {
         if (successMessage && successMessage !== "") {
             message(successMessage)
             resetForm()
+            setShowForm(false); 
         }
         dispatch(SetMsg())
     }, [successMessage])
@@ -199,7 +203,8 @@ const Shifts = () => {
         setSelectedUser([]);
     }
 
-    function handleDivUserClick(event: React.MouseEvent<HTMLDivElement>, numOfClick: number) {
+    // function handleDivUserClick(event: React.MouseEvent<HTMLDivElement>, numOfClick: number) {
+    function handleDivUserClick(event: React.MouseEvent<HTMLElement>, numOfClick: number) {
         const element = event.currentTarget;
         const id = element.id;
         if (selectedUser.includes(id)) {
@@ -233,134 +238,121 @@ const Shifts = () => {
                 theme="colored"
             />
 
+
+
             <div className="row mt-3" style={{ direction: "ltr" }}>
                 {/* <div className="mx-auto col-10 col-md-8 col-lg-6"> */}
-                <div className="mx-auto col-10 col-md-8">
-                    <form dir="rtl" id="formAddShifts" onSubmit={onSubmitShifts} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+                {/* <div className="mx-auto col-10 col-md-8"> */}
+                <div className="mx-auto col-10">
+                {isAdmin && <button onClick={() => setShowForm(!showForm)} style={{ marginRight: "10px" }} className="btn btn-primary btn-block mb-3">הוספת תורנות</button>}
+                    { showForm &&
+                        <form dir="rtl" id="formAddShifts" onSubmit={onSubmitShifts} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
+                            <h4 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תאריך תורנות</h4>
+                            <div style={{ marginRight: "10px" }}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['DatePicker', 'MobileTimePicker']}>
+                                        {/* Date Picking Component */}
+                                        <DemoItem >
+                                            <DatePicker
+                                                minDate={dayjs()}
+                                                format='DD-MM-YYYY'
+                                                value={selectedStartDate}
+                                                onChange={handleStartDateChange} />
+                                        </DemoItem>
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                            </div>
+                            <h4 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >סוג תורנות</h4>
 
-                        <Carousel
-                            cols={4}
-                            rows={1}
-                            gap={10}
-                            scrollSnap={true}
-                            showDots={true}
-                            step={4}
-                        >
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=1" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=2" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=3" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=4" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=5" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                
-                                <img width="100%" src="https://picsum.photos/800/600?random=6" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=7" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=8" />
-                            </Carousel.Item>
-                        </Carousel>
-                        {/* <Carousel  step={3} cols={4} rows={1} gap={10} scrollSnap={true}  showDots={true} >
-                            <Carousel.Item>
-                                {/* <img width="100%" src="https://picsum.photos/800/600?random=1" /> */}
-                        {/* </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=2" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=5" />
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=6" />
-                                <br></br>
-                                hello
-                            </Carousel.Item>
-                            <Carousel.Item>
-                                <img width="100%" src="https://picsum.photos/800/600?random=8" />
-                                <br></br>
-                                nice
-                            </Carousel.Item> */}
+                            {/* <!-- maintenanceType select --> */}
+                            <Carousel indicators={false} touch={true} interval={null}>
+                                {[...Array(Math.ceil(listMaintenanceType.length / numItems))].map((_, i) => (
+                                    <Carousel.Item key={i} className="px-3">
+                                        <div className="row text-center">
+                                            {listMaintenanceType
+                                                .slice(i * numItems, i * numItems + numItems)
+                                                .map((maintenanceType, j) => (
+                                                    <div className="col-lg-3 col-md-4 col-sm-6">
+                                                        <Card id={`divMaintenance-${maintenanceType.id}`} key={maintenanceType.id} onClick={(event) => handleMaintenanceDivClick(event.currentTarget)} className="notSelectedDiv" style={{ margin: '10px auto' }}>
+                                                            <Card.Body>
+                                                                <Card.Title> {maintenanceType.name}</Card.Title>
+                                                                <img src={MY_SERVER + maintenanceType.imgLogo} style={{ width: '50px', height: '50px' }} alt={"imglogo"} />
+                                                            </Card.Body>
+                                                        </Card>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </Carousel.Item>
+                                ))}
+                            </Carousel>
+                            <h4 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >רכב </h4>
+                            {/* <!-- car div --> */}
+                            <Carousel indicators={false} touch={true} interval={null}>
+                                {[...Array(Math.ceil(cars.length / numItems))].map((_, i) => (
+                                    <Carousel.Item key={i} className="px-3">
+                                        <div className="row text-center">
+                                            {cars
+                                                .slice(i * numItems, i * numItems + numItems)
+                                                .map((car, j) => (
+                                                    <div className="col-lg-3 col-md-4 col-sm-6">
+                                                        <Card id={`divCar-${car.id}`} key={car.id} onClick={(event) => handleCarDivClick(event.currentTarget)} className="notSelectedDiv" style={{ margin: '10px auto' }}>
+                                                            <Card.Body>
+                                                                <Card.Title> {car.nickName} - {car.licenseNum}</Card.Title>
+                                                                <Card.Text>
+                                                                    מחלקה: {car.dep_name}<br />
+                                                                    יצרן: {car.make}<br />
+                                                                    דגם: {car.model}<br />
+                                                                    צבע: {car.color}<br />
+                                                                    שנה: {car.year}   <br />
+                                                                </Card.Text>
+                                                                <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} />
+                                                            </Card.Body>
+                                                        </Card>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </Carousel.Item>
+                                ))}
+                            </Carousel>
+                            <h4 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >משתמש </h4>
+                            {/* <!-- users div --> */}
+                            <Carousel indicators={false} touch={true} interval={null}>
+                                {[...Array(Math.ceil(users.length / numItems))].map((_, i) => (
+                                    <Carousel.Item key={i} className="px-3">
+                                        <div className="row text-center">
+                                            {users
+                                                .slice(i * numItems, i * numItems + numItems)
+                                                .map((user, j) => (
+                                                    <div className="col-lg-3 col-md-4 col-sm-6" >
+                                                        {/* <div id={`divUser-${user.id}`} key={user.id} onClick={(event) => { maintenanceType?.id === "divMaintenance-2" ? handleDivUserClick(event, 1) : handleDivUserClick(event, 2) }} className="notSelectedDiv" > */}
+                                                        <Card id={`divUser-${user.id}`} key={user.id} onClick={(event) => { maintenanceType?.id === "divMaintenance-2" ? handleDivUserClick(event, 1) : handleDivUserClick(event, 2) }} className="notSelectedDiv" style={{ margin: '10px auto' }}>
+                                                            <Card.Body>
+                                                                <Card.Title> {user.first_name} {user.last_name}</Card.Title>
+                                                                <Card.Text>
+                                                                    תורנויות שבוצעו {user.count_shifts}
+                                                                </Card.Text>
+                                                                <img src={AvatarMan} alt="Avatar" className="avatar" />
+                                                            </Card.Body>
+                                                        </Card>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </Carousel.Item>
+                                ))}
+                            </Carousel>
 
-                        {/* </Carousel>  */}
-                        <div style={{ width: '400px', marginRight: '5px' }}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DemoContainer components={['DatePicker', 'MobileTimePicker']}>
-                                    {/* Date Picking Component */}
-                                    <DemoItem >
-                                        <DatePicker
-                                            minDate={dayjs()}
-                                            format='DD-MM-YYYY'
-                                            value={selectedStartDate}
-                                            onChange={handleStartDateChange} />
-                                    </DemoItem>
-                                </DemoContainer>
-                            </LocalizationProvider>
-                        </div>
-                        <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >סוג תורנות</h1>
-                        {/* <!-- maintenanceType select --> */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
-                            {listMaintenanceType.map(maintenanceType =>
-                                <div id={`divMaintenance-${maintenanceType.id}`} key={maintenanceType.id} onClick={(event) => handleMaintenanceDivClick(event.currentTarget)} className="notSelectedDiv" >
-                                    <div style={{ textAlign: 'center' }}>
-                                        <img src={MY_SERVER + maintenanceType.imgLogo} style={{ width: '50px', height: '50px' }} alt={"imglogo"} /><br />
-                                        <h6>  {maintenanceType.name} </h6>
-                                    </div>
-                                </div>)}
-                        </div>
+                            <h4 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "8px", marginTop: "10px" }} >הערות </h4>
 
-                        <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >רכב</h1>
-                        {/* <!-- car div --> */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
-                            {cars.map(car =>
-                                <div id={`divCar-${car.id}`} key={car.id} onClick={(event) => handleCarDivClick(event.currentTarget)} className="notSelectedDiv" >
-                                    <div style={{ textAlign: 'center' }}>
-                                        <h3>  {car.nickName} - {car.licenseNum}</h3>
-                                        מחלקה: {car.dep_name}<br />
-                                        יצרן: {car.make}<br />
-                                        דגם: {car.model}<br />
-                                        צבע: {car.color}<br />
-                                        שנה: {car.year}   <br />
-                                        <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
-                                    </div>
-                                </div>)}
-                        </div>
-                        <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >משתמש</h1>
-                        {/* <!-- users div --> */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
-                            {users.map(user =>
-                                // אם נבחר מוסך לאפשר לבחור שתי עובדים
-                                <div id={`divUser-${user.id}`} key={user.id} onClick={(event) => { maintenanceType?.id === "divMaintenance-2" ? handleDivUserClick(event, 1) : handleDivUserClick(event, 2) }} className="notSelectedDiv" >
-                                    <div style={{ textAlign: 'center' }}>
-                                        <h3> {user.first_name} {user.last_name} </h3>
-                                        <img src={AvatarMan} alt="Avatar" className="avatar" /><br></br>
-                                        תורנויות שבוצעו {user.count_shifts}
-                                    </div>
-                                </div>)}
-                        </div>
-
-
-                        <h1 className="h3 mb-3" style={{ color: "rgb(19, 125, 141)" }} >הערות</h1>
-                        {/* <!-- Comment input --> */}
-                        <div className="form-floating mb-2">
-                            <textarea onChange={(e) => setComments(e.target.value)} id="shiftcomment" rows={3} placeholder="הערות"></textarea>
-                        </div>
-                        <button type='submit' className="btn btn-primary btn-block mb-3">{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'שמור תורנות'}</button>
-                    </form>
-                    <form dir="rtl" id="formShifts" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}> 
+                            {/* <!-- Comment input --> */}
+                            <div className="form-floating mb-2">
+                                <textarea style={{ width: '100%', marginRight: "10px" }} onChange={(e) => setComments(e.target.value)} id="shiftcomment" rows={3} placeholder="הערות"></textarea>
+                            </div>
+                            <button type='submit' style={{ marginRight: "10px" }} className="btn btn-primary btn-block mb-3">{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'שמור תורנות'}</button>
+                        </form>
+                    }
+                    <form dir="rtl" id="formShifts" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                         <div style={{ marginTop: '10px' }}>
-                            <input placeholder='חיפוש לפי ' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} /> 
+                            <input placeholder='חיפוש לפי ' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
                             <h1> תורנויות עתידיות </h1><hr />
                             <table style={{ marginLeft: "auto", marginRight: "auto", marginTop: '10px' }}>
                                 <thead>
@@ -406,7 +398,7 @@ const Shifts = () => {
 
                                     {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) &&  new Date(shift.shiftDate!).getDate() < new Date().getDate()
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) && new Date(shift.shiftDate!).getDate() < new Date().getDate()
                                     ).map(shift =>
                                         <tr key={shift.id} style={{ cursor: 'pointer' }}>
                                             <td style={{ border: '1px solid black', padding: '5px' }}>{shift.maintenance_name}</td>
@@ -420,7 +412,7 @@ const Shifts = () => {
                                 </tbody>
                             </table>
                         </div >
-                       
+
                     </form>
                 </div>
             </div>
