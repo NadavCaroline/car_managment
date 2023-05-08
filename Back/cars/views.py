@@ -62,8 +62,8 @@ def register(request):
                 realID=request.data['profile']['realID'],
             )
             profile.save()
-            write_to_log('info', 'משתמש נוצר')
-            msg = {"status": "success", "msg": "משתמש נוצר בהצלחה"}
+            write_to_log('info', 'משתמש/ת נוצר/ה')
+            msg = {"status": "success", "msg": "משתמש/ת נוצר/ה בהצלחה"}
     except Exception as e:
         # Handle the exception
         msg = {"status": "error", "msg": str(e)}
@@ -83,8 +83,6 @@ class AllProfilesView(APIView):
         serializer = CreateProfileSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            print("********************")
-            # write_to_log('info', 'פרופיל משתמש עבר עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,7 +99,7 @@ class AllUsersView(APIView):
         serializer = UserSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('info', 'פרטי משתמש עברו עריכה', user=request.user)
+            write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -242,7 +240,7 @@ class CarOrdersView(APIView):
         serializer = CreateCarOrdersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('info', 'הזמנה בוצעה',
+            write_to_log('info', 'הזמנת רכב בוצעה',
                          user=request.user, car=car_model)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -357,28 +355,25 @@ class DrivingsView(APIView):
         if serializer.is_valid():
             serializer.save()
             if auto_start:
-                write_to_log('info', 'משתמש התחיל נסיעה',
+                write_to_log('info', 'משתמש/ת התחיל/ה נסיעה',
                              user=request.user, car=order_model.car)
             else:
-                write_to_log('warning', 'משתמש שכח להתחיל/לסיים נסיעה',
+                write_to_log('warning', 'משתמש/ת שכח/ה להתחיל/לסיים נסיעה',
                              user=request.user, car=order_model.car)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
-        print("*"*40)
-        print(request.data)
-        auto_end = request.PATCH.get('endDate')
-        print(auto_end)
+        auto_end = request.data.get('endDate')
         my_model = Drivings.objects.get(id=id)
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
             if auto_end:
-                write_to_log('info', 'משתמש סיים נסיעה',
+                write_to_log('info', 'משתמש/ת סיים/ה נסיעה',
                              user=request.user, car=my_model.order.car)
             else:
-                write_to_log('warning', 'משתמש שכח לסיים נסיעה',
+                write_to_log('warning', 'משתמש/ת שכח/ה לסיים/ה נסיעה',
                              user=request.user, car=my_model.order.car)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -402,6 +397,8 @@ class DepartmentsView(APIView):
         serializer = CreateDepartmentsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            write_to_log('warning', 'מחלקה חדשה נוספה למערכת',
+                     user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -426,10 +423,11 @@ class ForgotView(APIView):
                           None, [user.email], fail_silently=False)
                 msg = {"status": "success",
                        "msg": "מייל נשלח בהצלחה עם קישור לאיפוס סיסמא"}
+                write_to_log('info', 'נשלח קישור לאיפוס סיסמא', user=user)
         except Exception as e:
             # Handle the exception
             msg = {"status": "error", "msg": str(e)}
-        return Response(msg)
+        return Response(msg) 
 
 
 class ResetView(APIView):
