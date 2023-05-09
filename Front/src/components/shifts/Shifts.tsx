@@ -304,7 +304,7 @@ const Shifts = () => {
                                                     <div className="col-lg-3 col-md-4 col-sm-6">
                                                         <Card id={`divCar-${car.id}`} key={car.id} onClick={(event) => handleCarDivClick(event.currentTarget)} className="notSelectedDiv" style={{ margin: '10px auto',height: '90%' }}>
                                                             <Card.Body>
-                                                                <Card.Title> {car.nickName} - {car.licenseNum}</Card.Title>
+                                                                <Card.Title> {car.nickName} <br /> {car.licenseNum}</Card.Title>
                                                                 <Card.Text>
                                                                     מחלקה: {car.dep_name}<br />
                                                                     יצרן: {car.make}<br />

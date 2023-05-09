@@ -209,6 +209,9 @@ select.invalid {
   height: 50px;
   border-radius: 50%;
 }
+.dropdownNotification .dropdown-toggle::after {
+  display: none !important;
+}
 
 
 
