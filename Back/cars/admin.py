@@ -9,7 +9,8 @@ from .models import (Profile,
                      Logs,
                      MaintenanceTypes,
                      Shifts,
-                     Roles)
+                     Roles,
+                     Notification)
 
 
 # Register your models here.
@@ -23,3 +24,4 @@ admin.site.register(Logs)
 admin.site.register(MaintenanceTypes)
 admin.site.register(Shifts)
 admin.site.register(Roles)
+admin.site.register(Notification)

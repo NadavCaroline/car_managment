@@ -9,7 +9,8 @@ from .models import (Profile,
                      Logs,
                      MaintenanceTypes,
                      Shifts,
-                     Roles)
+                     Roles,
+                     Notification)
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 ################## TOKEN SERIALIZER ###############
@@ -92,7 +93,10 @@ class CreateShiftsSerializer(serializers.ModelSerializer):
         model = Shifts
         fields = '__all__'
 
-
+class CreateNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
 #################  READ ONLY SERIALIZERS ##################
 
 class UserSerializer(serializers.ModelSerializer):
@@ -159,4 +163,7 @@ class CarMaintenanceSerializer(serializers.ModelSerializer):
         fields = ['id', 'car', 'car_name', 'maintenanceDate',
                   'file1', 'file2', 'shift',
                   'maintenanceType', 'kilometer']
-
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id','recipient','title', 'message', 'created_at', 'is_read' ]

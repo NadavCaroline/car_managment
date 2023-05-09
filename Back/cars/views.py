@@ -498,4 +498,25 @@ class ResetView(APIView):
             msg={"status":"error","msg":str(e)}
         return Response(msg)
     
+class NotificationView(APIView):
+    def get(self, request):
+        my_model = Notification.objects.all()
+        serializer = CreateNotificationSerializer(my_model, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = CreateNotificationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, id):
+        my_model = Notification.objects.get(id=int(id))
+        my_model.is_read = True
+        model_dict = model_to_dict(my_model)
+        serializer = CreateNotificationSerializer(my_model, data=model_dict)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
     

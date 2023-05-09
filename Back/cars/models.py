@@ -262,3 +262,13 @@ class Accidents(models.Model):
     def __str__(self):
         return str(self.dateReported) + ' ' + self.user_name + ' ' + self.car_name
 
+class Notification(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+    title=models.CharField(max_length=255,blank=True)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']

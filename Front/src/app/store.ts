@@ -8,6 +8,9 @@ import  myOrderReducer  from '../components/orders/OrdersSlice';
 import  profileReducer  from '../components/profile/profileSlicer';
 import  shiftReducer  from '../components/shifts/shiftsSlice';
 import  userReducer  from '../components/users/userSlicer';
+import notificationReducer from '../components/notifications/notificationsSlice'
+// import  notificationReducer  from '../components/Notifications/notificationsSlicer';
+
 // import  maintena  from 'maintenanceTypesSlic' '../components/maintenanceTypes/maintenanceTypesSlice';
 // import MaintenanceTypeReducer from '../components/maintenanceType/MaintenanceTypeSlice';
 export const store = configureStore({
@@ -21,6 +24,7 @@ export const store = configureStore({
     log: logReducer,
     users: userReducer,
     shifts: shiftReducer,
+    notifications:notificationReducer
     // maintenanceTypes: maintenanceTypeReducer,
   },
 });

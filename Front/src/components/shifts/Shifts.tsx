@@ -302,7 +302,7 @@ const Shifts = () => {
                                                 .slice(i * numItems, i * numItems + numItems)
                                                 .map((car, j) => (
                                                     <div className="col-lg-3 col-md-4 col-sm-6">
-                                                        <Card id={`divCar-${car.id}`} key={car.id} onClick={(event) => handleCarDivClick(event.currentTarget)} className="notSelectedDiv" style={{ margin: '10px auto',height: '90%' }}>
+                                                        <Card id={`divCar-${car.id}`} key={car.id} onClick={(event) => handleCarDivClick(event.currentTarget)} className="notSelectedDiv" style={{ margin: '10px auto', height: '90%' }}>
                                                             <Card.Body>
                                                                 <Card.Title> {car.nickName} <br /> {car.licenseNum}</Card.Title>
                                                                 <Card.Text>
@@ -365,7 +365,9 @@ const Shifts = () => {
                                 <Row className="align-items-stretch" xs={1} md={2} lg={3} >
                                     {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) && (dayjs(shift!.shiftDate, 'YYYY-MM-DD').isSame(dayjs().format('YYYY-MM-DD'), 'day') || dayjs(shift!.shiftDate, 'YYYY-MM-DD').isAfter(dayjs().format('YYYY-MM-DD'), 'day'))
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) 
+                                        && (dayjs(shift!.shiftDate, 'YYYY-MM-DD').isSame(dayjs().format('YYYY-MM-DD'), 'day') || dayjs(shift!.shiftDate, 'YYYY-MM-DD').isAfter(dayjs().format('YYYY-MM-DD'), 'day')) ||
+                                        (shift.isDone && searchTerm=="בוצע" ) || (!shift.isDone && searchTerm=="סמן כבוצע" )
                                     ).map(shift =>
                                         <Col style={{ marginBottom: '10px' }}>
                                             <Card className='h-100 text-center'>
@@ -379,11 +381,14 @@ const Shifts = () => {
                                                         {shift.user_name2}<br></br>
                                                         {shift.comments}
                                                     </Card.Text>
+                                                </Card.Body>
+                                                <Card.Footer style={{backgroundColor: 'transparent',borderTop: 'none'}}>
                                                     {!shift.isDone && <Button id={shift.id?.toString()} variant="danger" onClick={() => shift.id !== undefined ? DoneClick(shift.id) : null}>
                                                         סמן כבוצע
                                                     </Button>}
-                                                    {shift.isDone && <Badge className="ms-2 bg-success">בוצע</Badge>}
-                                                </Card.Body>
+                                                    {shift.isDone && <Badge style={{ fontSize: '1em', fontWeight: 'normal', padding: '10px' }} className="ms-2 bg-success">בוצע</Badge>}
+
+                                                </Card.Footer>
                                             </Card>
                                         </Col>
 
@@ -395,7 +400,9 @@ const Shifts = () => {
                                 <Row className="align-items-stretch" xs={1} md={2} lg={3}>
                                     {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) &&  dayjs(shift!.shiftDate, 'YYYY-MM-DD').isBefore(dayjs().format('YYYY-MM-DD'), 'day')
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) 
+                                        && dayjs(shift!.shiftDate, 'YYYY-MM-DD').isBefore(dayjs().format('YYYY-MM-DD'), 'day') ||
+                                        (shift.isDone && searchTerm=="בוצע" ) || (!shift.isDone && searchTerm=="סמן כבוצע" )
                                     ).map(shift =>
                                         <Col mb={4}>
                                             <Card className='h-100 text-center'>
@@ -409,11 +416,14 @@ const Shifts = () => {
                                                         {shift.user_name2}<br></br>
                                                         {shift.comments}
                                                     </Card.Text>
-                                                    {!shift.isDone && <Button id={shift.id?.toString()} variant="danger" onClick={() => shift.id !== undefined ? DoneClick(shift.id) : null}>
+                                                </Card.Body>
+                                                <Card.Footer style={{backgroundColor: 'transparent',borderTop: 'none'}}>
+                                                {!shift.isDone && <Button id={shift.id?.toString()} variant="danger" onClick={() => shift.id !== undefined ? DoneClick(shift.id) : null}>
                                                         סמן כבוצע
                                                     </Button>}
-                                                    {shift.isDone && <Badge className="ms-2 bg-success">בוצע</Badge>}
-                                                </Card.Body>
+                                                    {shift.isDone && <Badge style={{ fontSize: '1em', fontWeight: 'normal', padding: '10px' }} className="ms-2 bg-success">בוצע</Badge>}
+                                              
+                                                </Card.Footer>
                                             </Card>
                                         </Col>
 
