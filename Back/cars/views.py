@@ -240,8 +240,7 @@ class CarOrdersView(APIView):
         serializer = CreateCarOrdersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('info', 'הזמנת רכב בוצעה',
-                         user=request.user, car=car_model)
+            write_to_log('info', 'הזמנת רכב בוצעה',user=request.user, car=car_model)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
