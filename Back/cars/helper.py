@@ -1,3 +1,4 @@
+from cars.serializers import CreateLogsSerializer,CreateNotificationSerializer
 from datetime import datetime
 
 import pytz
@@ -12,3 +13,17 @@ def write_to_log(level, action, user=None, car=None):
     """
     new_log = Logs(level=level,logDate=datetime.now(pytz.timezone('Asia/Jerusalem')) ,action=action,user=user,car=car)
     new_log.save()
+
+# helper function to write notification from every server call
+def add_notification(recipient, title, message, created_at):
+    notification_model = {
+        'recipient': recipient,
+        'title': title,
+        'message': message,
+        'created_at': created_at,
+        'is_read':'0'
+    }
+    serializer = CreateNotificationSerializer(data=notification_model)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)

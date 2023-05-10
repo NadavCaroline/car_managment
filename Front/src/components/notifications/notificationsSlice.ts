@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
 import NotificationModel from '../../models/Notification';
-import { getNotification, addNotification, NotificationIsRead } from './notificationsAPI';
+import { getNotification, addNotification, NotificationIsRead,deleteNotification } from './notificationsAPI';
 
 export interface notificationsState {
     notifications: NotificationModel[]
@@ -36,6 +36,13 @@ export const notificationIsReadAsync = createAsyncThunk(
     'notifications/notificationIsRead',
     async ({ token, id }: { token: string, id: number }) => {
         const response = await NotificationIsRead(token, id);
+        return response;
+    }
+);
+export const deleteNotificationAsync = createAsyncThunk(
+    'notifications/deleteNotification',
+    async ({ token, id }: { token: string, id: number }) => {
+        const response = await deleteNotification(token, id);
         return response;
     }
 );
@@ -76,6 +83,10 @@ export const notificationsSlice = createSlice({
             .addCase(notificationIsReadAsync.fulfilled, (state, action) => {
                 let temp = state.notifications.filter(notification => notification.id === action.payload.id)[0]
                 temp.is_read = true
+            })
+            .addCase(deleteNotificationAsync.fulfilled, (state, action) => {
+                state.notifications = state.notifications.filter(notification => notification.id !== action.payload.deleted_id);
+
             });
     },
 });

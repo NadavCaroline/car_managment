@@ -32,5 +32,15 @@ export const NotificationIsRead = async (token: string, id: number) => {
     }).then((res) => res.data);
 }
 
-
-
+export const deleteNotification = async (token: string, id: number) => {
+  return axios.delete(MY_SERVER + 'notifications/' + id,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((res) => { 
+      console.log(res.data);
+      return  res.data}
+   
+    );
+}

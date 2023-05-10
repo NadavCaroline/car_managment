@@ -367,7 +367,7 @@ const Shifts = () => {
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) 
                                         && (dayjs(shift!.shiftDate, 'YYYY-MM-DD').isSame(dayjs().format('YYYY-MM-DD'), 'day') || dayjs(shift!.shiftDate, 'YYYY-MM-DD').isAfter(dayjs().format('YYYY-MM-DD'), 'day')) ||
-                                        (shift.isDone && searchTerm=="בוצע" ) || (!shift.isDone && searchTerm=="סמן כבוצע" )
+                                        (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) )
                                     ).map(shift =>
                                         <Col style={{ marginBottom: '10px' }}>
                                             <Card className='h-100 text-center'>
@@ -402,8 +402,7 @@ const Shifts = () => {
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) 
                                         && dayjs(shift!.shiftDate, 'YYYY-MM-DD').isBefore(dayjs().format('YYYY-MM-DD'), 'day') ||
-                                        (shift.isDone && searchTerm=="בוצע" ) || (!shift.isDone && searchTerm=="סמן כבוצע" )
-                                    ).map(shift =>
+                                        (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) )                                    ).map(shift =>
                                         <Col mb={4}>
                                             <Card className='h-100 text-center'>
                                                 {/* <Card.Img variant="top" src="https://via.placeholder.com/350x150" /> */}
