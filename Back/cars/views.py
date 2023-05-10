@@ -15,6 +15,8 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .helper import write_to_log
+from django.db.models import Count,Q
+
 
 
 @api_view(['GET'])
@@ -102,7 +104,33 @@ class AllUsersView(APIView):
             write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@permission_classes([IsAuthenticated])
+class UsersOfDep(APIView):
+    def get(self, request):
+        user = request.user
+        users = User.objects.all()
+        users = list(filter(lambda user: (user.profile.department.id ==user.profile.department.id ), users))
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+    
+@permission_classes([IsAuthenticated])
+class UsersOfDepByShifts(APIView):
+    def get(self, request):
+        usermain = request.user
+        users = User.objects.annotate(count_shifts=Count('user1'))
+        users2 = User.objects.annotate(count_shifts=Count('user2'))
+       
+        for obj1 in users:
+            obj2 = users2.get(pk=obj1.pk) # Match objects by primary key
+            obj1.count_shifts += obj2.count_shifts # Add values from other queryset
+            obj1.save() # Save updated object to database
+        # userOrdered=users.order_by('count_shifts')
+        usersAll = list(filter(lambda user: (user.profile.department.id ==usermain.profile.department.id ), users))
+        sorted_users = sorted(usersAll, key=lambda u: u.count_shifts)  # sort the users by username
 
+        serializer = CustomUserSerializer(sorted_users, many=True)
+        return Response(serializer.data)
 
 @permission_classes([IsAuthenticated])
 class ProfileView(APIView):
@@ -289,18 +317,71 @@ class MaintenanceTypesView(APIView):
 @permission_classes([IsAuthenticated])
 class ShiftsView(APIView):
     def get(self, request):
-        my_model = Shifts.objects.all()
-        print(my_model)
-        serializer = ShiftsSerializer(my_model, many=True)
+        user = request.user
+        shifts = Shifts.objects.all()
+        if(user.profile.roleLevel.id==1):# filter by user if user is not admin
+            shifts= Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id))
+        shifts=shifts.order_by('-shiftDate')
+ 
+        serializer = ShiftsSerializer(shifts, many=True)
         return Response(serializer.data)
+    
+    def put(self, request, id):
+        try:
+            my_model = Shifts.objects.get(id=int(id))
+            my_model.isDone=request.data['isDone']
+            model_dict = model_to_dict(my_model)
+            serializer = CreateShiftsSerializer(my_model, data=model_dict)
+            if serializer.is_valid():
+                serializer.save()
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        serializer = CreateShiftsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user1=request.data['user1']
+            user2=request.data['user2']
+            if ( user1  and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'],user1=user1)).exclude(car=request.data['car']).exists() or
+                Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'],user2=user1)).exclude(car=request.data['car']).exists()) or
+                user2  and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'],user1=user2)).exclude(car=request.data['car']).exists() or
+                Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'],user2=user2)).exclude(car=request.data['car']).exists())):
+                                    
+                return Response("למשתמש כבר קיים תורנות בתאריך הנבחר",status=status.HTTP_208_ALREADY_REPORTED)
+            serializer = CreateShiftsSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                userMain = request.user
+                user1 = User.objects.get(id=int(request.data["user1"]))
+                username1=user1.first_name+" "+user1.last_name  
+                maintenanceType=MaintenanceTypes.objects.get(id=int(request.data["maintenanceType"]))
+                subject=' תורנות '+maintenanceType.name
+                shiftDate=datetime.fromisoformat(str(request.data['shiftDate'])).strftime("%d/%m/%Y")
+                emails=[]
+                if  request.data["user2"]=='':  
+                    username2=""
+                    message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת לתורנות <b>{maintenanceType.name}</b><br> בתאריך: {shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
+                    emails=[userMain.email,user1.email]     
+                else:
+                    user2= User.objects.get(id=int(request.data["user2"]))
+                    username2=   user2.first_name+" "+user2.last_name
+                    message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים לתורנות <b>{maintenanceType.name}</b><br> בתאריך:{shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
+                    emails=[userMain.email,user1.email,user2.email]
+                    
+                html_message = '<div dir="rtl">{}</div>'.format(message)
+                send_mail(subject, message, None, emails, fail_silently=False,html_message=html_message)
 
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            # Handle the exception
+            if "duplicate key" in str(e):
+                # if "my_shift_pk"   in str(e):
+                return Response( "תורנות כבר קיימת",status=status.HTTP_208_ALREADY_REPORTED)
+            else:
+                 return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    
 
 @permission_classes([IsAuthenticated])
 class LogsView(APIView):
@@ -450,3 +531,26 @@ class ResetView(APIView):
             # Handle the exception
             msg = {"status": "error", "msg": str(e)}
         return Response(msg)
+    
+class NotificationView(APIView):
+    def get(self, request):
+        my_model = Notification.objects.all()
+        serializer = CreateNotificationSerializer(my_model, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = CreateNotificationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, id):
+        my_model = Notification.objects.get(id=int(id))
+        my_model.is_read = True
+        model_dict = model_to_dict(my_model)
+        serializer = CreateNotificationSerializer(my_model, data=model_dict)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
+    

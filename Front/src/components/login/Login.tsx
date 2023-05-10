@@ -16,7 +16,7 @@ import {
   MDBTabsPane
 } from 'mdb-react-ui-kit';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faVcard, faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faVcard, faEyeSlash, faEye,faCar } from '@fortawesome/free-solid-svg-icons'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';

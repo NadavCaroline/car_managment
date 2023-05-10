@@ -13,6 +13,8 @@ urlpatterns = [
     path('profile', views.ProfileView.as_view()),
     path('allprofiles', views.AllProfilesView.as_view()),
     path('allprofiles/<id>', views.AllProfilesView.as_view()),
+    path('usersOfDep', views.UsersOfDep.as_view()),
+    path('usersOfDepByShifts', views.UsersOfDepByShifts.as_view()),
     path('allusers', views.AllUsersView.as_view()),
     path('allusers/<id>', views.AllUsersView.as_view()),
     path('cars', views.CarsView.as_view()),
@@ -38,6 +40,8 @@ urlpatterns = [
     path('alldrives', views.AllDrivingsView.as_view()),
     path('rolesLevel', views.RolesView.as_view()),
     path('forgot', views.ForgotView.as_view()),
+    path('notifications', views.NotificationView.as_view()),
+    path('notifications/<id>', views.NotificationView.as_view()),
     path('reset/<str:uidb64>/<str:token>',  views.ResetView.as_view(), name='password_reset_confirm'),
    
 
