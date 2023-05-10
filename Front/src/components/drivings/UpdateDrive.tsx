@@ -117,10 +117,10 @@ const UpdateDrive = (props: any) => {
     return (
         // We Check if the drive has fields to update, or maybe it is empty, and the user needs to send new data
         <div >
-                // The second case, in which the user need to fill the fields, because they don't exist.
+                 {/* The second case, in which the user need to fill the fields, because they don't exist. */}
             <div>
                 <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    <div style={{ position: "relative", padding: "32px", width: "420px", height: "400px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px", textAlign: "left" }}>
+                    <div style={{ position: "relative", padding: "32px", width: "420px", height: "400px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px", textAlign: "left"}}>
                         <button style={{ position: "absolute", top: "0", right: "0" }} onClick={() => props.setselectedDrive(null)}>X</button>
                         <form onSubmit={() => handleDriveUpdate()}>
                             <button type='submit'>שמור</button>

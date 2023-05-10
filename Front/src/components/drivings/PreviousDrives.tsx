@@ -45,9 +45,9 @@ const PreviousDrives = () => {
     return (
         <div >
             {drives && orders ?
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)'}}>
                     {autoEnded.map(drive =>
-                        <div onClick={() => setselectedDrive(drive)} key={drive.id} style={{ borderRadius: '5px', border: '2px solid red', padding: '.5rem', margin: "10px" }}>
+                        <div onClick={() => setselectedDrive(drive)} key={drive.id} style={{ borderRadius: '5px', border: '2px solid red', padding: '.5rem', margin: "10px",cursor: 'pointer' }}>
                             <div>
                                 מכונית: {drive.car_name}<br />
                                 <img src={MY_SERVER + drive.car_image} style={{ width: '150px', height: '100px' }} alt={drive.car_name} /><br /><br />
@@ -58,7 +58,7 @@ const PreviousDrives = () => {
                     )}
 
                     {endedDrives.map(drive =>
-                        <div onClick={() => setselectedDrive(drive)} key={drive.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', margin: "10px" }}>
+                        <div onClick={() => setselectedDrive(drive)} key={drive.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', margin: "10px",cursor: 'pointer' }}>
                             <div>
                                 מכונית: {drive.car_name}<br />
                                 <img src={MY_SERVER + drive.car_image} style={{ width: '150px', height: '100px' }} alt={drive.car_name} /><br /><br />

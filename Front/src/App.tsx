@@ -66,6 +66,7 @@ function App() {
     getProfile()
   }, [logged])
 
+
   return (
     logged ?
       <div>

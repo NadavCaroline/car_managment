@@ -38,7 +38,7 @@ export const startDriveAsync = createAsyncThunk(
   }
 );
 
-export const endDriveAsync = createAsyncThunk(
+export const  endDriveAsync = createAsyncThunk(
   'drive/endDrive',
   async ({ token, drive }: { token: string, drive: DriveModel }) => {
     const response = await endDrive(token, drive);

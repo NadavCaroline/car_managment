@@ -161,50 +161,58 @@ const ActiveDrive = () => {
     // Handles the auto fill of the start/end date of a drive
     // if the user didn't start/end the drive
     useEffect(() => {
-        if (orders && drives) {
+        if (orders) {
+            console.log("Enterd Orders")
             // const activeOrder = orders.find(o => o.id === drives[drives.length -1].order)
-            if ((activeOrder?.ended === false) || (new Date().getTime() > new Date(activeOrder?.toDate!).getTime())) {
-                console.log("The Drive Has To End")
-                if (activeDrive) {
-                    console.log("The Drive Is Active")
-                    dispatch(endDriveAsync({
-                        token: token, drive: drives[drives.length - 1]
-                    }))
-                    dispatch(orderEndedAsync({
-                        token: token,
-                        id: activeOrder?.id!
-                    }))
-                    localStorage.removeItem('isRunning')
-                    localStorage.removeItem('activeDrive')
-                    setactiveDrive(null)
-                    setIsRunning(false)
-                    dispatch(getDrivesAsync(token))
-                }
-            }
-            else if (orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)) {
+            // if ((activeOrder?.ended === false) && (new Date().getTime() > new Date(activeOrder?.toDate!).getTime())) {
+            //     console.log("Entered First If")
+            //     if (activeDrive) {
+            //         dispatch(endDriveAsync({
+            //             token: token, drive: drives[drives.length - 1]
+            //         }))
+            //         dispatch(orderEndedAsync({
+            //             token: token,
+            //             id: activeOrder?.id!
+            //         }))
+            //         localStorage.removeItem('isRunning')
+            //         localStorage.removeItem('activeDrive')
+            //         setactiveDrive(null)
+            //         setIsRunning(false)
+            //         dispatch(getDrivesAsync(token))
+            //     }
+
+            // }
+            // else
+            if (orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)) {
                 let active = orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)
-                console.log("The drive isn't active")
-                console.log(active)
-                dispatch(startDriveAsync({
-                    token: token, drive: {
-                        user: decoded.user_id,
-                        order: active?.id,
-                    } 
-                }))
-                dispatch(endDriveAsync({
-                    token: token,
-                    drive: drives[drives.length - 1]
-                }))
+                let drive = drives.find(drive => drive.order === active?.id)
+                // console.log('active', active)
+                // console.log('drive', drive)
+                if (drive) {
+                    dispatch(endDriveAsync({
+                        token: token, drive: drive
+                    }))
+                } else {
+                    dispatch(startDriveAsync({
+                        token: token, drive: {
+                            user: decoded.user_id,
+                            order: active?.id,
+                        }
+                    }))
+                }
                 dispatch(orderEndedAsync({
                     token: token,
                     id: active?.id!
                 }))
+                localStorage.removeItem('isRunning')
+                localStorage.removeItem('activeDrive')
+                setactiveDrive(null)
+                setIsRunning(false)
                 dispatch(getDrivesAsync(token))
-                dispatch(getOrdersAsync(token))                
-            } else {
-                console.log("Everything Works Fine")
+                dispatch(getOrdersAsync(token))
             }
         }
+
     }, [orders.length])
 
     return (
@@ -218,7 +226,7 @@ const ActiveDrive = () => {
                     </h3>
 
                     <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
-                    בשעה: {activeDrive?.startDate!.toString().slice(11, 16)}<br />
+                    {/* בשעה: {activeDrive?.startDate!.toString().slice(11, 16)}<br /> */}
                     קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} /><br />
 
                     <input type='file' onChange={handleendFile1Change} /><br />
