@@ -1,27 +1,22 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { ShiftModel } from '../../models/Shift';
+import ShiftModel from '../../models/Shift';
+
 // import { getShifts } from './shiftsAPI' ;
-import { getShifts } from './shiftsAPI';
+import { getShifts, addShift, shiftDone } from './shiftsAPI';
 
 export interface shiftsState {
-    shifts: ShiftModel
+    shifts: ShiftModel[]
+    error: string | null
+    msg: string | null
+
+
 }
 
 const initialState: shiftsState = {
-    shifts: {
-        id: 0,
-        user1:'',
-        user_name1: '',
-        user2:'',
-        user_name2: '',
-        car: '',
-        car_name: '',
-        shiftDate:'',
-        maintenanceType: '',
-        maintenance_name:'',
-        comments:''
-    }
+    shifts: [],
+    error: "",
+    msg: ""
 };
 
 
@@ -32,21 +27,62 @@ export const getshiftsAsync = createAsyncThunk(
         return response;
     }
 );
+export const addShiftAsync = createAsyncThunk(
+    'shifts/addShift',
+    async ({ token, shift }: { token: string, shift: ShiftModel }) => {
+        const response = await addShift(token, shift);
+        return response;
+    }
+);
+export const shiftDoneAsync = createAsyncThunk(
+    'shifts/shiftDone',
+    async ({ token, id }: { token: string, id: number }) => {
+        const response = await shiftDone(token, id);
+        return response;
+    }
+);
 
 export const shiftsSlice = createSlice({
     name: 'shifts',
     initialState,
     reducers: {
+        SetError: (state, action: PayloadAction<string>) => {
+            state.error = action.payload;
+        },
+        SetMsg: (state) => {
+            state.msg = ""
+        },
     },
     extraReducers: (builder) => {
         builder
             .addCase(getshiftsAsync.fulfilled, (state, action) => {
                 state.shifts = action.payload;
-                // state.shifts = action.payload;
+            })
+            .addCase(addShiftAsync.fulfilled, (state, action) => {
+                if (action.payload.status === 201) {//successfull created
+                    state.shifts.push(action.payload.data)
+                    state.msg = "תורנות נוצרה ונשלחה בהצלחה"
+                }
+                else if (action.payload.status === 208) {//already exists
+                    state.error = action.payload.data;
+                }
+                else if (action.payload.status === 401) {
+                    state.error = '';
+                }
+
+            })
+
+            .addCase(addShiftAsync.rejected, (state, action) => {
+                state.error = action.error.message ?? ''
+            })
+            .addCase(shiftDoneAsync.fulfilled, (state, action) => {
+                let temp = state.shifts.filter(shift => shift.id === action.payload.id)[0]
+                temp.isDone = true
             });
     },
 });
-
-export const { } = shiftsSlice.actions;
+export const { SetError, SetMsg } = shiftsSlice.actions;
+export const shiftError = (state: RootState) => state.shifts.error;
+export const shiftMessage = (state: RootState) => state.shifts.msg;
 export const shiftSelector = (state: RootState) => state.shifts.shifts;
 export default shiftsSlice.reducer;

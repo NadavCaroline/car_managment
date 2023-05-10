@@ -22,6 +22,7 @@ import { isLogged, loginWithRefreshAsync, logout, userAccess, userRefresh } from
 import { Login } from './components/login/Login';
 import { getOrdersAsync } from './components/orders/OrdersSlice';
 import { adminSelector, getProfileAsync, profileSelector } from './components/profile/profileSlicer';
+import Notifications from './components/notifications/Notifications';
 
 function App() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
@@ -57,8 +58,8 @@ function App() {
   }, [access])
 
   // Gets the profile to see if admin
-  const getProfile = async() => {
-  const x =  await dispatch(getProfileAsync(access))
+  const getProfile = async () => {
+    const x = await dispatch(getProfileAsync(access))
   }
 
   // Checks if the user has access to admin features
@@ -106,10 +107,7 @@ function App() {
 
               </div>
               <div className="item justify-content-end">
-                <a href="/Notifications" style={{ paddingRight: "1.5em", paddingLeft: "1em" }}>
-                  <span className="notify-badge">1</span>
-                  <FontAwesomeIcon icon={faBell} style={{ fontSize: "1.5em", color: "white" }} />
-                </a>
+                <Notifications />
               </div>
               <div className=" justify-content-end">
                 <a href='/' className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>Logout</a>

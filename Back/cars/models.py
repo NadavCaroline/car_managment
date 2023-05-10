@@ -93,6 +93,8 @@ class CarOrders(models.Model):
 class MaintenanceTypes(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
+    imgLogo = models.ImageField( upload_to='images/',
+        null=True, blank=True)
  
     def __str__(self):
         return self.name
@@ -105,25 +107,41 @@ class Shifts(models.Model):
     shiftDate = models.DateField()
     maintenanceType = models.ForeignKey(MaintenanceTypes, on_delete=models.CASCADE, null=True)
     comments = models.CharField(max_length=200, blank=True)
+    isDone = models.BooleanField(default=False)
 
+    
     @property
     def car_name(self):
-        return self.car.licenseNum+''+self.car.nickName
+        return self.car.licenseNum+' '+self.car.nickName
 
     @property
     def user_name1(self):
         return self.user1.first_name + ' ' + self.user1.last_name
     @property
     def user_name2(self):
-        return self.user2.first_name + ' ' + self.user2.last_name
+        if self.user2:
+            return self.user2.first_name + ' ' + self.user2.last_name
+        else:
+            return ""
     
     @property
     def maintenance_name(self):
         return self.maintenanceType.name
+    @property
+    def maintenance_logo(self):
+        return self.maintenanceType.imgLogo.name
     
 
     def __str__(self):
-        return self.user_name + ': ' + self.car_name + ' ' + self.maintenance_name
+        return   self.car_name + ' ' + self.maintenance_name
+    
+    class Meta:
+        constraints = [
+                models.UniqueConstraint(fields=['shiftDate', 'car','maintenanceType'], name='my_shift_pk'),
+                # models.UniqueConstraint(fields=['shiftDate', 'user1'], name='shift-user1_pk'),
+                # models.UniqueConstraint(fields=['shiftDate', 'user2'], name='shift-user2_pk')
+
+            ]
     
 #  רשיון רכב,ביטוח חובה,ביטוח מקיף, טיפול רכב(מוסך) 
 class FileTypes(models.Model):
@@ -244,3 +262,13 @@ class Accidents(models.Model):
     def __str__(self):
         return str(self.dateReported) + ' ' + self.user_name + ' ' + self.car_name
 
+class Notification(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE)
+    title=models.CharField(max_length=255,blank=True)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']

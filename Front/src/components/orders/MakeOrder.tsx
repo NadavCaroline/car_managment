@@ -148,7 +148,6 @@ const MakeOrder = () => {
                     onChange={handleEndDateChange} />
                 </DemoItem><br /><br />
               </div>
-
             }
             <DemoItem >
               {!isAllDay &&

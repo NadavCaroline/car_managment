@@ -9,7 +9,8 @@ from .models import (Profile,
                      Logs,
                      MaintenanceTypes,
                      Shifts,
-                     Roles)
+                     Roles,
+                     Notification)
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 ################## TOKEN SERIALIZER ###############
@@ -92,7 +93,10 @@ class CreateShiftsSerializer(serializers.ModelSerializer):
         model = Shifts
         fields = '__all__'
 
-
+class CreateNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
 #################  READ ONLY SERIALIZERS ##################
 
 class UserSerializer(serializers.ModelSerializer):
@@ -100,7 +104,15 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+class CustomUserSerializer(serializers.ModelSerializer):
+    count_shifts = serializers.IntegerField()
 
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'count_shifts')
+        # ordering = ['count_shifts']
+    def get_ordered(self):
+        return User.objects.order_by('count_shifts')
 
 class ProfileSerializer(serializers.ModelSerializer):
 
@@ -141,9 +153,9 @@ class DrivingsSerializer(serializers.ModelSerializer):
 class ShiftsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shifts
-        fields = ['id', 'user', 'user_name', 'car', 'car_name',
-                  'shiftDate', 'maintenanceType', 'maintenance_name']
-
+        fields = ['id', 'user1','user_name1', 'user2','user_name2', 'car','car_name', 'shiftDate',
+                   'maintenanceType', 'maintenance_name','maintenance_logo','comments','isDone']
+        ordering = ['-shiftDate']
 
 class CarMaintenanceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -151,4 +163,7 @@ class CarMaintenanceSerializer(serializers.ModelSerializer):
         fields = ['id', 'car', 'car_name', 'maintenanceDate',
                   'file1', 'file2', 'shift',
                   'maintenanceType', 'kilometer']
-
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id','recipient','title', 'message', 'created_at', 'is_read' ]
