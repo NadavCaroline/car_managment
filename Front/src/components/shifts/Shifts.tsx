@@ -403,7 +403,7 @@ const Shifts = () => {
                                         shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) 
                                         && dayjs(shift!.shiftDate, 'YYYY-MM-DD').isBefore(dayjs().format('YYYY-MM-DD'), 'day') ||
                                         (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) )                                    ).map(shift =>
-                                        <Col mb={4}>
+                                        <Col style={{ marginBottom: '10px' }}>
                                             <Card className='h-100 text-center'>
                                                 {/* <Card.Img variant="top" src="https://via.placeholder.com/350x150" /> */}
                                                 <Card.Body >
