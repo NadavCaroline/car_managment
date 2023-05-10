@@ -3,13 +3,13 @@ import { Badge, Dropdown, DropdownButton } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { userToken } from '../login/loginSlice'
+import { userAccess, userToken } from '../login/loginSlice'
 import { getNotificationAsync, notificationIsReadAsync, notificationSelector } from './notificationsSlice';
 import dayjs from 'dayjs';
 
 const Notifications = () => {
   const dispatch = useAppDispatch()
-  const token = useAppSelector(userToken);
+  const token = useAppSelector(userAccess);
   const notifications = useAppSelector(notificationSelector);
 
 
