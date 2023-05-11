@@ -53,15 +53,15 @@ return (
       </div>
     </Dropdown.Toggle>
 
-    <Dropdown.Menu >
+    <Dropdown.Menu className="dropdown-menu" style={{ position: 'fixed', height: 'auto',maxHeight: '400px',overflowX: 'hidden' }} >
       <Dropdown.Header>התראות</Dropdown.Header>
       <Dropdown.Divider />
       {notifications.map((notification,index) =>[
         
-      <Dropdown.Item onClick={e => {  e.stopPropagation(); notification.id !== undefined && notificationClick(notification.id);}} style={{ backgroundColor: notification.is_read ? 'white' : 'lightblue' }}>
+      <Dropdown.Item className="notification-item" onClick={e => {  e.stopPropagation(); notification.id !== undefined && notificationClick(notification.id);}} style={{ backgroundColor: notification.is_read ? 'white' : 'lightblue' }}>
           <div className="d-flex flex-column">
             <div style={{ fontWeight: "bold" }}>{notification.title}</div>
-            <div>{notification.message}</div>
+            <div >{notification.message}</div>
             <small style={{ alignSelf: 'flex-end' }} className="text-muted mt-1">
                 {dayjs(notification.created_at, 'YYYY-MM-DD').locale('he').format('DD/MM/YYYY')}
             

@@ -20,6 +20,8 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Carousel, Card, Container, Row, Col, Badge, Button } from "react-bootstrap";
 import { adminSelector, getProfileAsync, profileSelector } from '../profile/profileSlicer';
+import { getNotificationAsync } from '../notifications/notificationsSlice';
+
 
 const Shifts = () => {
     const dispatch = useAppDispatch()
@@ -164,7 +166,7 @@ const Shifts = () => {
 
         }
         setIsLoading(true);
-        dispatch(addShiftAsync({ token: token, shift: shift })).then((res) => { setIsLoading(false); });
+        dispatch(addShiftAsync({ token: token, shift: shift })).then((res) => { setIsLoading(false);dispatch(getNotificationAsync( token)); });
     };
 
     function handleCarDivClick(element: HTMLElement): void {
@@ -363,11 +365,12 @@ const Shifts = () => {
                             <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תורנויות עתידיות</h3><hr />
                             <Container>
                                 <Row className="align-items-stretch" xs={1} md={2} lg={3} >
-                                    {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                                    {shifts && shifts.filter(shift => ((shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) 
-                                        && (dayjs(shift!.shiftDate, 'YYYY-MM-DD').isSame(dayjs().format('YYYY-MM-DD'), 'day') || dayjs(shift!.shiftDate, 'YYYY-MM-DD').isAfter(dayjs().format('YYYY-MM-DD'), 'day')) ||
-                                        (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) )
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) ||
+                                        (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) ))
+                                        &&( (dayjs(shift!.shiftDate, 'YYYY-MM-DD').locale('he').isSame(dayjs().locale('he').format('YYYY-MM-DD'), 'day') || dayjs(shift!.shiftDate, 'YYYY-MM-DD').locale('he').isAfter(dayjs().locale('he').format('YYYY-MM-DD'), 'day')) )
+                                      
                                     ).map(shift =>
                                         <Col style={{ marginBottom: '10px' }}>
                                             <Card className='h-100 text-center'>
@@ -398,11 +401,11 @@ const Shifts = () => {
                             <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תורנויות קודמות</h3><hr />
                             <Container>
                                 <Row className="align-items-stretch" xs={1} md={2} lg={3}>
-                                    {shifts && shifts.filter(shift => (shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                                    {shifts && shifts.filter(shift => ((shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) 
-                                        && dayjs(shift!.shiftDate, 'YYYY-MM-DD').isBefore(dayjs().format('YYYY-MM-DD'), 'day') ||
-                                        (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) )                                    ).map(shift =>
+                                        shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) ||
+                                        (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) ) )
+                                        && (dayjs(shift!.shiftDate, 'YYYY-MM-DD').locale('he').isBefore(dayjs().locale('he').format('YYYY-MM-DD'), 'day'))                                    ).map(shift =>
                                         <Col style={{ marginBottom: '10px' }}>
                                             <Card className='h-100 text-center'>
                                                 {/* <Card.Img variant="top" src="https://via.placeholder.com/350x150" /> */}
@@ -410,7 +413,7 @@ const Shifts = () => {
                                                     <Card.Title> {dayjs(shift.shiftDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}<br></br>{shift.maintenance_name}</Card.Title>
                                                     <img src={MY_SERVER + shift.maintenance_logo} style={{ width: '50px', height: '50px' }} alt={"imglogo"} />
                                                     <Card.Text>
-                                                        {shift.car_name}<br></br>
+                                                      {shift.car_name}<br></br>
                                                         {shift.user_name1}<br></br>
                                                         {shift.user_name2}<br></br>
                                                         {shift.comments}

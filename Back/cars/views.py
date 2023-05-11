@@ -364,7 +364,7 @@ class ShiftsView(APIView):
                 emails=[]
                 notification='הנך משובץ לתורנות בתאריך '+ shiftDate
                 car=Cars.objects.get(id=int(car))
-                carMsg=" על רכב "+car.nickName+"-"+car.licenseNum
+                carMsg=",רכב-"+car.nickName+"-"+car.licenseNum
                 if  user2=='':  
                     username2=""
                     message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת ל<b>{subject}</b><br> בתאריך: {shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
