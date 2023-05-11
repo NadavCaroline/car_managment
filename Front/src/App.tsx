@@ -23,6 +23,8 @@ import { Login } from './components/login/Login';
 import { getOrdersAsync } from './components/orders/OrdersSlice';
 import { adminSelector, getProfileAsync, profileSelector } from './components/profile/profileSlicer';
 import Notifications from './components/notifications/Notifications';
+import { getNotificationAsync } from './components/notifications/notificationsSlice';
+
 
 function App() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
@@ -50,6 +52,7 @@ function App() {
         dispatch(logout())
       }
     }
+    // access && dispatch(getNotificationAsync(access))
   }, [])
 
   // Decode the access token

@@ -209,11 +209,48 @@ select.invalid {
   height: 50px;
   border-radius: 50%;
 }
+
 .dropdownNotification .dropdown-toggle::after {
   display: none !important;
 }
+/* notification wrap text responsive */
+.dropdown-menu {
+  max-width: 400px; /* default width */
+}
 
+@media (min-width: 576px) { /* adjust width for screens wider than 576px */
+  .dropdown-menu {
+    max-width: 500px;
+  }
+}
 
+@media (min-width: 768px) { /* adjust width for screens wider than 768px */
+  .dropdown-menu {
+    max-width: 700px;
+  }
+}
+
+@media (min-width: 992px) { /* adjust width for screens wider than 992px */
+  .dropdown-menu {
+    max-width: 700px;
+  }
+}
+
+@media (min-width: 1200px) { /* adjust width for screens wider than 1200px */
+  .dropdown-menu {
+    max-width: 700px;
+  }
+}
+
+.notification-item {
+  white-space: normal;
+}
+
+@media (max-width: 768px) {
+  .dropdown-menu.show .notification-item {
+    white-space: pre-wrap;
+  }
+}
 
 
 
