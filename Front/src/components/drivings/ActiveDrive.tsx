@@ -67,7 +67,7 @@ const ActiveDrive = () => {
     }
     // Gets the end kilometer of the car of the active order, according to the report of the last drive
     const handleStartKilometer = () => {
-        const lastDrive = allDrives.filter(drive => drive.endKilometer && (drive.order === activeOrder?.id)).pop()
+        const lastDrive = allDrives.filter(drive => drive.car === activeOrder?.car).pop()
         lastDrive ? setstartKilometer(String(lastDrive?.endKilometer)) : setstartKilometer("")
     }
 
@@ -80,7 +80,6 @@ const ActiveDrive = () => {
 
     // Checks if there is an active drive when app is loaded
     useEffect(() => {
-        const startStopBtn = document.querySelector('.round') as HTMLButtonElement;
         if (localStorage.hasOwnProperty('isRunning')) {
             setIsRunning(true)
         }
@@ -162,7 +161,6 @@ const ActiveDrive = () => {
     // if the user didn't start/end the drive
     useEffect(() => {
         if (orders) {
-            console.log("Enterd Orders")
             // const activeOrder = orders.find(o => o.id === drives[drives.length -1].order)
             // if ((activeOrder?.ended === false) && (new Date().getTime() > new Date(activeOrder?.toDate!).getTime())) {
             //     console.log("Entered First If")
@@ -186,8 +184,6 @@ const ActiveDrive = () => {
             if (orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)) {
                 let active = orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)
                 let drive = drives.find(drive => drive.order === active?.id)
-                // console.log('active', active)
-                // console.log('drive', drive)
                 if (drive) {
                     dispatch(endDriveAsync({
                         token: token, drive: drive
@@ -221,9 +217,7 @@ const ActiveDrive = () => {
                 <div>
                     <h1>נסיעה פעילה</h1>
                     <hr />
-                    <h3>
-                        הנסיעה התחילה
-                    </h3>
+                    <h3>הנסיעה התחילה</h3>
 
                     <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
                     {/* בשעה: {activeDrive?.startDate!.toString().slice(11, 16)}<br /> */}
