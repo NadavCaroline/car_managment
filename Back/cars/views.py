@@ -23,9 +23,10 @@ from django.db.models import Count,Q
 def index(r):
     return Response('index')
 
-
 class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+    serializer_class = CustomTokenObtainPairSerializer
+# class MyTokenObtainPairView(TokenObtainPairView):
+#     serializer_class = MyTokenObtainPairSerializer
 
 
 @api_view(['POST'])
