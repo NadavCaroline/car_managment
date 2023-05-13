@@ -123,10 +123,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class CarsSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField()
+
     class Meta:
         model = Cars
         fields = ['id', 'licenseNum','nickName', 'make', 'model',
-                  'color', 'year','garageName','garagePhone' ,'department','dep_name','isDisabled',  'image']
+                  'color', 'year','garageName','garagePhone' ,'department','dep_name','isDisabled', 'image']
 
 class CarOrdersSerializer(serializers.ModelSerializer):
     class Meta:
