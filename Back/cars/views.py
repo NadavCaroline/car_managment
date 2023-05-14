@@ -589,12 +589,13 @@ class ResetView(APIView):
 
 class NotificationView(APIView):
     def get(self, request):
-        my_model = Notification.objects.all()
+        user = request.user
+        my_model = Notification.objects.all().filter(recipient=user)
         serializer = CreateNotificationSerializer(my_model, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = CreateNotificationSerializer(data=request.data)
+        serializer = CreateNotificationSerializer(data=request.data, many=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -608,3 +609,9 @@ class NotificationView(APIView):
         if serializer.is_valid():
             serializer.save()
         return Response(serializer.data)
+    def delete(self, request, id):
+        my_model = Notification.objects.get(id=id)
+        deleted_id = my_model.id
+        my_model.delete()
+        msg={"status":"success","deleted_id": deleted_id}
+        return Response(msg)
