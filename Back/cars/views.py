@@ -187,8 +187,8 @@ class AllCarsView(APIView):
             uploaded_image = request.FILES.get('image')
 
             # Define the new dimensions for the resized image
-            new_height = 550
-            new_width = 550
+            new_height = 500
+            new_width = 500
 
             # Use NumPy to resize the image
             image_array = np.array(Image.open(uploaded_image))
@@ -349,6 +349,7 @@ class MaintenanceTypesView(APIView):
         serializer = CreateMaintenanceTypesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            # Added maintenance type
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -412,7 +413,7 @@ class ShiftsView(APIView):
                 html_message = '<div dir="rtl">{}</div>'.format(message)
                 send_mail(subject, message, None, emails,
                           fail_silently=False, html_message=html_message)
-
+                # Created Shift
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -495,7 +496,7 @@ class DrivingsView(APIView):
                              user=request.user, car=order_model.car)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     def patch(self, request, id):
         auto_end = request.data.get('endDate')
         my_model = Drivings.objects.get(id=id)
