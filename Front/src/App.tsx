@@ -89,7 +89,7 @@ function App() {
               <div className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`} id="navbarsExample09">
                 <a className="nav-link " href="/myOrders">הזמנות שלי</a>
                 <a className="nav-link " href="/makeOrder">הזמנת רכב</a>
-                <a className="nav-link " href="/maintenance">טיפולי רכב</a>
+                {/* <a className="nav-link " href="/maintenance">טיפולי רכב</a> */}
                 <a className="nav-link " href="/drivings">ניהול נסיעות</a>
                 <a className="nav-link " href="/shifts">תורנויות</a>
                 {/* רק מנהל מחלקה יכול לראות את התפריטים הבאים */}

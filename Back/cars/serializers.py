@@ -169,9 +169,9 @@ class ShiftsSerializer(serializers.ModelSerializer):
 class CarMaintenanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarMaintenance
-        fields = ['id', 'car', 'car_name', 'maintenanceDate',
-                  'file1', 'file2', 'shift',
-                  'maintenanceType', 'kilometer']
+        fields = ['id', 'car', 'maintenanceDate', 'fileMaintenance',
+                  'fileType', 'expirationDate', 'nextMaintenancekilometer',
+                  'comments', 'car_name','car_file_type_name','car_fileFolderName']
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification

@@ -286,8 +286,13 @@ class CarOrdersView(APIView):
 
 @permission_classes([IsAuthenticated])
 class CarMaintenanceView(APIView):
-    def get(self, request):
-        my_model = CarMaintenance.objects.all().values('car')
+    def get(self, request,id):
+        # my_model = CarMaintenance.objects.all().values('car')
+        if(id):
+            my_model = CarMaintenance.objects.filter(car=id).order_by('-expirationDate')
+        else:
+            my_model = CarMaintenance.objects.all().order_by('-expirationDate')
+       
         serializer = CarMaintenanceSerializer(my_model, many=True)
         return Response(serializer.data)
 

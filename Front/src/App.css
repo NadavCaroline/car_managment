@@ -251,6 +251,11 @@ select.invalid {
     white-space: pre-wrap;
   }
 }
+.cardlabel {
+  font-weight: bold;
+  width: 150px;
+  display: inline-block;
+}
 
 
 

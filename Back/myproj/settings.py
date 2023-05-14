@@ -179,17 +179,17 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-TEST_MEDIA_URL = '/car_test/'
-TEST_MEDIA_ROOT = os.path.join(BASE_DIR, 'car_test')
+TEST_MEDIA_URL = '/carlicense/'
+TEST_MEDIA_ROOT = os.path.join(BASE_DIR, 'static/carlicense')
 
 HOVA_MEDIA_URL = '/hova/'
-HOVA_MEDIA_ROOT = os.path.join(BASE_DIR, 'hova')
+HOVA_MEDIA_ROOT = os.path.join(BASE_DIR, 'static/hova')
 
 MAINTENANCE_MEDIA_URL = '/maintenance/'
-MAINTENANCE_MEDIA_ROOT = os.path.join(BASE_DIR, 'maintenance')
+MAINTENANCE_MEDIA_ROOT = os.path.join(BASE_DIR, 'static/maintenance')
 
 MEKIF_MEDIA_URL = '/mekif/'
-MEKIF_MEDIA_ROOT = os.path.join(BASE_DIR, 'mekif')
+MEKIF_MEDIA_ROOT = os.path.join(BASE_DIR, 'static/mekif')
 
 # IMAGES_MEDIA_URL = 'files/images/'
 # IMAGES_MEDIA_ROOT = os.path.join(BASE_DIR, 'images')
