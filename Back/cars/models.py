@@ -225,6 +225,10 @@ class Drivings(models.Model):
         null=True, blank=True)
 
     @property
+    def car(self):
+        return self.order.car.id
+
+    @property
     def car_name(self):
         return self.order.car.make + ' ' + self.order.car.model
 
