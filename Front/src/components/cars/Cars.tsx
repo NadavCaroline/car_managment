@@ -7,6 +7,7 @@ import { userAccess, userToken } from '../login/loginSlice';
 import { getProfileAsync, profileSelector } from '../profile/profileSlicer';
 import { MY_SERVER } from '../../env';
 import CarModel from '../../models/Car';
+import CarMaintenanceModel from '../../models/CarMaintenance';
 import { depsSelector, getDepsAsync } from '../deps/depsSlicer';
 import { Card, Container, Row, Col, Badge, Button } from "react-bootstrap";
 import dayjs from 'dayjs';
@@ -26,6 +27,9 @@ export function Cars() {
   const [addpopUp, setaddpopUp] = useState(false)
   // const [editPopUp, seteditPopUp] = useState(false)
   const [selectedCarId, setSelectedCarId] = useState("")
+  const [nickName, setNickName] = useState("")
+  const [garageName, setGarageName] = useState("")
+  const [garagePhone, setGaragePhone] = useState("")
   const [licenseNum, setlicenseNum] = useState("")
   const [make, setmake] = useState("")
   const [model, setmodel] = useState("")
@@ -33,13 +37,33 @@ export function Cars() {
   const [year, setyear] = useState("")
   const [department, setdepartment] = useState("")
   const [carImage, setcarImage] = useState<File | null>(null)
+  // const [fileTypesImage, setFileTypesImage] = useState<{ id: string; img: File | null }>({ id: '', img: null });
   const [newDep, setnewDep] = useState("")
   const [selectedCar, setselectedCar] = useState<CarModel | null>(null)
   const updateCar: CarModel = {}
+  const [carMaintenanceArr, setCarMaintenanceArr] = useState<CarMaintenanceModel []>([]);
+  const updateCarMaintenance: CarMaintenanceModel = {}
 
   // Handles image upload
   const handleCarImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setcarImage(e.target!.files![0])
+  };
+
+  const handleFileTypesChange = (filetypeId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+
+    const file = event.target.files?.[0];
+
+    if (file && file.type === 'application/pdf') {
+      updateCarMaintenance.fileType=filetypeId
+      // updateCarMaintenance.fileMaintenance=file
+      // setFileTypesImage({ id: filetypeId, img: file });
+    }
+    else {
+      // Reset the file input
+      event.target.value = '';
+      // setFileTypesImage({ id: '', img: null });
+      //display error
+    }
   };
   // Pop up for adding car
   const handleExitUpload = () => {
@@ -61,17 +85,16 @@ export function Cars() {
   const handlePostRequest = () => {
     const car: CarModel = {
       licenseNum: licenseNum,
-      nickName: '',
+      nickName: nickName,
       make: make,
       model: model,
       color: color,
       year: year,
-      garageName: '',
-      garagePhone: '',
+      garageName: garageName,
+      garagePhone: garagePhone,
       department: department,
       image: carImage,
       isDisabled: '0'
-
     }
     dispatch(addCarsAsync({ token: token, car: car }))
   }
@@ -79,10 +102,10 @@ export function Cars() {
     if (selectedCarId) {
       const mydiv = document.getElementById('divCar-' + selectedCarId);
       if (mydiv) {
-        mydiv.classList.remove('selectedDiv');
+        mydiv.classList.remove('selectedDivBody');
       }
     }
-    element.classList.add('selectedDiv');
+    element.classList.add('selectedDivBody');
     setSelectedCarId(carid);
   }
   // Gets the cars from the server
@@ -135,10 +158,17 @@ export function Cars() {
                           <td style={{ textAlign: 'right' }}>שנה:</td>
                           <td style={{ textAlign: 'right' }}>{car.year}</td>
                         </tr>
+
                       </tbody>
                     </table>
                   </Card.Text>
-                  <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} />
+                  <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br></br>
+                  {car.garageName && (
+                    <React.Fragment>
+                      מוסך {car.garageName} {car.garagePhone}<br></br>
+                    </React.Fragment>
+                  )}
+                  <button className="btn btn-primary" style={{ marginTop: '10px' }} onClick={() => setselectedCar(car)}>עריכה</button>
                 </Card.Body>
                 <Card.Footer>
                   <Container>
@@ -223,9 +253,13 @@ export function Cars() {
       </form>
       {addpopUp &&
         <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <div style={{ position: "relative", padding: "32px", width: "420px", height: "400px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px", textAlign: "left" }}>
+          <div style={{ position: "relative", padding: "32px", width: "420px", height: "640px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px", textAlign: "left" }}>
             <button style={{ position: "absolute", top: "0", right: "0" }} onClick={() => handleExitUpload()}>X</button>
             <form>
+              <div>
+                כינוי רכב:
+                <input onChange={(e) => setNickName(e.target.value)} />
+              </div>
               <div>
                 מספר לוחית רישוי:
                 <input required onChange={(e) => setlicenseNum(e.target.value)} />
@@ -258,7 +292,15 @@ export function Cars() {
                 </select>
               </div>
               <div>
-                תמונה:
+                שם מוסך :
+                <input onChange={(e) => setGarageName(e.target.value)} />
+              </div>
+              <div>
+                טלפון מוסך :
+                <input onChange={(e) => setGaragePhone(e.target.value)} />
+              </div>
+              <div>
+                תמונת הרכב:
                 <input required type='file' onChange={handleCarImageChange} />
                 {carImage &&
                   <div>
@@ -267,8 +309,13 @@ export function Cars() {
                       style={{ width: '150px', height: '100px' }} /><br />
                   </div>}
               </div>
+              {fileTypes.map((fileType, index) => (
+                <div>{fileType.name}
+                  <input required type='file' onChange={(e) => handleFileTypesChange(String(fileType.id), e)} />
+                </div>
+              ))}
               <br />
-              <button onClick={() => handlePostRequest()}>שמור</button>
+              <button className="btn btn-primary" onClick={() => handlePostRequest()}>שמור</button>
             </form>
           </div>
         </div>
