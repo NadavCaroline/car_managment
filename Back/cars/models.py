@@ -229,6 +229,10 @@ class Drivings(models.Model):
         return self.order.car.make + ' ' + self.order.car.model
 
     @property
+    def car(self):
+        return self.order.car
+
+    @property
     def car_image(self):
         return self.order.car.image.url
 

@@ -67,8 +67,9 @@ def register(request):
                 department=department,
                 realID=request.data['profile']['realID'],
             )
+            new_user = request.data['user']['username']
             profile.save()
-            write_to_log('info', 'משתמש/ת נוצר/ה')
+            write_to_log('info', f' משתמש/ת נוצר/ה - {new_user}')
             msg = {"status": "success", "msg": "משתמש/ת נוצר/ה בהצלחה"}
     except Exception as e:
         # Handle the exception
@@ -474,6 +475,16 @@ class DrivingsView(APIView):
         auto_start = request.POST.get('startDate')
         order_model = CarOrders.objects.get(id=request.POST.get('order'))
         serializer = CreateDrivingsSerializer(data=request.data)
+        car_by_order = CarOrders.objects.get(id=request.data['order']).car
+        last_order_by_car = ""
+        latest_toDate = None
+        for order in CarOrders.objects.filter(car=car_by_order, ended=True):
+            if not latest_toDate or order.toDate > latest_toDate:
+                latest_toDate = order.toDate
+                last_order_by_car = order
+
+        last_drive_kilo = Drivings.objects.get(order=last_order_by_car).endKilometer
+        kilo_warning = False if str(last_drive_kilo) == str(request.data['startKilometer']) else True
         if serializer.is_valid():
             uploaded_files = request.FILES.getlist('image')
             if len(uploaded_files) > 3:
@@ -494,6 +505,8 @@ class DrivingsView(APIView):
             else:
                 write_to_log('warning', 'משתמש/ת שכח/ה להתחיל/לסיים נסיעה',
                              user=request.user, car=order_model.car)
+            if kilo_warning:
+                write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם", user=request.user, car=order_model.car)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
