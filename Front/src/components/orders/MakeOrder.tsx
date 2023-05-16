@@ -11,7 +11,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
 import jwt_decode from "jwt-decode"
 import CarModel from '../../models/Car';
-import { MY_SERVER } from '../../env';
+import { MY_SERVER, MaxDayOrderAdvance } from '../../env';
 
 const MakeOrder = () => {
   const dispatch = useAppDispatch()
@@ -137,6 +137,7 @@ const MakeOrder = () => {
             <DemoItem >
               <DatePicker
                 minDate={dayjs()}
+                maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
                 format='DD-MM-YYYY'
                 value={selectedStartDate}
                 onChange={handleStartDateChange} />
@@ -148,6 +149,7 @@ const MakeOrder = () => {
                 <DemoItem >
                   <DatePicker
                     minDate={dayjs()}
+                    maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
                     format='DD-MM-YYYY'
                     value={selectedEndDate}
                     onChange={handleEndDateChange} />
