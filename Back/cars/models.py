@@ -58,6 +58,9 @@ class Cars(models.Model):
     @property
     def dep_name(self):
         return self.department.name
+    @property
+    def dep_name(self):
+        return self.department.name
     def __str__(self):
         return self.model
 
@@ -178,6 +181,7 @@ class CarMaintenance(models.Model):
     @property
     def car_fileFolderName(self):
         return self.fileType.fileFolderName 
+    
     
     
     # @property

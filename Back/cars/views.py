@@ -15,7 +15,8 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .helper import write_to_log,add_notification
-from django.db.models import Count,Q
+from django.db.models import Count,Q,OuterRef,Max
+from django.db.models.functions import Coalesce
 
 
 
@@ -286,13 +287,12 @@ class CarOrdersView(APIView):
 
 @permission_classes([IsAuthenticated])
 class CarMaintenanceView(APIView):
-    def get(self, request,id):
-        # my_model = CarMaintenance.objects.all().values('car')
-        if(id):
-            my_model = CarMaintenance.objects.filter(car=id).order_by('-expirationDate')
-        else:
-            my_model = CarMaintenance.objects.all().order_by('-expirationDate')
-       
+    # def get(self, request,id):
+    #     my_model = CarMaintenance.objects.filter(car=id).order_by('-expirationDate')
+    #     serializer = CarMaintenanceSerializer(my_model, many=True)
+    #     return Response(serializer.data)
+    def get(self, request):
+        my_model = CarMaintenance.objects.all().order_by('-expirationDate')
         serializer = CarMaintenanceSerializer(my_model, many=True)
         return Response(serializer.data)
 
@@ -574,3 +574,10 @@ class NotificationView(APIView):
         my_model.delete()
         msg={"status":"success","deleted_id": deleted_id}
         return Response(msg)
+    
+@permission_classes([IsAuthenticated])
+class FileTypesView(APIView):
+    def get(self, request):
+        my_model = FileTypes.objects.all()
+        serializer = CreateFileTypesSerializer(my_model, many=True)
+        return Response(serializer.data)

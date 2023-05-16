@@ -10,7 +10,7 @@ from .models import (Profile,
                      MaintenanceTypes,
                      Shifts,
                      Roles,
-                     Notification)
+                     Notification,FileTypes)
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 ################## TOKEN SERIALIZER ###############
@@ -106,6 +106,10 @@ class CreateNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+class CreateFileTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileTypes
+        fields = '__all__'
 #################  READ ONLY SERIALIZERS ##################
 
 class UserSerializer(serializers.ModelSerializer):
@@ -176,3 +180,7 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = ['id','recipient','title', 'message', 'created_at', 'is_read' ]
+class FileTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileTypes
+        fields = ['id','name','fileFolderName' ]

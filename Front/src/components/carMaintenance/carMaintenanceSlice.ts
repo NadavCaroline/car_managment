@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
 import CarMaintenanceModel from '../../models/CarMaintenance';
-import { getCarMaintenance } from './carMaintenanceAPI';
+import { getCarMaintenance, getCarMaintenanceByCar } from './carMaintenanceAPI';
 
 export interface CarMaintenanceState {
   carMaintenance: CarMaintenanceModel[]
@@ -11,10 +11,17 @@ const initialState: CarMaintenanceState = {
     carMaintenance: []
 };
 
+export const getCarMaintenanceByCarAsync = createAsyncThunk(
+  'carMaintenance/getCarMaintenanceByCar',
+  async ({token, carid}: {token: string, carid: string}) => {
+    const response = await getCarMaintenanceByCar(token,carid);
+    return response;
+  }
+);
 export const getCarMaintenanceAsync = createAsyncThunk(
   'carMaintenance/getCarMaintenance',
-  async ({token, carid}: {token: string, carid: string}) => {
-    const response = await getCarMaintenance(token,carid);
+  async (token: string) => {
+    const response = await getCarMaintenance(token);
     return response;
   }
 );
