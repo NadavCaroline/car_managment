@@ -486,18 +486,6 @@ class DrivingsView(APIView):
         last_drive_kilo = Drivings.objects.get(order=last_order_by_car).endKilometer
         kilo_warning = False if str(last_drive_kilo) == str(request.data['startKilometer']) else True
         if serializer.is_valid():
-            uploaded_files = request.FILES.getlist('image')
-            if len(uploaded_files) > 3:
-                return Response({'error': 'Cannot upload more than 3 images.'}, status=status.HTTP_400_BAD_REQUEST)
-            images = []
-            for uploaded_file in uploaded_files:
-                image = Image.open(uploaded_file)
-                image_array = np.array(image)
-                resized_image_array = np.array(Image.fromarray(image_array).resize((300, 300)))
-                resized_image = Image.fromarray(resized_image_array)
-                output = InMemoryUploadedFile(resized_image, 'ImageField', uploaded_file.name, 'image/jpeg', resized_image.size, None)
-                images.append(output)
-            # Do something with the resized images...
             serializer.save()
             if auto_start:
                 write_to_log('info', 'משתמש/ת התחיל/ה נסיעה',

@@ -58,6 +58,7 @@ class Cars(models.Model):
     @property
     def dep_name(self):
         return self.department.name
+    
     def __str__(self):
         return self.model
 
@@ -223,10 +224,6 @@ class Drivings(models.Model):
         null=True, blank=True)
     endImg3 = models.ImageField(upload_to='images/',
         null=True, blank=True)
-
-    @property
-    def car(self):
-        return self.order.car.id
 
     @property
     def car_name(self):

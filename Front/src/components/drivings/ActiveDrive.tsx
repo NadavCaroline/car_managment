@@ -18,6 +18,7 @@ const ActiveDrive = () => {
     const orders = useAppSelector(ordersSelector)
     const [activeOrder, setactiveOrder] = useState<OrderModel | null>(null)
     const [refreshFlag, setrefreshFlag] = useState(false)
+    const [noStartKilo, setnoStartKilo] = useState("")
     const [startKilometer, setstartKilometer] = useState("")
     const [endKilometer, setendKilometer] = useState("")
     const [changeKilometer, setchangeKilometer] = useState(false)
@@ -273,7 +274,7 @@ const ActiveDrive = () => {
                                     דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
                                 </div> :
                                 <div>
-                                    קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} />
+                                    קילומטראז': <input onChange={(e) => setnoStartKilo(e.target.value)} value={noStartKilo} />
                                 </div>
                             }
                             <input type='file' onChange={handleFile1Change} />
