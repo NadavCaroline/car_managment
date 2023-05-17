@@ -267,5 +267,36 @@ select.invalid {
   display: inline-block;
 }
 
+.circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin: 0;
+}
+.circle::before {
+  position: absolute;
+  content: attr(data-tooltip);
+  display: none;
+  background-color:#0F3E6A;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+}
 
+.circle:hover::before {
+  display: inline-block;
+}
+
+.red {
+  background-color: red;
+}
+
+.green {
+  background-color: rgb(12, 185, 12);
+}
+.btn-success{
+  background-color: rgb(12, 185, 12)!important;
+}
 
