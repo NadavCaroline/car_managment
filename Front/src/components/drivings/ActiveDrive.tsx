@@ -6,7 +6,7 @@ import jwt_decode from "jwt-decode";
 import OrderModel from '../../models/Order';
 import { DriveModel } from '../../models/Drive';
 import { getOrdersAsync, orderEndedAsync, ordersSelector } from '../orders/OrdersSlice';
-import { MY_SERVER } from '../../env';
+import { MY_SERVER, NotificationKilomter } from '../../env';
 
 const ActiveDrive = () => {
     const dispatch = useAppDispatch()
@@ -129,7 +129,8 @@ const ActiveDrive = () => {
                     startImg1: startSelectedFile1,
                     startImg2: startSelectedFile2,
                     startImg3: startSelectedFile3,
-                }
+                }, kilo: NotificationKilomter
+                
             }))
 
             startStopBtn.textContent = 'Stop';

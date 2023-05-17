@@ -26,11 +26,12 @@ export const getAllDrives = async (token: string) => {
 }
 
 
-export const startDrive = async ( token: string,drive: DriveModel) => {
+export const startDrive = async ( token: string,drive: DriveModel, kilo?:number) => {
     return axios.post(MY_SERVER + 'drives', drive, {
         headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'KilometerVariable': kilo
         }
     }).then((res) => res.data)
 }

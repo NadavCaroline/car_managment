@@ -499,9 +499,12 @@ class DrivingsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
+        next_kilo = request.headers.get('KilometerVariable')
         auto_end = request.data.get('endDate')
         my_model = Drivings.objects.get(id=id)
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
+        if CarMaintenance.objects.get(car=CarOrders.objects.get(id=request.data['order']).car).nextMaintenancekilometer - request.data['endKilometer'] < next_kilo:
+            print("Notification")
         if serializer.is_valid():
             serializer.save()
             if auto_end:
