@@ -1,5 +1,8 @@
 from datetime import datetime
 import pytz
+import numpy as np
+import io
+from PIL import Image
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from rest_framework.response import Response
@@ -14,11 +17,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from .helper import write_to_log,add_notification
+from .helper import write_to_log,add_notification, handle_uploaded_file
 from django.db.models import Count,Q,OuterRef,Max
 from django.db.models.functions import Coalesce
-
-
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 @api_view(['GET'])
 def index(r):
@@ -65,8 +68,9 @@ def register(request):
                 department=department,
                 realID=request.data['profile']['realID'],
             )
+            new_user = request.data['user']['username']
             profile.save()
-            write_to_log('info', 'משתמש/ת נוצר/ה')
+            write_to_log('info', f' משתמש/ת נוצר/ה - {new_user}')
             msg = {"status": "success", "msg": "משתמש/ת נוצר/ה בהצלחה"}
     except Exception as e:
         # Handle the exception
@@ -106,33 +110,39 @@ class AllUsersView(APIView):
             write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 @permission_classes([IsAuthenticated])
 class UsersOfDep(APIView):
     def get(self, request):
         user = request.user
         users = User.objects.all()
-        users = list(filter(lambda user: (user.profile.department.id ==user.profile.department.id ), users))
+        users = list(filter(lambda user: (
+            user.profile.department.id == user.profile.department.id), users))
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
-    
+
+
 @permission_classes([IsAuthenticated])
 class UsersOfDepByShifts(APIView):
     def get(self, request):
         usermain = request.user
         users = User.objects.annotate(count_shifts=Count('user1'))
         users2 = User.objects.annotate(count_shifts=Count('user2'))
-       
+
         for obj1 in users:
-            obj2 = users2.get(pk=obj1.pk) # Match objects by primary key
-            obj1.count_shifts += obj2.count_shifts # Add values from other queryset
-            obj1.save() # Save updated object to database
+            obj2 = users2.get(pk=obj1.pk)  # Match objects by primary key
+            obj1.count_shifts += obj2.count_shifts  # Add values from other queryset
+            obj1.save()  # Save updated object to database
         # userOrdered=users.order_by('count_shifts')
-        usersAll = list(filter(lambda user: (user.profile.department.id ==usermain.profile.department.id ), users))
-        sorted_users = sorted(usersAll, key=lambda u: u.count_shifts)  # sort the users by username
+        usersAll = list(filter(lambda user: (
+            user.profile.department.id == usermain.profile.department.id), users))
+        # sort the users by username
+        sorted_users = sorted(usersAll, key=lambda u: u.count_shifts)
 
         serializer = CustomUserSerializer(sorted_users, many=True)
         return Response(serializer.data)
+
 
 @permission_classes([IsAuthenticated])
 class ProfileView(APIView):
@@ -175,6 +185,34 @@ class AllCarsView(APIView):
     def post(self, request):
         serializer = CreateCarsSerializer(data=request.data)
         if serializer.is_valid():
+            # Get the uploaded image from the request
+            uploaded_image = request.FILES.get('image')
+
+            # Define the new dimensions for the resized image
+            new_height = 500
+            new_width = 500
+
+            # Use NumPy to resize the image
+            image_array = np.array(Image.open(uploaded_image))
+            resized_image = np.array(Image.fromarray(image_array).resize((new_width, new_height)))
+
+            # Convert the resized image back to a JPEG image
+            resized_image = Image.fromarray(resized_image).convert('RGB')
+
+            # Save the resized image to a temporary file
+            resized_image_file = io.BytesIO()
+            resized_image.save(resized_image_file, format='JPEG')
+
+            # Create a new SimpleUploadedFile object with a random filename
+            resized_image_file = SimpleUploadedFile(
+                f'car_image_{np.random.randint(1, 100000)}.jpg', 
+                resized_image_file.getvalue(), 
+                content_type='image/jpeg'
+            )
+
+            # Set the `image` field in the serializer data to the resized image
+            serializer.validated_data['image'] = resized_image_file
+
             serializer.save()
             write_to_log('info', 'מכונית התווספה', user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -270,7 +308,8 @@ class CarOrdersView(APIView):
         serializer = CreateCarOrdersSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('info', 'הזמנת רכב בוצעה',user=request.user, car=car_model)
+            write_to_log('info', 'הזמנת רכב בוצעה',
+                         user=request.user, car=car_model)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -316,6 +355,7 @@ class MaintenanceTypesView(APIView):
         serializer = CreateMaintenanceTypesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            # Added maintenance type
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -325,17 +365,17 @@ class ShiftsView(APIView):
     def get(self, request):
         user = request.user
         shifts = Shifts.objects.all()
-        if(user.profile.roleLevel.id==1):# filter by user if user is not admin
-            shifts= Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id))
-        shifts=shifts.order_by('-shiftDate')
- 
+        if (user.profile.roleLevel.id == 1):  # filter by user if user is not admin
+            shifts = Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id))
+        shifts = shifts.order_by('-shiftDate')
+
         serializer = ShiftsSerializer(shifts, many=True)
         return Response(serializer.data)
-    
+
     def put(self, request, id):
         try:
             my_model = Shifts.objects.get(id=int(id))
-            my_model.isDone=request.data['isDone']
+            my_model.isDone = request.data['isDone']
             model_dict = model_to_dict(my_model)
             serializer = CreateShiftsSerializer(my_model, data=model_dict)
             if serializer.is_valid():
@@ -346,56 +386,50 @@ class ShiftsView(APIView):
 
     def post(self, request):
         try:
-            user1=request.data['user1']
-            user2=request.data['user2']
-            shiftDate=request.data['shiftDate']
-            car=request.data['car']
-            maintenanceType=request.data['maintenanceType']
-            comments=request.data['comments']
-            if ( user1  and (Shifts.objects.filter(Q(shiftDate=shiftDate,user1=user1)).exclude(car=car).exists() or
-                Shifts.objects.filter(Q(shiftDate=shiftDate,user2=user1)).exclude(car=car).exists()) or
-                user2  and (Shifts.objects.filter(Q(shiftDate=shiftDate,user1=user2)).exclude(car=car).exists() or
-                Shifts.objects.filter(Q(shiftDate=shiftDate,user2=user2)).exclude(car=car).exists())):
-                                     
-                return Response("למשתמש כבר קיים תורנות בתאריך הנבחר",status=status.HTTP_208_ALREADY_REPORTED)
+            user1 = request.data['user1']
+            user2 = request.data['user2']
+            if (user1 and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user1=user1)).exclude(car=request.data['car']).exists() or
+                           Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user2=user1)).exclude(car=request.data['car']).exists()) or
+                user2 and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user1=user2)).exclude(car=request.data['car']).exists() or
+                           Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user2=user2)).exclude(car=request.data['car']).exists())):
+
+                return Response("למשתמש כבר קיים תורנות בתאריך הנבחר", status=status.HTTP_208_ALREADY_REPORTED)
             serializer = CreateShiftsSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 userMain = request.user
-                user1 = User.objects.get(id=int(user1))
-                username1=user1.first_name+" "+user1.last_name  
-                maintenanceType=MaintenanceTypes.objects.get(id=int(maintenanceType))
-                subject=' תורנות '+maintenanceType.name
-                shiftDate=datetime.fromisoformat(str(shiftDate)).strftime("%d/%m/%Y")
-                emails=[]
-                notification='הנך משובץ לתורנות בתאריך '+ shiftDate
-                car=Cars.objects.get(id=int(car))
-                carMsg=",רכב-"+car.nickName+"-"+car.licenseNum
-                if  user2=='':  
-                    username2=""
-                    message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת ל<b>{subject}</b><br> בתאריך: {shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
-                    emails=[userMain.email,user1.email]    
-                    add_notification(user1,subject,notification+carMsg,'')
+                user1 = User.objects.get(id=int(request.data["user1"]))
+                username1 = user1.first_name+" "+user1.last_name
+                maintenanceType = MaintenanceTypes.objects.get(
+                    id=int(request.data["maintenanceType"]))
+                subject = ' תורנות '+maintenanceType.name
+                shiftDate = datetime.fromisoformat(
+                    str(request.data['shiftDate'])).strftime("%d/%m/%Y")
+                emails = []
+                if request.data["user2"] == '':
+                    username2 = ""
+                    message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת לתורנות <b>{maintenanceType.name}</b><br> בתאריך: {shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
+                    emails = [userMain.email, user1.email]
                 else:
-                    user2= User.objects.get(id=int(user2))
-                    username2=   user2.first_name+" "+user2.last_name
-                    message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים ל<b>{subject}</b><br> בתאריך:{shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
-                    emails=[userMain.email,user1.email,user2.email]
-                    add_notification(user1,subject,notification+" ביחד עם "+ username2+carMsg,'')
-                    add_notification(user2,subject,notification+" ביחד עם "+ username1+carMsg,'')
+                    user2 = User.objects.get(id=int(request.data["user2"]))
+                    username2 = user2.first_name+" "+user2.last_name
+                    message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים לתורנות <b>{maintenanceType.name}</b><br> בתאריך:{shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
+                    emails = [userMain.email, user1.email, user2.email]
+
                 html_message = '<div dir="rtl">{}</div>'.format(message)
-                send_mail(subject, message, None, emails, fail_silently=False,html_message=html_message)
+                send_mail(subject, message, None, emails,
+                          fail_silently=False, html_message=html_message)
+                # Created Shift
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             # Handle the exception
             if "duplicate key" in str(e):
                 # if "my_shift_pk"   in str(e):
-                return Response( "תורנות כבר קיימת",status=status.HTTP_208_ALREADY_REPORTED)
+                return Response("תורנות כבר קיימת", status=status.HTTP_208_ALREADY_REPORTED)
             else:
-                 return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-    
+                return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @permission_classes([IsAuthenticated])
 class LogsView(APIView):
@@ -446,7 +480,29 @@ class DrivingsView(APIView):
         auto_start = request.POST.get('startDate')
         order_model = CarOrders.objects.get(id=request.POST.get('order'))
         serializer = CreateDrivingsSerializer(data=request.data)
+        car_by_order = CarOrders.objects.get(id=request.data['order']).car
+        last_order_by_car = ""
+        latest_toDate = None
+        for order in CarOrders.objects.filter(car=car_by_order, ended=True):
+            if not latest_toDate or order.toDate > latest_toDate:
+                latest_toDate = order.toDate
+                last_order_by_car = order
+
+        last_drive_kilo = Drivings.objects.get(order=last_order_by_car).endKilometer
+        kilo_warning = False if str(last_drive_kilo) == str(request.data['startKilometer']) else True
         if serializer.is_valid():
+            uploaded_files = request.FILES.getlist('image')
+            if len(uploaded_files) > 3:
+                return Response({'error': 'Cannot upload more than 3 images.'}, status=status.HTTP_400_BAD_REQUEST)
+            images = []
+            for uploaded_file in uploaded_files:
+                image = Image.open(uploaded_file)
+                image_array = np.array(image)
+                resized_image_array = np.array(Image.fromarray(image_array).resize((300, 300)))
+                resized_image = Image.fromarray(resized_image_array)
+                output = InMemoryUploadedFile(resized_image, 'ImageField', uploaded_file.name, 'image/jpeg', resized_image.size, None)
+                images.append(output)
+            # Do something with the resized images...
             serializer.save()
             if auto_start:
                 write_to_log('info', 'משתמש/ת התחיל/ה נסיעה',
@@ -454,6 +510,8 @@ class DrivingsView(APIView):
             else:
                 write_to_log('warning', 'משתמש/ת שכח/ה להתחיל/לסיים נסיעה',
                              user=request.user, car=order_model.car)
+            if kilo_warning:
+                write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם", user=request.user, car=order_model.car)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -492,7 +550,7 @@ class DepartmentsView(APIView):
         if serializer.is_valid():
             serializer.save()
             write_to_log('warning', 'מחלקה חדשה נוספה למערכת',
-                     user=request.user)
+                         user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -521,7 +579,7 @@ class ForgotView(APIView):
         except Exception as e:
             # Handle the exception
             msg = {"status": "error", "msg": str(e)}
-        return Response(msg) 
+        return Response(msg)
 
 
 class ResetView(APIView):
@@ -545,7 +603,8 @@ class ResetView(APIView):
             # Handle the exception
             msg = {"status": "error", "msg": str(e)}
         return Response(msg)
-    
+
+
 class NotificationView(APIView):
     def get(self, request):
         user = request.user
@@ -559,7 +618,7 @@ class NotificationView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def put(self, request, id):
         my_model = Notification.objects.get(id=int(id))
         my_model.is_read = True
@@ -574,10 +633,11 @@ class NotificationView(APIView):
         my_model.delete()
         msg={"status":"success","deleted_id": deleted_id}
         return Response(msg)
-    
+  
 @permission_classes([IsAuthenticated])
 class FileTypesView(APIView):
     def get(self, request):
         my_model = FileTypes.objects.all()
         serializer = CreateFileTypesSerializer(my_model, many=True)
         return Response(serializer.data)
+

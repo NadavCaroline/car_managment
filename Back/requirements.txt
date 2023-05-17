@@ -5,6 +5,7 @@ django-cors-headers==3.13.0
 djangorestframework==3.13.1
 djangorestframework-jwt==1.11.0
 djangorestframework-simplejwt==5.2.0
+numpy==1.24.3
 Pillow==9.2.0
 psycopg2==2.9.5
 pycodestyle==2.10.0

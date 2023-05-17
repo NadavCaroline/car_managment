@@ -136,15 +136,17 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class CarsSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField()
+
     class Meta:
         model = Cars
         fields = ['id', 'licenseNum','nickName', 'make', 'model',
-                  'color', 'year','garageName','garagePhone' ,'department','dep_name','isDisabled',  'image']
+                  'color', 'year','garageName','garagePhone' ,'department','dep_name','isDisabled', 'image']
 
 class CarOrdersSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarOrders
-        fields = ['id', 'user_name', 'car_name', 'orderDate','ended',
+        fields = ['id', 'user_name', 'car_name', 'orderDate','ended', 'car',
                   'fromDate', 'toDate', 'isAllDay', 'destination', 'car_image']
 
 
@@ -158,7 +160,7 @@ class LogsSerializer(serializers.ModelSerializer):
 class DrivingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drivings
-        fields = ['id', 'user', 'user_name',  'car_name', 'startDate', 'endDate',
+        fields = ['id', 'user', 'user_name', 'car', 'car_name', 'startDate', 'endDate',
                   'startKilometer', 'endKilometer', 'comments', 'car_image','order',
                   'startImg1', 'startImg2', 'startImg3', 'endImg1', 'endImg2', 'endImg3']
 
