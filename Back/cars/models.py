@@ -58,6 +58,9 @@ class Cars(models.Model):
     @property
     def dep_name(self):
         return self.department.name
+    @property
+    def dep_name(self):
+        return self.department.name
     def __str__(self):
         return self.model
 
@@ -172,6 +175,15 @@ class CarMaintenance(models.Model):
     @property
     def car_name(self):
         return self.car.make + ' ' + self.car.model
+    @property
+    def car_file_type_name(self):
+        return self.fileType.name 
+    @property
+    def car_fileFolderName(self):
+        return self.fileType.fileFolderName 
+    
+    
+    
     # @property
     # def nextmainenancedate(self):
     #     return self.maintenanceDate.date() + datetime.timedelta(days=self.maintenanceType.numofdays)   

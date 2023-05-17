@@ -54,7 +54,7 @@ return (
     </Dropdown.Toggle>
 
     <Dropdown.Menu className="dropdown-menu" style={{ position: 'fixed', height: 'auto',maxHeight: '400px',overflowX: 'hidden' }} >
-      <Dropdown.Header>התראות</Dropdown.Header>
+      {/* <Dropdown.Header>התראות</Dropdown.Header> */}
       <Dropdown.Divider />
       {notifications.map((notification,index) =>[
         
