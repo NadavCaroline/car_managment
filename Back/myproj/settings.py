@@ -132,9 +132,9 @@ WSGI_APPLICATION = 'myproj.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'carManager',
+        'NAME': 'car_manager',
         'USER': 'postgres',
-        'PASSWORD': '123',
+        'PASSWORD': 'qwer1234',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }

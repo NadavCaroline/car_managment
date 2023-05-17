@@ -151,7 +151,7 @@ class FileTypes(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
     fileFolderName=models.CharField(max_length=50)
- 
+
     def __str__(self):
         return self.name
     
@@ -237,8 +237,16 @@ class Drivings(models.Model):
         null=True, blank=True)
 
     @property
+    def car(self):
+        return self.order.car.id
+
+    @property
     def car_name(self):
         return self.order.car.make + ' ' + self.order.car.model
+
+    @property
+    def car(self):
+        return self.order.car
 
     @property
     def car_image(self):
