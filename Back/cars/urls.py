@@ -41,6 +41,7 @@ urlpatterns = [
     path('rolesLevel', views.RolesView.as_view()),
     path('forgot', views.ForgotView.as_view()),
     path('notifications', views.NotificationView.as_view()),
+    path('fileTypes', views.FileTypesView.as_view()),
     path('notifications/<id>', views.NotificationView.as_view()),
     path('reset/<str:uidb64>/<str:token>',  views.ResetView.as_view(), name='password_reset_confirm'),
    

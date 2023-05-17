@@ -203,6 +203,16 @@ select.invalid {
   color:white;
   background-color: rgb(19, 125, 141) !important;
 }
+.selectedDivBody  {
+  outline: none;
+  border-color:none; 
+  box-shadow:0px 0px 0px 3px rgba(0,144,237,.4);
+  padding: '.5rem';
+}
+.selectedDivBody > .card-body {
+  color:white;
+  background-color: rgb(19, 125, 141) !important;
+}
 .avatar {
   vertical-align: middle;
   width: 50px;
@@ -251,7 +261,11 @@ select.invalid {
     white-space: pre-wrap;
   }
 }
-
+.cardlabel {
+  font-weight: bold;
+  width: 150px;
+  display: inline-block;
+}
 
 
 

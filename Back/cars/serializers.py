@@ -10,12 +10,21 @@ from .models import (Profile,
                      MaintenanceTypes,
                      Shifts,
                      Roles,
-                     Notification)
+                     Notification,FileTypes)
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 ################## TOKEN SERIALIZER ###############
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
 
+        # Add custom claims to the token
+        token['first_name'] = user.first_name
+        token['last_name'] = user.last_name
+
+        return token
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -97,6 +106,10 @@ class CreateNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+class CreateFileTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileTypes
+        fields = '__all__'
 #################  READ ONLY SERIALIZERS ##################
 
 class UserSerializer(serializers.ModelSerializer):
@@ -161,10 +174,14 @@ class ShiftsSerializer(serializers.ModelSerializer):
 class CarMaintenanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarMaintenance
-        fields = ['id', 'car', 'car_name', 'maintenanceDate',
-                  'file1', 'file2', 'shift',
-                  'maintenanceType', 'kilometer']
+        fields = ['id', 'car', 'maintenanceDate', 'fileMaintenance',
+                  'fileType', 'expirationDate', 'nextMaintenancekilometer',
+                  'comments', 'car_name','car_file_type_name','car_fileFolderName']
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = ['id','recipient','title', 'message', 'created_at', 'is_read' ]
+class FileTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileTypes
+        fields = ['id','name','fileFolderName' ]

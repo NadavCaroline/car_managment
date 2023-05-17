@@ -368,7 +368,7 @@ const Shifts = () => {
                                     {shifts && shifts.filter(shift => ((shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) ||
-                                        (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) ))
+                                        (shift.isDone && searchTerm=="בוצע" ) || (!shift.isDone && "סמן כבוצע"==searchTerm ))
                                         &&( (dayjs(shift!.shiftDate, 'YYYY-MM-DD').locale('he').isSame(dayjs().locale('he').format('YYYY-MM-DD'), 'day') || dayjs(shift!.shiftDate, 'YYYY-MM-DD').locale('he').isAfter(dayjs().locale('he').format('YYYY-MM-DD'), 'day')) )
                                       
                                     ).map(shift =>
@@ -404,7 +404,7 @@ const Shifts = () => {
                                     {shifts && shifts.filter(shift => ((shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name1?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
                                         shift.user_name2?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) ||
-                                        (shift.isDone && "בוצע".includes(searchTerm) ) || (!shift.isDone && "סמן כבוצע".includes(searchTerm) ) )
+                                        (shift.isDone && "בוצע"==searchTerm ) || (!shift.isDone && searchTerm=="סמן כבוצע" ) )
                                         && (dayjs(shift!.shiftDate, 'YYYY-MM-DD').locale('he').isBefore(dayjs().locale('he').format('YYYY-MM-DD'), 'day'))                                    ).map(shift =>
                                         <Col style={{ marginBottom: '10px' }}>
                                             <Card className='h-100 text-center'>

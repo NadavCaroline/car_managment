@@ -81,7 +81,7 @@ function App() {
                 <a href='/'>
                   <img src={Logo} alt="Logo" width="36" height="36" className="vertical-align-middle" />
                 </a>
-                <a href='/profile' className="navbar-brand" > {decoded.username} </a>
+                <a href='/profile' className="navbar-brand" > {decoded.first_name+" "+decoded.last_name} </a>
               </div>
               <button className="custom-toggler navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded={!isNavCollapsed ? true : false} aria-label="Toggle navigation" onClick={handleNavCollapse}>
                 <span className="navbar-toggler-icon"></span>
@@ -89,7 +89,7 @@ function App() {
               <div className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`} id="navbarsExample09">
                 <a className="nav-link " href="/myOrders">הזמנות שלי</a>
                 <a className="nav-link " href="/makeOrder">הזמנת רכב</a>
-                <a className="nav-link " href="/maintenance">טיפולי רכב</a>
+                {/* <a className="nav-link " href="/maintenance">טיפולי רכב</a> */}
                 <a className="nav-link " href="/drivings">ניהול נסיעות</a>
                 <a className="nav-link " href="/shifts">תורנויות</a>
                 {/* רק מנהל מחלקה יכול לראות את התפריטים הבאים */}
@@ -114,7 +114,7 @@ function App() {
                 <Notifications />
               </div>
               <div className=" justify-content-end">
-                <a href='/' className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>Logout</a>
+                <a href='/' className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>התנתק</a>
               </div>
 
             </nav>
