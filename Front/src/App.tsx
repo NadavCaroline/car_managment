@@ -114,7 +114,7 @@ function App() {
                 <Notifications />
               </div>
               <div className=" justify-content-end">
-                <a href='/' className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>Logout</a>
+                <a href='/' className="btn btn-primary btn-block" style={{ marginLeft: "1em" }} onClick={() => dispatch(logout())}>התנתק</a>
               </div>
 
             </nav>
