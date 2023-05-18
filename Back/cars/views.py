@@ -214,7 +214,7 @@ class AllCarsView(APIView):
             serializer.validated_data['image'] = resized_image_file
 
             serializer.save()
-            write_to_log('info', 'מכונית התווספה', user=request.user)
+            # write_to_log('info', 'מכונית התווספה', user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
