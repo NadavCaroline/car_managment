@@ -81,7 +81,7 @@ const MakeOrder = () => {
   // useEffect(() => {
   //  console.log(orderDetails)
   // }, [])
-  
+
   // Keep in mind, the timezone in israel is 2 hours ahead.
   const handleDateTimeVar = () => {
     const [startday, startmonth, startyear] = formatedStartDate.split('-').map(Number);
@@ -128,75 +128,94 @@ const MakeOrder = () => {
   }
 
   return (
-    <div style={{ margin: '10px' }}>
-      יום שלם: <input defaultChecked={false} type={'checkbox'} onChange={() => handleIsAllDay()} />
-      <div style={{ width: '400px', marginRight: '5px' }}>
+    <div>
+      <div style={{ display: 'flex' }}>
+        <div style={{ padding: '10px' }}>
+          יום שלם
+          <input defaultChecked={false} type="checkbox" onChange={() => handleIsAllDay()} /><br />
+          יותר מיום אחד?
+          <input defaultChecked={false} type="checkbox" onChange={() => handleMoreThanday()} style={{ marginLeft: '5px' }} />
+        </div>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DemoContainer components={['DatePicker', 'MobileTimePicker']}>
             {/* Date Picking Component */}
-            <DemoItem >
-              <DatePicker
-                minDate={dayjs()}
-                maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
-                format='DD-MM-YYYY'
-                value={selectedStartDate}
-                onChange={handleStartDateChange} />
-            </DemoItem><br /><br />
+            <div style={{ marginRight: '10px', marginLeft: '10px' }}>
+              <DemoItem>
+                מתאריך:
+                <DatePicker
+                  minDate={dayjs()}
+                  maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
+                  format="DD-MM-YYYY"
+                  value={selectedStartDate}
+                  onChange={handleStartDateChange}
+                />
+              </DemoItem>
+
+            </div>
+
             {/* Time Picking Components */}
-            יותר מיום אחד?<input defaultChecked={false} type={'checkbox'} onChange={() => handleMoreThanday()} /><br />
-            {moreThanDay &&
+            {moreThanDay && (
               <div>
-                <DemoItem >
+                <DemoItem>
+                  עד תאריך:
                   <DatePicker
                     minDate={dayjs()}
                     maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
-                    format='DD-MM-YYYY'
+                    format="DD-MM-YYYY"
                     value={selectedEndDate}
-                    onChange={handleEndDateChange} />
-                </DemoItem><br /><br />
+                    onChange={handleEndDateChange}
+                  />
+                </DemoItem>
               </div>
-            }
-            <DemoItem >
-              {!isAllDay &&
-                <div>
-                  <div> משעה:</div>
-                  <div style={{ direction: "ltr" }}>
-                    <MobileTimePicker value={startTime} ampm={false} onChange={handleStartTimeChange} />
+            )}
+            <div>
+              <DemoItem>
+                {!isAllDay &&
+                  <div style={{ display: 'flex' }}>
+                    <div style={{ marginLeft: '10px' }}>
+                      משעה:<br />
+                      <MobileTimePicker value={startTime} ampm={false} onChange={handleStartTimeChange} />
+                    </div>
+                    <div>
+                      עד שעה:<br />
+                      <MobileTimePicker value={endTime} ampm={false} onChange={handleEndTimeChange} />
+                    </div>
                   </div>
-                  <div>עד שעה:</div>
-                  <div style={{ direction: "ltr" }}>
-                    <MobileTimePicker value={endTime} ampm={false} onChange={handleEndTimeChange} />
-                  </div>
-                </div>}
-            </DemoItem>
+                }
+              </DemoItem>
+            </div>
           </DemoContainer>
         </LocalizationProvider>
       </div>
-      <div style={{ marginBottom: '10px' }}>
-        {formatedStartDate &&
-          <div>
-            <b>מתאריך:</b>
-            {formatedStartDate}
-          </div>}<br />
-        {formatedEndDate &&
-          <div>
-            <b>עד תאריך: </b>
-            {formatedEndDate}
-          </div>}<br />
-        {formatedStartTime &&
-          <div>
-            <b>משעה:</b>
-            {formatedStartTime.slice(0, -3)}
-          </div>}
-        {formatedEndTime &&
-          <div>
-            <b>עד שעה:</b>
-            {formatedEndTime.slice(0, -3)}
-          </div>}
-        {isAllDay &&
+      <div>
+        {isAllDay ?
           <div>
             <b>כל היום</b>
-          </div>}
+            <div>
+              {formatedStartDate}
+            </div>
+          </div> :
+          <div>
+            <div>
+              <b>מתאריך:</b> {formatedStartDate}
+            </div>
+
+            <div>
+              <b>עד תאריך:</b> {formatedEndDate}
+            </div>
+          </div>
+        }
+        {formatedStartTime && (
+          <div>
+            <b>משעה:</b> {formatedStartTime.slice(0, -3)}
+          </div>
+        )}
+        {formatedEndTime && (
+          <div>
+            <b>עד שעה:</b> {formatedEndTime.slice(0, -3)}
+          </div>
+        )}
+
       </div>
       {/* Display The cars */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
@@ -213,7 +232,8 @@ const MakeOrder = () => {
             </div>
           </div>)}
       </div>
-      {notAvailableCars.length > 0 &&
+      {
+        notAvailableCars.length > 0 &&
         <div>
           <hr />
           <h3>לא זמינות</h3>
@@ -237,13 +257,13 @@ const MakeOrder = () => {
                           עד תאריך: {order.toDate!.toString().slice(0, 10)}<br />
                         </div>
                       }
-                    
-                    {order.isAllDay}
-                      {!order.isAllDay ? 
-                      <div> משעה: {order.fromDate!.toString().slice(11, 16)}<br />
-                        עד שעה: {order.toDate!.toString().slice(11, 16)}</div> :
+
+                      {order.isAllDay}
+                      {!order.isAllDay ?
+                        <div> משעה: {order.fromDate!.toString().slice(11, 16)}<br />
+                          עד שעה: {order.toDate!.toString().slice(11, 16)}</div> :
                         <div>כל היום</div>
-                    }
+                      }
                     </div>)}
                   </div>
                 </div>
@@ -251,13 +271,14 @@ const MakeOrder = () => {
           </div>
         </div>
       }
-      {selectedCar &&
+      {
+        selectedCar &&
         <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <div style={{ position: "relative", padding: "32px", width: "400px", height: "300px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px" }}>
             <img src={MY_SERVER + selectedCar.image} style={{ width: '150px', height: '100px' }} alt={selectedCar.model} /><br /><br />
             <form>
-            יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} />
-            <button type={'submit'} onClick={() => handleOrder()}>הזמן</button>
+              יעד נסיעה: <input onChange={(e) => setdestination(e.target.value)} />
+              <button type={'submit'} onClick={() => handleOrder()}>הזמן</button>
             </form>
           </div>
         </div>

@@ -10,7 +10,8 @@ from .models import (Profile,
                      MaintenanceTypes,
                      Shifts,
                      Roles,
-                     Notification)
+                     Notification,
+                     FileTypes)
 
 
 # Register your models here.
@@ -25,3 +26,4 @@ admin.site.register(MaintenanceTypes)
 admin.site.register(Shifts)
 admin.site.register(Roles)
 admin.site.register(Notification)
+admin.site.register(FileTypes)

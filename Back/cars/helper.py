@@ -21,7 +21,7 @@ def write_to_log(level, action, user=None, car=None):
 def handle_uploaded_file(file):
     return SimpleUploadedFile(file.name, file.read(), content_type=file.content_type)
 # helper function to write notification from every server call
-def add_notification(recipient, title, message, created_at):
+def add_notification(recipient, title, message):
     # notification_model = {
     #     'recipient': recipient,
     #     'title': title,

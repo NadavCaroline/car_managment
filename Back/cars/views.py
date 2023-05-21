@@ -17,7 +17,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from .helper import write_to_log, handle_uploaded_file
+from .helper import write_to_log, handle_uploaded_file, add_notification
 from django.db.models import Count, Q
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -482,8 +482,8 @@ class DrivingsView(APIView):
             if not latest_toDate or order.toDate > latest_toDate:
                 latest_toDate = order.toDate
                 last_order_by_car = order
-
         last_drive_kilo = Drivings.objects.get(order=last_order_by_car).endKilometer
+
         kilo_warning = False if str(last_drive_kilo) == str(request.data['startKilometer']) else True
         if serializer.is_valid():
             serializer.save()
@@ -499,14 +499,19 @@ class DrivingsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
-        next_kilo = request.headers.get('KilometerVariable')
+        next_kilo = int(request.headers.get('KilometerVariable'))
         auto_end = request.data.get('endDate')
         my_model = Drivings.objects.get(id=id)
+        car_by_drive = Cars.objects.get(id= Drivings.objects.get(id=request.data['id']).car)
+        dep_by_car = Departments.objects.get(name =Cars.objects.get(id= Drivings.objects.get(id=request.data['id']).car).department)
+        manager = User.objects.get(username= Profile.objects.get(department=dep_by_car, roleLevel=2).user)
+        kilo_diff = int(CarMaintenance.objects.filter(car=Drivings.objects.get(id=request.data['id']).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
-        if CarMaintenance.objects.get(car=CarOrders.objects.get(id=request.data['order']).car).nextMaintenancekilometer - request.data['endKilometer'] < next_kilo:
-            print("Notification")
         if serializer.is_valid():
             serializer.save()
+            # Check if notification about maintenance needs to be sent by the kilometer.
+            if kilo_diff < next_kilo:
+                add_notification(recipient=manager, title=f'טיפול לרכב {car_by_drive} מתקרב', message=f'טיפול לרכב {car_by_drive} בעוד {kilo_diff} קילומטר.')
             if auto_end:
                 write_to_log('info', 'משתמש/ת סיים/ה נסיעה',
                              user=request.user, car=my_model.order.car)
