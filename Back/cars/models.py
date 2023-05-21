@@ -240,7 +240,7 @@ class Drivings(models.Model):
 
     @property
     def car(self):
-        return self.order.car
+        return self.order.car.id
 
     @property
     def car_image(self):
@@ -254,8 +254,12 @@ class Drivings(models.Model):
     def destination(self):
         return self.order.destination
     
+    class Meta:
+        ordering = ['-startDate']
+
     def __str__(self):
         return self.user_name + " - " + self.car_name
+    
 class Accidents(models.Model):
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

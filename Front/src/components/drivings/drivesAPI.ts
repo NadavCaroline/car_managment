@@ -30,18 +30,18 @@ export const startDrive = async ( token: string,drive: DriveModel, kilo?:number)
     return axios.post(MY_SERVER + 'drives', drive, {
         headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
-            'KilometerVariable': kilo
+            'Authorization': `Bearer ${token}`
+
         }
     }).then((res) => res.data)
 }
 
-export const endDrive = async ( token: string,drive: DriveModel) => {
-  console.log(drive)
+export const endDrive = async ( token: string,drive: DriveModel, kilo?:number) => {
     return axios.patch(MY_SERVER + 'drives/' + drive.id, drive, {
         headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'KilometerVariable': kilo
         }
     }).then((res) => res.data)
 }

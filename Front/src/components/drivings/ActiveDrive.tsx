@@ -129,7 +129,7 @@ const ActiveDrive = () => {
                     startImg1: startSelectedFile1,
                     startImg2: startSelectedFile2,
                     startImg3: startSelectedFile3,
-                }, kilo: NotificationKilomter
+                }
                 
             }))
 
@@ -144,8 +144,8 @@ const ActiveDrive = () => {
                     endKilometer: endKilometer,
                     endImg1: endSelectedFile1,
                     endImg2: endSelectedFile2,
-                    endImg3: endSelectedFile3,
-                }
+                    endImg3: endSelectedFile3
+                },kilo: NotificationKilomter
             }))
             dispatch(orderEndedAsync({
                 token: token,

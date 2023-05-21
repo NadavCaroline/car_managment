@@ -73,7 +73,7 @@ function App() {
 
   return (
     logged ?
-      <div>
+      <div style={{ fontFamily: 'Arial, sans-serif' }}>
         <div dir='rtl'>
           < header >
             <nav className="navbar navbar-expand-lg navbar-light " style={{ backgroundColor: 'rgb(19, 125, 141)' }}>
