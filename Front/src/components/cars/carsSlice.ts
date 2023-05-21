@@ -7,10 +7,14 @@ import { getAllCars, getCars, addCar, updateCar } from './carsAPI';
 
 export interface CarState {
   cars: CarModel[]
+  error: string | null
+  msg: string | null
 }
 
 const initialState: CarState = {
-  cars: []
+  cars: [],
+  error: "",
+  msg: ""
 };
 
 export const getCarsAsync = createAsyncThunk(
@@ -30,14 +34,14 @@ export const getAllCarsAsync = createAsyncThunk(
 );
 export const addCarsAsync = createAsyncThunk(
   'myCars/addCar',
-  async ({token, car}: {token: string, car: CarModel}) => {
+  async ({ token, car }: { token: string, car: CarModel }) => {
     const response = await addCar(token, car);
     return response;
   }
 );
 export const updateCarAsync = createAsyncThunk(
   'myCars/updateCar',
-  async ({token, car}: {token: string, car: CarModel}) => {
+  async ({ token, car }: { token: string, car: CarModel }) => {
     const response = await updateCar(token, car);
     return response;
   }
@@ -47,18 +51,25 @@ export const carsSlice = createSlice({
   name: 'myCars',
   initialState,
   reducers: {
+    SetError: (state, action: PayloadAction<string>) => {
+      state.error = action.payload;
+    },
+    SetMsg: (state) => {
+      state.msg = ""
+    },
 
   },
   extraReducers: (builder) => {
     builder
-    .addCase(getAllCarsAsync.fulfilled, (state, action) => {
-      state.cars = action.payload
-    })
+      .addCase(getAllCarsAsync.fulfilled, (state, action) => {
+        state.cars = action.payload
+      })
       .addCase(getCarsAsync.fulfilled, (state, action) => {
         state.cars = action.payload
       })
       .addCase(addCarsAsync.fulfilled, (state, action) => {
         state.cars.push(action.payload)
+        state.msg = "מכונית נוספה בהצלחה"
       })
       .addCase(updateCarAsync.fulfilled, (state, action) => {
         let temp = state.cars.filter(car => car.id === action.payload.id)[0]
@@ -67,6 +78,8 @@ export const carsSlice = createSlice({
   },
 });
 
-export const { } = carsSlice.actions;
+export const {SetError, SetMsg } = carsSlice.actions;
 export const carsSelector = (state: RootState) => state.myCars.cars;
+export const carError = (state: RootState) => state.myCars.error;
+export const carMessage = (state: RootState) => state.myCars.msg;
 export default carsSlice.reducer;
