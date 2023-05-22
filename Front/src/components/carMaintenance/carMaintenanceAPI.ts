@@ -21,3 +21,21 @@ export const getCarMaintenance = async (token: string) => {
     }).then((res) => res.data);
 }
 
+export const addCarMaintenance = async (token: string, carMaintenance: CarMaintenanceModel) => {
+  return axios.post(MY_SERVER + 'carmaintenance', carMaintenance,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((res) => res);
+}
+export const updateCarMaintenance = async (token: string, carMaintenance: CarMaintenanceModel) => {
+  return axios.patch(MY_SERVER + 'carmaintenance/' + carMaintenance.id, carMaintenance,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((res) => res);
+}

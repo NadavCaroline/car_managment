@@ -29,14 +29,15 @@ export const addCar = async (token: string, car: CarModel) => {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`
       }
-    }).then((res) => res.data);
+    }).then((res) => res);
 }
 
 export const updateCar = async (token: string, car: CarModel) => {
   return axios.patch(MY_SERVER + 'allCars/' + car.id, car,
     {
       headers: {
+        'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`
       }
-    }).then((res) => res.data);
+    }).then((res) => res);
 }

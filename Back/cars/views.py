@@ -214,7 +214,7 @@ class AllCarsView(APIView):
             serializer.validated_data['image'] = resized_image_file
 
             serializer.save()
-            write_to_log('info', 'מכונית התווספה', user=request.user)
+            # write_to_log('info', 'מכונית התווספה', user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -223,8 +223,8 @@ class AllCarsView(APIView):
         serializer = CarsSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('warning', 'מכונית עברה עריכה',
-                         user=request.user, car=my_model)
+            # write_to_log('warning', 'מכונית עברה עריכה',
+            #              user=request.user, car=my_model)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
