@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { addCarsAsync, carsSelector, getAllCarsAsync, getCarsAsync, updateCarAsync, carError, carMessage, SetError, SetMsg } from './carsSlice';
-import { getCarMaintenanceAsync, carMaintenanceSelector, addCarMaintenanceAsync,carMaintenanceError, carMaintenanceMessage,SetErrorCarMaintenance,SetMsgCarMaintenance} from '../carMaintenance/carMaintenanceSlice';
+import { addCarsAsync, carsSelector, getAllCarsAsync, updateCarAsync, carError, carMessage, SetError, SetMsg } from './carsSlice';
+import { getCarMaintenanceAsync, carMaintenanceSelector, addCarMaintenanceAsync, carMaintenanceError, carMaintenanceMessage, SetErrorCarMaintenance, SetMsgCarMaintenance, updateCarMaintenanceAsync } from '../carMaintenance/carMaintenanceSlice';
 import { getFileTypesAsync, fileTypesSelector } from '../fileType/fileTypeSlice';
-import { userAccess, userToken } from '../login/loginSlice';
+import { userAccess } from '../login/loginSlice';
 import { MY_SERVER } from '../../env';
 import CarModel from '../../models/Car';
 import CarMaintenanceModel from '../../models/CarMaintenance';
@@ -17,9 +17,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 import { Dayjs } from 'dayjs';
-import { isCryptoKey } from 'util/types';
 import { ToastContainer, toast } from 'react-toastify';
-import { string } from 'yup';
 
 export function Cars() {
   const [show, setShow] = useState(false);
@@ -42,11 +40,8 @@ export function Cars() {
   const [year, setyear] = useState("")
   const [department, setdepartment] = useState("")
   const [carImage, setcarImage] = useState<File | null>(null)
-  const [newDep, setnewDep] = useState("")
   const [selectedCar, setselectedCar] = useState<CarModel | null>(null)
-  const updateCar: CarModel = {}
-  const [carMaintenanceArr, setCarMaintenanceArr] = useState<CarMaintenanceModel[]>([]);
-  const updateCarMaintenance: CarMaintenanceModel = {}
+  const [selectedCarMaintenance, setselectedCarMaintenance] = useState<CarMaintenanceModel | null>(null)
   const [isChecked, setIsChecked] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputImgRef = useRef<HTMLInputElement | null>(null);
@@ -101,12 +96,7 @@ export function Cars() {
     setComments("");
   };
 
-  // // Pop up for adding car
-  // const handleExitUpload = () => {
-  //   setaddpopUp(false)
-  //   setcarImage(null)
-  //   setnewDep("")
-  // }
+
   const handleClose = () => {
     setShow(false);
   };
@@ -125,11 +115,6 @@ export function Cars() {
     e.preventDefault(); // Prevent the default form submission behavior
     // Process your form data or perform other actions
   };
-  // async function convertURLToFile(url: string, filename: string): Promise<File> {
-  //   const response = await fetch(url);
-  //   const blob = await response.blob();
-  //   return new File([blob], filename);
-  // }
   async function convertURLToFile(url: string, filename: string): Promise<File> {
     const response = await fetch(url);
     const blob = await response.blob();
@@ -168,6 +153,8 @@ export function Cars() {
     theme: "colored",
     rtl: true,
   });
+
+
   const updateModalCar = (car: CarModel) => {
     convertURLToFile(MY_SERVER + car.image, String(car.image).split('/')[2].split('.')[0])
       .then((file) => {
@@ -191,10 +178,34 @@ export function Cars() {
     setIsChecked(car.isDisabled ?? false);
     handleShow();
   }
+  const updCar = () => {
+    if (!checkCarForm())
+      return;
+    const carNew: CarModel = {
+      id: selectedCar?.id,
+      licenseNum: licenseNum,
+      nickName: nickName,
+      make: make,
+      model: model,
+      color: color,
+      year: year,
+      garageName: garageName,
+      garagePhone: garagePhone,
+      department: department,
+      image: carImage,
+      isDisabled: isChecked
+    }
+
+    dispatch(updateCarAsync({ token: token, car: carNew })).then((res) => { });
+  }
+
   const checkCarForm = (): boolean => {
     let msgError = "";
     const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg'];
-    if (!licenseNum) {
+    if (!nickName) {
+      msgError = "נא להכניס כינוי רכב "
+    }
+    else if (!licenseNum) {
       msgError = "נא להכניס מספר רכב "
     }
     else if (!(/^\d+$/.test(licenseNum))) {
@@ -247,26 +258,7 @@ export function Cars() {
     }
     console.log(carImage);
     console.log(typeof carImage);
-    dispatch(addCarsAsync({ token: token, car: carNew })).then((res) => { handleClose(); });
-  }
-  const updCar = () => {
-    if (!checkCarForm())
-    return;
-    const carNew: CarModel = {
-      id: selectedCar?.id,
-      licenseNum: licenseNum,
-      nickName: nickName,
-      make: make,
-      model: model,
-      color: color,
-      year: year,
-      garageName: garageName,
-      garagePhone: garagePhone,
-      department: department,
-      // image: selectedCar?.image,
-      isDisabled: isChecked
-    }
-    dispatch(updateCarAsync({ token: token, car: carNew })).then((res) => { handleClose(); setselectedCar(null); setSelectedCarId("") });
+    dispatch(addCarsAsync({ token: token, car: carNew })).then((res) => { });
   }
   const checkCarMaintenanceForm = (): boolean => {
     let msgError = "";
@@ -274,35 +266,76 @@ export function Cars() {
     if (!fileType) {
       msgError = "בחר סוג מסמך"
     }
-    else if (!selectedFile || !imageExtensions.includes(selectedFile.name.split('.').pop()?.toLowerCase() ?? '')) {
+    else if ( !selectedCarMaintenance && (!selectedFile || !imageExtensions.includes(selectedFile.name.split('.').pop()?.toLowerCase() ?? ''))) {
       msgError = "בחר קובץ מסוג PDF"
     }
-    else if (fileType=='5' && !(/^\d+$/.test(nextKm))) {
+    else if (fileType == '5' && !(/^\d+$/.test(nextKm))) {
       msgError = 'נא להכניס מספר ק"מ'
     }
-    else if(!selectedMaintenanceDate)
-    {
+    else if (!selectedMaintenanceDate) {
       msgError = 'נא להכניס תאריך מסמך'
     }
-    else if(!selectedExpirationDate)
-    {
+    else if (!selectedExpirationDate) {
       msgError = 'נא להכניס תאריך תוקף'
     }
-    else if(dayjs(selectedExpirationDate, 'YYYY-MM-DD').locale('he').isBefore(dayjs(selectedMaintenanceDate, 'YYYY-MM-DD').locale('he').format('YYYY-MM-DD'), 'day')) {
+    else if (dayjs(selectedExpirationDate, 'YYYY-MM-DD').locale('he').isBefore(dayjs(selectedMaintenanceDate, 'YYYY-MM-DD').locale('he').format('YYYY-MM-DD'), 'day')) {
       msgError = 'תאריך תוקף חייב להיות גדול מתאריך מסמך'
     }
-                                  
+
     if (msgError) {
       dispatch(SetErrorCarMaintenance(msgError))
       return false;
     }
-    
+
     return true;
   }
+  const updateModalCarMaintenance = (carMaintenance: CarMaintenanceModel) => {
+    // setSelectedFile(MY_SERVER + carMaintenance.fileMaintenance);
+    setSelectedFile(null)
+    setselectedCarMaintenance(carMaintenance);
+    setSelectedMaintenanceDate(dayjs(carMaintenance.maintenanceDate, 'YYYY-MM-DD').locale('he') ?? '');
+    setFileType(carMaintenance.fileType ?? '');
+    setSelectedExpirationDate(dayjs(carMaintenance.expirationDate, 'YYYY-MM-DD').locale('he') ?? '');
+    setNextKm(carMaintenance.nextMaintenancekilometer ?? '');
+    setComments(carMaintenance.comments ?? '');
+
+    handleShowModalFiles();
+  }
+  const updCarMaintenance = () => {
+    if (!checkCarMaintenanceForm())
+      return;
+    // if(!selectedfile)
+    // {
+    // let urlfile = decodeURIComponent(String(carMaintenance.fileMaintenance));
+    // convertURLToFile(MY_SERVER + urlfile, urlfile.split('/')[2].split('.')[0])
+    //   .then((file) => {
+    //     setSelectedFile(file);
+    //     console.log(file);
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error converting URL to File:', error);
+    //   });
+    // }
+    const carMaintenanceNew: CarMaintenanceModel = {
+      id: selectedCarMaintenance?.id,
+      car: selectedCarId,
+      maintenanceDate: selectedMaintenanceDate!.format('YYYY-MM-DD'),
+      // fileMaintenance: selectedFile,
+      fileType: fileType,
+      expirationDate: selectedExpirationDate!.format('YYYY-MM-DD'),
+      nextMaintenancekilometer: nextKm,
+      comments: comments,
+    }
+    if (selectedFile) {
+      carMaintenanceNew.fileMaintenance = selectedFile
+    }
+    dispatch(updateCarMaintenanceAsync({ token: token, carMaintenance: carMaintenanceNew })).then((res) => { });
+  }
+
   // Handles the addition of a car maintenance
   const addCarMaintenance = () => {
     if (!checkCarMaintenanceForm())
-    return;
+      return;
     const carMaintenanceNew: CarMaintenanceModel = {
       car: selectedCarId,
       maintenanceDate: selectedMaintenanceDate!.format('YYYY-MM-DD'),
@@ -312,18 +345,25 @@ export function Cars() {
       nextMaintenancekilometer: nextKm,
       comments: comments,
     }
-    dispatch(addCarMaintenanceAsync({ token: token, carMaintenance: carMaintenanceNew })).then((res) => handleCloseModalFiles());
+    dispatch(addCarMaintenanceAsync({ token: token, carMaintenance: carMaintenanceNew })).then((res) => { });
   }
 
   function handleCarDivClick(element: HTMLElement, carid: string): void {
-    if (selectedCarId) {
-      const mydiv = document.getElementById('divCar-' + selectedCarId);
-      if (mydiv) {
-        mydiv.classList.remove('selectedDivBody');
-      }
-    }
+    // if (selectedCarId) {
+    //   const mydiv = document.getElementById('divCar-' + selectedCarId);
+    //   if (mydiv) {
+    //     mydiv.classList.remove('selectedDivBody');
+    //   }
+    // }
+    removeAllHighlights();
     element.classList.add('selectedDivBody');
     setSelectedCarId(carid);
+  }
+  const removeAllHighlights = () => {
+    const elements = document.querySelectorAll('[id^="divCar-"]');
+    elements.forEach(element => {
+      element.classList.remove('selectedDivBody');
+    });
   }
 
 
@@ -352,7 +392,7 @@ export function Cars() {
   // Gets the cars from the server
   useEffect(() => {
     dispatch(getCarMaintenanceAsync(token))
-  }, [carMaintenance.length])
+  }, [carMaintenance.length, selectedCarMaintenance])
 
   // Gets the departments from the server
   useEffect(() => {
@@ -368,7 +408,12 @@ export function Cars() {
   useEffect(() => {
     if (successMessage && successMessage !== "") {
       message(successMessage)
-      // resetForm()
+      handleClose();//close modal car form
+      // if (selectedCar) {
+      setselectedCar(null);
+      setSelectedCarId("");
+      removeAllHighlights();
+      // }
     }
     dispatch(SetMsg())
   }, [successMessage])
@@ -381,7 +426,8 @@ export function Cars() {
   useEffect(() => {
     if (successMessageMaintenance && successMessageMaintenance !== "") {
       message(successMessageMaintenance)
-      // resetForm()
+      handleCloseModalFiles()//close modal form car maintenance
+      setselectedCarMaintenance(null);
     }
     dispatch(SetMsgCarMaintenance())
   }, [successMessageMaintenance])
@@ -464,29 +510,30 @@ export function Cars() {
                     <Card.Footer>
                       <Container>
                         <Row>
-                          {fileTypes.map((fileType, index) => (
-                            <Col key={fileType.id} xs={6} md={6} lg={6} style={{ paddingRight: '5px', paddingLeft: '0' }}>
+                          {fileTypes.map((fileType, index) => {
+                            const matchingCarMaintenance = carMaintenance
+                              .filter(cm => cm.fileType === fileType.id && cm.car === car.id)
+                              .slice(0, 1);
 
-
-                              {carMaintenance
-                                .filter(cm => cm.fileType === fileType.id && cm.car === car.id)
-                                .slice(0, 1) // Get only the first element
-                                .map((cm, index) => (
-                                  <Card style={{ marginBottom: '10px' }}>
-                                    {/* <a href={MY_SERVER + cm.car_fileFolderName + cm.fileMaintenance} style={{ textDecoration: 'none', color: 'inherit' }} target="_blank"> */}
-                                    <a href={MY_SERVER + cm.fileMaintenance} style={{ textDecoration: 'none', color: 'inherit' }} target="_blank">
-                                      <Card.Body style={{ padding: '0' }}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>{fileType.name}<br></br>
-                                          <small style={{ marginLeft: '10px', fontWeight: 'normal' }}>{cm.expirationDate ? dayjs(cm.expirationDate).format('DD/MM/YYYY') : ''}</small>
-                                        </Card.Title>
-                                      </Card.Body>
-                                    </a>
-                                  </Card>
-                                ))}
-
-
-                            </Col>
-                          ))}
+                            if (matchingCarMaintenance.length > 0) {
+                              return (
+                                <Col key={fileType.id} xs={6} md={6} lg={6} style={{ paddingRight: '5px', paddingLeft: '0' }}>
+                                  {matchingCarMaintenance.map((cm, index) => (
+                                    <Card style={{ marginBottom: '10px' }}>
+                                      <a href={MY_SERVER + cm.fileMaintenance} style={{ textDecoration: 'none', color: 'inherit' }} target="_blank">
+                                        <Card.Body style={{ padding: '0' }}>
+                                          <Card.Title style={{ fontSize: '1rem' }}>{fileType.name}<br></br>
+                                            <small style={{ marginLeft: '10px', fontWeight: 'normal' }}>{cm.expirationDate ? dayjs(cm.expirationDate).format('DD/MM/YYYY') : ''}</small>
+                                          </Card.Title>
+                                        </Card.Body>
+                                      </a>
+                                    </Card>
+                                  ))}
+                                </Col>
+                              );
+                            }
+                            return null; // Render nothing if no matching carMaintenance
+                          })}
                         </Row>
                       </Container>
                     </Card.Footer>
@@ -503,7 +550,7 @@ export function Cars() {
                 <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >מסמכי רכב</h3><hr />
                 <div style={{ textAlign: 'left' }}>
                   {cars.filter(car => String(car.id) === selectedCarId)[0].isDisabled != true &&
-                    <button style={{ marginLeft: "10px", marginBottom: "10px" }} className="btn btn-primary" onClick={() => { resetModalFiles(); handleShowModalFiles(); }}>הוספת מסמך</button>
+                    <button style={{ marginLeft: "10px", marginBottom: "10px" }} className="btn btn-primary" onClick={() => { resetModalFiles(); setselectedCarMaintenance(null); handleShowModalFiles(); }}>הוספת מסמך</button>
                   }
                 </div>
                 <Container>
@@ -529,10 +576,24 @@ export function Cars() {
                               </a> <br></br>
 
                               {dayjs(carMaintenance.maintenanceDate, 'YYYY-MM-DD').format('DD/MM/YYYY')} עד {dayjs(carMaintenance.expirationDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}<br></br>
-                              {/* {carMaintenance.car_name}<br></br> */}
-                              <span className="cardlabel" >ק"מ טיפול הבא</span>{carMaintenance.nextMaintenancekilometer} ק"מ<br></br>
-                              <span className="cardlabel" >הערות</span> {carMaintenance.comments}
+                              {carMaintenance.nextMaintenancekilometer && (
+                                <>
+                                  <span className="cardlabel" style={{ marginLeft: '10px' }}>
+                                    ק"מ טיפול הבא
+                                  </span>
+                                  {carMaintenance.nextMaintenancekilometer} ק"מ
+                                  <br />
+                                </>
+                              )}
+                              {carMaintenance.comments &&
+                                <table style={{ margin: '0 auto' }}>
+                                  <tr>
+                                    <td style={{ fontWeight: 'bold', display: 'inline-block', textAlign: 'right', paddingLeft: '10px' }}>הערות</td>
+                                    <td style={{ textAlign: 'right' }}>{carMaintenance.comments}</td>
+                                  </tr>
+                                </table>}
                             </Card.Text>
+                            <button className="btn btn-primary" style={{ marginTop: '10px' }} onClick={() => updateModalCarMaintenance(carMaintenance)}>עריכה</button>
                           </Card.Body>
                         </Card>
                       </Col>
@@ -553,7 +614,9 @@ export function Cars() {
           {/* modal for file type car */}
           <Modal show={showModalFiles} onHide={handleCloseModalFiles} style={{ direction: 'rtl' }}>
             <Modal.Header style={{ backgroundColor: "rgb(19, 125, 141)" }}  >
-              <Modal.Title style={{ color: "white" }}>הוספת מסמך לרכב</Modal.Title>
+              {/* <Modal.Title style={{ color: "white" }}>הוספת מסמך לרכב</Modal.Title> */}
+              <Modal.Title style={{ color: "white" }}>{selectedCarMaintenance ? ('עדכון מסמך לרכב ') : 'הוספת מסמך לרכב'}</Modal.Title>
+
               <button
                 type="button"
                 className="btn-close"
@@ -629,11 +692,23 @@ export function Cars() {
                         accept=".pdf"
                         onChange={handleFileChange}
                       />
-                      {selectedFile && (
-                        <a href={URL.createObjectURL(selectedFile)} style={{ marginRight: "10px" }} target="_blank" rel="noopener noreferrer">
-                          {selectedFile.name}
+                      {/* {selectedFile && (
+                        <a href={selectedCarMaintenance ? (MY_SERVER + decodeURIComponent(String(selectedCarMaintenance.fileMaintenance))) : URL.createObjectURL(selectedFile)} style={{ marginRight: "10px" }} target="_blank" rel="noopener noreferrer">
+                          {selectedCarMaintenance ?decodeURIComponent(String(selectedCarMaintenance.fileMaintenance)!.split('/')[2]) :selectedFile?.name}
                         </a>
-                      )}
+                      )} */}
+                      {selectedFile ?
+                        <a href={URL.createObjectURL(selectedFile)} style={{ marginRight: "10px" }} target="_blank" rel="noopener noreferrer">
+                          {selectedFile?.name}
+                        </a> :
+                              (selectedCarMaintenance ?
+                                <a href={(MY_SERVER + decodeURIComponent(String(selectedCarMaintenance.fileMaintenance)))} style={{ marginRight: "10px" }} target="_blank" rel="noopener noreferrer">
+                                  {decodeURIComponent(String(selectedCarMaintenance.fileMaintenance)!.split('/')[2])}
+                                </a>
+                                :
+                                ''
+                              )
+                      }
                     </td>
                   </tr>
                   {/* רק בסוג של טיפול רכב מראה את השדה קילומטרז */}
@@ -643,7 +718,7 @@ export function Cars() {
                         ק"מ טיפול הבא
                       </td>
                       <td style={{ paddingLeft: '10px' }}>
-                        <input inputMode="numeric" pattern="[0-9]*" onChange={(e) => setNextKm(e.target.value)} />
+                        <input inputMode="numeric" value={nextKm} pattern="[0-9]*" onChange={(e) => setNextKm(e.target.value)} />
                       </td>
                     </tr>}
                   <tr>
@@ -652,7 +727,7 @@ export function Cars() {
                     </td>
                     <td>
                       <div className="form-floating mb-2">
-                        <textarea style={{ width: '100%' }} id="filecomment" onChange={(e) => setComments(e.target.value)} rows={3} placeholder="הערות"></textarea>
+                        <textarea style={{ width: '100%' }} value={comments} id="filecomment" onChange={(e) => setComments(e.target.value)} rows={3} placeholder="הערות"></textarea>
                       </div>
                     </td>
                   </tr>
@@ -662,7 +737,8 @@ export function Cars() {
 
             </Modal.Body>
             <Modal.Footer>
-              <Button className="btn btn-primary" onClick={() => addCarMaintenance()}>שמור</Button>
+              {/* <Button className="btn btn-primary" onClick={() => addCarMaintenance()}>שמור</Button> */}
+              <Button className="btn btn-primary" onClick={() => { selectedCarMaintenance ? updCarMaintenance() : addCarMaintenance() }}>{selectedCarMaintenance ? 'עדכן' : 'שמור'}</Button>
             </Modal.Footer>
           </Modal>
 
@@ -756,24 +832,12 @@ export function Cars() {
                       {carImage && (
                         <div>
                           <img
-                            //  src={carImage ? URL.createObjectURL(carImage):(selectedCar? (MY_SERVER + selectedCar.image):'')}
                             src={URL.createObjectURL(carImage)}
                             alt={carImage?.name}
                             style={{ width: '150px', height: '100px' }}
                           /><br />
                         </div>
                       )}
-                      {/* {(carImage ||selectedCar) && (
-                      <div>
-                        <img
-                         src={carImage ? URL.createObjectURL(carImage):(selectedCar? (MY_SERVER + selectedCar.image):'')}
-                          // src= {URL.createObjectURL(carImage)}
-                          alt={carImage?.name}
-                          style={{ width: '150px', height: '100px' }}
-                        /><br />
-                      </div>
-                    )} */}
-
                     </td>
                   </tr>
                   <tr>
@@ -800,25 +864,6 @@ export function Cars() {
               <Button className="btn btn-primary" onClick={() => { selectedCar ? updCar() : addCar() }}>{selectedCar ? 'עדכן' : 'שמור'}</Button>
             </Modal.Footer>
           </Modal>
-
-          {/* {selectedCar &&
-          <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <div style={{ position: "relative", padding: "32px", width: "400px", height: "200px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px", textAlign: "left" }}>
-              <button style={{ position: "absolute", top: "0", right: "0" }} onClick={() => setselectedCar(null)}>X</button>
-              <div>
-                שינוי מחלקה:
-                <select value={newDep} onChange={(e) => setnewDep(e.target.value)}>
-                  <option value="" disabled={true}>בחר מחלקה </option>
-                  {departments.map((dep) => (
-                    <option key={dep.id} value={dep.id}>
-                      {dep.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <button onClick={() => handleUpdate()}>שמור</button>
-            </div>
-          </div>} */}
         </div>
       </div>
     </div>

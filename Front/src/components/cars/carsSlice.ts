@@ -68,17 +68,46 @@ export const carsSlice = createSlice({
         state.cars = action.payload
       })
       .addCase(addCarsAsync.fulfilled, (state, action) => {
-        state.cars.push(action.payload)
-        state.msg = "מכונית נוספה בהצלחה"
+        if (action.payload.status === 201) {//successfull created
+          state.cars.push(action.payload.data)
+          state.msg = "מכונית נוספה בהצלחה"
+        }
+        else if (action.payload.status === 208) {//already exists
+          state.error = action.payload.data;
+        }
+        else if (action.payload.status === 401) {
+          state.error = '';
+        }
       })
       .addCase(updateCarAsync.fulfilled, (state, action) => {
-        let temp = state.cars.filter(car => car.id === action.payload.id)[0]
-        temp.department = action.payload.department
+        if (action.payload.status === 200) {//successfull updated
+          state.msg = "רכב  עודכן בהצלחה"
+
+          let temp = state.cars.filter(car => car.id === action.payload.data.id)[0]
+          temp.licenseNum = action.payload.data.licenseNum
+          temp.nickName = action.payload.data.nickName
+          temp.make = action.payload.data.make
+          temp.model = action.payload.data.model
+          temp.color = action.payload.data.color
+          temp.year = action.payload.data.year
+          temp.garageName = action.payload.data.garageName
+          temp.garagePhone = action.payload.data.garagePhone
+          temp.department = action.payload.data.department
+          temp.isDisabled = action.payload.data.isDisabled
+          // temp.image = action.payload.image
+        }
+        else if (action.payload.status === 208) {//already exists
+          state.error = action.payload.data;
+        }
+        else if (action.payload.status === 401) {
+          state.error = '';
+        }
+
       });
   },
 });
 
-export const {SetError, SetMsg } = carsSlice.actions;
+export const { SetError, SetMsg } = carsSlice.actions;
 export const carsSelector = (state: RootState) => state.myCars.cars;
 export const carError = (state: RootState) => state.myCars.error;
 export const carMessage = (state: RootState) => state.myCars.msg;

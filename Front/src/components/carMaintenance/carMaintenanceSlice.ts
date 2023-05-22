@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
 import CarMaintenanceModel from '../../models/CarMaintenance';
-import { getCarMaintenance, getCarMaintenanceByCar, addCarMaintenance } from './carMaintenanceAPI';
+import { getCarMaintenance, getCarMaintenanceByCar, addCarMaintenance, updateCarMaintenance } from './carMaintenanceAPI';
 
 export interface CarMaintenanceState {
   carMaintenance: CarMaintenanceModel[]
@@ -31,9 +31,16 @@ export const getCarMaintenanceAsync = createAsyncThunk(
 );
 
 export const addCarMaintenanceAsync = createAsyncThunk(
-  'carMaintenance/addCarMaintanceAsync',
+  'carMaintenance/addCarMaintance',
   async ({ token, carMaintenance }: { token: string, carMaintenance: CarMaintenanceModel }) => {
     const response = await addCarMaintenance(token, carMaintenance);
+    return response;
+  }
+);
+export const updateCarMaintenanceAsync = createAsyncThunk(
+  'carMaintenance/updateCarMaintenance',
+  async ({ token, carMaintenance }: { token: string, carMaintenance: CarMaintenanceModel }) => {
+    const response = await updateCarMaintenance(token, carMaintenance);
     return response;
   }
 );
@@ -54,13 +61,32 @@ export const carMaintenanceSlice = createSlice({
         state.carMaintenance = action.payload
       })
       .addCase(addCarMaintenanceAsync.fulfilled, (state, action) => {
-        state.carMaintenance.push(action.payload)
-        state.msg = "מסמך נוסף בהצלחה"
+        if (action.payload.status === 201) {//successfull created
+          state.carMaintenance.push(action.payload.data)
+          state.msg = "מסמך נוסף בהצלחה"
+        }
+        else if (action.payload.status === 208) {//already exists
+          state.error = action.payload.data;
+        }
+        else if (action.payload.status === 401) {
+          state.error = '';
+        }
+      })
+      .addCase(updateCarMaintenanceAsync.fulfilled, (state, action) => {
+        if (action.payload.status === 200) {//successfull updated
+          state.msg = "מסמך  עודכן בהצלחה"
+        }
+        else if (action.payload.status === 208) {//already exists
+          state.error = action.payload.data;
+        }
+        else if (action.payload.status === 401) {
+          state.error = '';
+        }
       })
   },
 });
 
-export const {SetErrorCarMaintenance, SetMsgCarMaintenance  } = carMaintenanceSlice.actions;
+export const { SetErrorCarMaintenance, SetMsgCarMaintenance } = carMaintenanceSlice.actions;
 export const carMaintenanceSelector = (state: RootState) => state.carMaintenance.carMaintenance;
 export const carMaintenanceError = (state: RootState) => state.carMaintenance.error;
 export const carMaintenanceMessage = (state: RootState) => state.carMaintenance.msg;
