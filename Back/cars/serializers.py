@@ -136,7 +136,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class CarsSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField()
 
     class Meta:
         model = Cars

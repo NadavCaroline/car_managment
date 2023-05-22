@@ -66,6 +66,7 @@ MIDDLEWARE = [
 ]
 
 
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
 
@@ -103,6 +104,14 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'kilometervariable',
+    'NotificationDaysExpiration',
+]
 
 CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'myproj.urls'

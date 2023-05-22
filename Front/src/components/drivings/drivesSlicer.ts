@@ -32,7 +32,7 @@ export const getAllDrivesAsync = createAsyncThunk(
 
 export const startDriveAsync = createAsyncThunk(
   'drive/startDrive',
-  async ({ token, drive }: { token: string, drive: DriveModel }) => {
+  async ({ token, drive }: { token: string, drive: DriveModel}) => {
     const response = await startDrive(token, drive);
     return response;
   }
@@ -40,8 +40,8 @@ export const startDriveAsync = createAsyncThunk(
 
 export const  endDriveAsync = createAsyncThunk(
   'drive/endDrive',
-  async ({ token, drive }: { token: string, drive: DriveModel }) => {
-    const response = await endDrive(token, drive);
+  async ({ token, drive, kilo }: { token: string, drive: DriveModel, kilo?: number }) => {
+    const response = await endDrive(token, drive, kilo);
     return response;
   }
 );

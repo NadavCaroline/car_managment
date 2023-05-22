@@ -12,6 +12,7 @@ import Logo from './images/carLogo.png';
 // import { library } from "@fortawesome/fontawesome-svg-core";
 import jwt_decode from "jwt-decode"
 import jwtDecode from 'jwt-decode';
+import scheduleRequest from './AppScheduler';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from '@fortawesome/free-solid-svg-icons'
@@ -55,6 +56,13 @@ function App() {
     // access && dispatch(getNotificationAsync(access))
   }, [])
 
+
+  // Responsible for the maintenance date check
+  // Sends a request each day at 08:00
+  useEffect(() => {
+    scheduleRequest();
+  }, []);
+
   // Decode the access token
   useEffect(() => {
     access && setdecoded(jwt_decode(access))
@@ -73,7 +81,7 @@ function App() {
 
   return (
     logged ?
-      <div>
+      <div style={{ fontFamily: 'Arial, sans-serif' }}>
         <div dir='rtl'>
           < header >
             <nav className="navbar navbar-expand-lg navbar-light " style={{ backgroundColor: 'rgb(19, 125, 141)' }}>

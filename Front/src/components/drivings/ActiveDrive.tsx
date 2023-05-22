@@ -6,7 +6,7 @@ import jwt_decode from "jwt-decode";
 import OrderModel from '../../models/Order';
 import { DriveModel } from '../../models/Drive';
 import { getOrdersAsync, orderEndedAsync, ordersSelector } from '../orders/OrdersSlice';
-import { MY_SERVER } from '../../env';
+import { MY_SERVER, NotificationKilomter } from '../../env';
 
 const ActiveDrive = () => {
     const dispatch = useAppDispatch()
@@ -18,6 +18,7 @@ const ActiveDrive = () => {
     const orders = useAppSelector(ordersSelector)
     const [activeOrder, setactiveOrder] = useState<OrderModel | null>(null)
     const [refreshFlag, setrefreshFlag] = useState(false)
+    const [noStartKilo, setnoStartKilo] = useState("")
     const [startKilometer, setstartKilometer] = useState("")
     const [endKilometer, setendKilometer] = useState("")
     const [changeKilometer, setchangeKilometer] = useState(false)
@@ -129,6 +130,7 @@ const ActiveDrive = () => {
                     startImg2: startSelectedFile2,
                     startImg3: startSelectedFile3,
                 }
+                
             }))
 
             startStopBtn.textContent = 'Stop';
@@ -142,8 +144,8 @@ const ActiveDrive = () => {
                     endKilometer: endKilometer,
                     endImg1: endSelectedFile1,
                     endImg2: endSelectedFile2,
-                    endImg3: endSelectedFile3,
-                }
+                    endImg3: endSelectedFile3
+                },kilo: NotificationKilomter
             }))
             dispatch(orderEndedAsync({
                 token: token,
@@ -273,7 +275,7 @@ const ActiveDrive = () => {
                                     דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
                                 </div> :
                                 <div>
-                                    קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} />
+                                    קילומטראז': <input onChange={(e) => setnoStartKilo(e.target.value)} value={noStartKilo} />
                                 </div>
                             }
                             <input type='file' onChange={handleFile1Change} />

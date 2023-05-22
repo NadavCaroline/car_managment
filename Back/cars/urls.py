@@ -44,6 +44,6 @@ urlpatterns = [
     path('fileTypes', views.FileTypesView.as_view()),
     path('notifications/<id>', views.NotificationView.as_view()),
     path('reset/<str:uidb64>/<str:token>',  views.ResetView.as_view(), name='password_reset_confirm'),
-   
+   path('nextmaindate', views.nextMainDate),
 
 ]

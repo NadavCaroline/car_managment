@@ -487,22 +487,10 @@ class DrivingsView(APIView):
             if not latest_toDate or order.toDate > latest_toDate:
                 latest_toDate = order.toDate
                 last_order_by_car = order
-
         last_drive_kilo = Drivings.objects.get(order=last_order_by_car).endKilometer
+
         kilo_warning = False if str(last_drive_kilo) == str(request.data['startKilometer']) else True
         if serializer.is_valid():
-            uploaded_files = request.FILES.getlist('image')
-            if len(uploaded_files) > 3:
-                return Response({'error': 'Cannot upload more than 3 images.'}, status=status.HTTP_400_BAD_REQUEST)
-            images = []
-            for uploaded_file in uploaded_files:
-                image = Image.open(uploaded_file)
-                image_array = np.array(image)
-                resized_image_array = np.array(Image.fromarray(image_array).resize((300, 300)))
-                resized_image = Image.fromarray(resized_image_array)
-                output = InMemoryUploadedFile(resized_image, 'ImageField', uploaded_file.name, 'image/jpeg', resized_image.size, None)
-                images.append(output)
-            # Do something with the resized images...
             serializer.save()
             if auto_start:
                 write_to_log('info', 'משתמש/ת התחיל/ה נסיעה',
@@ -516,11 +504,19 @@ class DrivingsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
+        next_kilo = int(request.headers.get('KilometerVariable'))
         auto_end = request.data.get('endDate')
         my_model = Drivings.objects.get(id=id)
+        car_by_drive = Cars.objects.get(id= Drivings.objects.get(id=request.data['id']).car)
+        dep_by_car = Departments.objects.get(name =Cars.objects.get(id= Drivings.objects.get(id=request.data['id']).car).department)
+        manager = User.objects.get(username= Profile.objects.get(department=dep_by_car, roleLevel=2).user)
+        kilo_diff = int(CarMaintenance.objects.filter(car=Drivings.objects.get(id=request.data['id']).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
+            # Check if notification about maintenance needs to be sent by the kilometer.
+            if kilo_diff < next_kilo:
+                add_notification(recipient=manager, title=f'טיפול לרכב {car_by_drive} מתקרב', message=f'טיפול לרכב {car_by_drive} בעוד {kilo_diff} קילומטר.')
             if auto_end:
                 write_to_log('info', 'משתמש/ת סיים/ה נסיעה',
                              user=request.user, car=my_model.order.car)
@@ -641,3 +637,26 @@ class FileTypesView(APIView):
         serializer = CreateFileTypesSerializer(my_model, many=True)
         return Response(serializer.data)
 
+
+@api_view(['POST'])
+def nextMainDate(request):
+    next_noti_date = request.data
+    next_noti_date.sort()
+    last_maintenance_records = CarMaintenance.objects.values('car').annotate(last_expiration_date=Max('expirationDate')).order_by()
+
+    for record in last_maintenance_records:
+        expiration_date = record['last_expiration_date']
+        car = record['car']
+        car_name = Cars.objects.get(id=car).nickName
+        car_lisenceNum = Cars.objects.get(id=car).licenseNum
+        dep_by_car = Departments.objects.get(name =Cars.objects.get(id=car).department)
+        manager = User.objects.get(username= Profile.objects.get(department=dep_by_car, roleLevel=2).user)
+        days_overdue = (expiration_date - datetime.now().date()).days
+        if days_overdue == 0:
+            add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} הגיע.')
+        elif days_overdue < 0:
+            add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} לא בוצע.')
+        for day in next_noti_date:
+                if days_overdue == day:
+                    add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name} מתקרב', message=f'טיפול לרכב {car_lisenceNum} - {car_name} בעוד {day} ימים.')
+    return Response('Next Maintenance Date Checked')
