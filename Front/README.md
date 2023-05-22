@@ -26,4 +26,6 @@ npm install @hookform/resolvers
 npm i yup
 npm install react-icons
 npm install react-responsive-carousel --save
+npm i bootstrap-switch-button-react --save
+
 npm start
