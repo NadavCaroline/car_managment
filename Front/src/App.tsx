@@ -12,6 +12,7 @@ import Logo from './images/carLogo.png';
 // import { library } from "@fortawesome/fontawesome-svg-core";
 import jwt_decode from "jwt-decode"
 import jwtDecode from 'jwt-decode';
+import scheduleRequest from './AppScheduler';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from '@fortawesome/free-solid-svg-icons'
@@ -54,6 +55,13 @@ function App() {
     }
     // access && dispatch(getNotificationAsync(access))
   }, [])
+
+
+  // Responsible for the maintenance date check
+  // Sends a request each day at 08:00
+  useEffect(() => {
+    scheduleRequest();
+  }, []);
 
   // Decode the access token
   useEffect(() => {

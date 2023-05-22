@@ -110,6 +110,7 @@ CORS_ALLOW_HEADERS = [
     'authorization',
     'content-type',
     'kilometervariable',
+    'NotificationDaysExpiration',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True

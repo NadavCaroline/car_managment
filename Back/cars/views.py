@@ -637,3 +637,26 @@ class FileTypesView(APIView):
         serializer = CreateFileTypesSerializer(my_model, many=True)
         return Response(serializer.data)
 
+
+@api_view(['POST'])
+def nextMainDate(request):
+    next_noti_date = request.data
+    next_noti_date.sort()
+    last_maintenance_records = CarMaintenance.objects.values('car').annotate(last_expiration_date=Max('expirationDate')).order_by()
+
+    for record in last_maintenance_records:
+        expiration_date = record['last_expiration_date']
+        car = record['car']
+        car_name = Cars.objects.get(id=car).nickName
+        car_lisenceNum = Cars.objects.get(id=car).licenseNum
+        dep_by_car = Departments.objects.get(name =Cars.objects.get(id=car).department)
+        manager = User.objects.get(username= Profile.objects.get(department=dep_by_car, roleLevel=2).user)
+        days_overdue = (expiration_date - datetime.now().date()).days
+        if days_overdue == 0:
+            add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} הגיע.')
+        elif days_overdue < 0:
+            add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} לא בוצע.')
+        for day in next_noti_date:
+                if days_overdue == day:
+                    add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name} מתקרב', message=f'טיפול לרכב {car_lisenceNum} - {car_name} בעוד {day} ימים.')
+    return Response('Next Maintenance Date Checked')
