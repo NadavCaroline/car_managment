@@ -360,22 +360,23 @@ class MaintenanceTypesView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 @permission_classes([IsAuthenticated])
 class ShiftsView(APIView):
     def get(self, request):
         user = request.user
         shifts = Shifts.objects.all()
-        if (user.profile.roleLevel.id == 1):  # filter by user if user is not admin
-            shifts = Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id))
-        shifts = shifts.order_by('-shiftDate')
-
+        if(user.profile.roleLevel.id==1):# filter by user if user is not admin
+            shifts= Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id))
+        shifts=shifts.order_by('-shiftDate')
+ 
         serializer = ShiftsSerializer(shifts, many=True)
         return Response(serializer.data)
-
+    
     def put(self, request, id):
         try:
             my_model = Shifts.objects.get(id=int(id))
-            my_model.isDone = request.data['isDone']
+            my_model.isDone=request.data['isDone']
             model_dict = model_to_dict(my_model)
             serializer = CreateShiftsSerializer(my_model, data=model_dict)
             if serializer.is_valid():
@@ -386,50 +387,56 @@ class ShiftsView(APIView):
 
     def post(self, request):
         try:
-            user1 = request.data['user1']
-            user2 = request.data['user2']
-            if (user1 and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user1=user1)).exclude(car=request.data['car']).exists() or
-                           Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user2=user1)).exclude(car=request.data['car']).exists()) or
-                user2 and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user1=user2)).exclude(car=request.data['car']).exists() or
-                           Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user2=user2)).exclude(car=request.data['car']).exists())):
-
-                return Response("למשתמש כבר קיים תורנות בתאריך הנבחר", status=status.HTTP_208_ALREADY_REPORTED)
+            user1=request.data['user1']
+            user2=request.data['user2']
+            shiftDate=request.data['shiftDate']
+            car=request.data['car']
+            maintenanceType=request.data['maintenanceType']
+            comments=request.data['comments']
+            if ( user1  and (Shifts.objects.filter(Q(shiftDate=shiftDate,user1=user1)).exclude(car=car).exists() or
+                Shifts.objects.filter(Q(shiftDate=shiftDate,user2=user1)).exclude(car=car).exists()) or
+                user2  and (Shifts.objects.filter(Q(shiftDate=shiftDate,user1=user2)).exclude(car=car).exists() or
+                Shifts.objects.filter(Q(shiftDate=shiftDate,user2=user2)).exclude(car=car).exists())):
+                                     
+                return Response("למשתמש כבר קיים תורנות בתאריך הנבחר",status=status.HTTP_208_ALREADY_REPORTED)
             serializer = CreateShiftsSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 userMain = request.user
-                user1 = User.objects.get(id=int(request.data["user1"]))
-                username1 = user1.first_name+" "+user1.last_name
-                maintenanceType = MaintenanceTypes.objects.get(
-                    id=int(request.data["maintenanceType"]))
-                subject = ' תורנות '+maintenanceType.name
-                shiftDate = datetime.fromisoformat(
-                    str(request.data['shiftDate'])).strftime("%d/%m/%Y")
-                emails = []
-                if request.data["user2"] == '':
-                    username2 = ""
-                    message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת לתורנות <b>{maintenanceType.name}</b><br> בתאריך: {shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
-                    emails = [userMain.email, user1.email]
+                user1 = User.objects.get(id=int(user1))
+                username1=user1.first_name+" "+user1.last_name  
+                maintenanceType=MaintenanceTypes.objects.get(id=int(maintenanceType))
+                subject=' תורנות '+maintenanceType.name
+                shiftDate=datetime.fromisoformat(str(shiftDate)).strftime("%d/%m/%Y")
+                emails=[]
+                notification='הנך משובץ לתורנות בתאריך '+ shiftDate
+                car=Cars.objects.get(id=int(car))
+                carMsg=",רכב-"+car.nickName+"-"+car.licenseNum
+                if  user2=='':  
+                    username2=""
+                    message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת ל<b>{subject}</b><br> בתאריך: {shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
+                    emails=[userMain.email,user1.email]    
+                    add_notification(user1,subject,notification+carMsg)
                 else:
-                    user2 = User.objects.get(id=int(request.data["user2"]))
-                    username2 = user2.first_name+" "+user2.last_name
-                    message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים לתורנות <b>{maintenanceType.name}</b><br> בתאריך:{shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
-                    emails = [userMain.email, user1.email, user2.email]
-
+                    user2= User.objects.get(id=int(user2))
+                    username2=   user2.first_name+" "+user2.last_name
+                    message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים ל<b>{subject}</b><br> בתאריך:{shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
+                    emails=[userMain.email,user1.email,user2.email]
+                    add_notification(user1,subject,notification+" ביחד עם "+ username2+carMsg)
+                    add_notification(user2,subject,notification+" ביחד עם "+ username1+carMsg)
                 html_message = '<div dir="rtl">{}</div>'.format(message)
-                send_mail(subject, message, None, emails,
-                          fail_silently=False, html_message=html_message)
-                # Created Shift
+                send_mail(subject, message, None, emails, fail_silently=False,html_message=html_message)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             # Handle the exception
             if "duplicate key" in str(e):
                 # if "my_shift_pk"   in str(e):
-                return Response("תורנות כבר קיימת", status=status.HTTP_208_ALREADY_REPORTED)
+                return Response( "תורנות כבר קיימת",status=status.HTTP_208_ALREADY_REPORTED)
             else:
-                return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+                 return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    
 
 @permission_classes([IsAuthenticated])
 class LogsView(APIView):
