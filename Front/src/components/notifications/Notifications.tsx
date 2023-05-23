@@ -65,7 +65,7 @@ return (
             <small style={{ alignSelf: 'flex-end' }} className="text-muted mt-1">
                 {dayjs(notification.created_at, 'YYYY-MM-DD').locale('he').format('DD/MM/YYYY')}
             
-            <FontAwesomeIcon data-tip="Delete" style={{ alignSelf: 'flex-end',paddingRight:'10px' }} className="text-muted mt-1" icon={faTrashAlt} onClick={() =>notification.id !== undefined && deleteNotification(notification.id)}/>            
+            <FontAwesomeIcon data-tip="Delete" style={{ alignSelf: 'flex-end',paddingRight:'10px' }} className="text-muted mt-1" icon={faTrashAlt} onClick={e =>{e.stopPropagation();(notification.id !== undefined && deleteNotification(notification.id))}}/>            
             </small>
           </div>
         </Dropdown.Item>,
