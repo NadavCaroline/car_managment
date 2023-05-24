@@ -16,14 +16,14 @@ import {
   MDBTabsPane
 } from 'mdb-react-ui-kit';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faVcard, faEyeSlash, faEye,faCar } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faVcard, faEyeSlash, faEye, faCar } from '@fortawesome/free-solid-svg-icons'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Link, Outlet, useOutlet } from 'react-router-dom';
-
+import Banner from '../../images/banner.png';
 export function Login() {
 
   const dispatch = useAppDispatch();
@@ -39,7 +39,7 @@ export function Login() {
   // const isComponentInOutlet =  false;//outlet?.('my-outlet') !== null;
 
   type UserLoginForm = {
-    userName:string;
+    userName: string;
     password: string;
   };
   const emailRegExp: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -63,7 +63,7 @@ export function Login() {
   });
   const onSubmitLogin = (data: UserLoginForm) => {
     // e.preventDefault();
-    dispatch(loginAsync({username: data.userName,password: data.password }))
+    dispatch(loginAsync({ username: data.userName, password: data.password }))
   };
 
   const handleBasicClick = (value: string) => {
@@ -138,6 +138,12 @@ export function Login() {
         pauseOnHover
         theme="colored"
       />
+      <div style={{width:'100%',textAlign:'center'}}>
+      {/* <img src={Banner} alt="Banner" width={"827px"}  height={"164px"}/> */}
+      {/* <img src={Banner} alt="Banner"  width={"497px"}  height={"99px"}/> */}
+
+        <img src={Banner} alt="Banner" className="banner-image" />
+      </div>
       <div className="row mt-3" style={{ direction: "ltr" }}>
         <div className="mx-auto col-10 col-md-8 col-lg-6">
           <MDBTabs pills fill className='mb-3'>
