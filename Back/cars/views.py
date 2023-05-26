@@ -246,14 +246,24 @@ class AvaliableOrdersView(APIView):
             if (order.toDate.replace(tzinfo=None) <= toDate and order.toDate.replace(tzinfo=None) >= fromDate) or (order.fromDate.replace(tzinfo=None) <= toDate and order.fromDate.replace(tzinfo=None) >= fromDate):
                 cars_black_list.add(order.car)
                 order_details.append({"car": order.car.id, "fromDate": datetime.fromisoformat(str(order.fromDate)).astimezone(pytz.timezone('Israel')).strftime(
-                    "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).astimezone(pytz.timezone('Israel')).strftime("%Y-%m-%d %H:%M:%S"), "carID": order.car.id})
+                    "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).astimezone(pytz.timezone('Israel')).strftime("%Y-%m-%d %H:%M:%S"), 'isAllDay': order.isAllDay})
             else:
                 available_cars.add(order.car)
         cars = available_cars.difference(cars_black_list)
         for car in Cars.objects.all():
             if car not in cars_black_list:
                 cars.add(car)
-
+        
+        last_maintenance_records = CarMaintenance.objects.values('car').annotate(last_expiration_date=Max('expirationDate')).order_by()
+        for record in last_maintenance_records:
+            days_overdue = (record['last_expiration_date'] - datetime.now().date()).days
+            car = Cars.objects.get(id=record['car'])
+            if days_overdue < 7:
+                print(car)
+                cars_black_list.add(car)
+                order_details.append({"car": car.id, 'maintenance': 'טיפול לרכב מתקרב'})
+                cars.remove(car)
+        print(cars_black_list)
         cars = list(filter(lambda car: (car.department.id ==
                     user.profile.department.id), cars))
         cars_black_list = list(filter(lambda car: (
@@ -261,7 +271,7 @@ class AvaliableOrdersView(APIView):
         serializer = CarsSerializer(list(cars), many=True)
         black_list_serializer = CarsSerializer(
             list(cars_black_list), many=True)
-        print({"orderDetails": order_details})
+        print(black_list_serializer)
         return Response({"available": serializer.data, "notAvilable": black_list_serializer.data, "orderDetails": order_details})
 
 
