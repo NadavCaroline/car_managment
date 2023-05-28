@@ -546,7 +546,7 @@ export function Cars() {
           {selectedCarId &&
             <form dir="rtl" id="formCarmaintenance" onSubmit={handleFormSubmit} style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
               <div style={{ marginTop: '10px' }}>
-                <input placeholder='חיפוש' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
+                <input className='form-control' placeholder='חיפוש' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
                 <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >מסמכי רכב</h3><hr />
                 <div style={{ textAlign: 'left' }}>
                   {cars.filter(car => String(car.id) === selectedCarId)[0].isDisabled != true &&
@@ -631,7 +631,7 @@ export function Cars() {
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>סוג מסמך</td>
                     <td>
-                      <select value={fileType} onChange={(e) => setFileType(e.target.value)}>
+                      <select className='form-select' value={fileType} onChange={(e) => setFileType(e.target.value)}>
                         <option value="" disabled={true}>בחר סוג מסמך </option>
                         {fileTypes.map((filetype) => (
                           <option key={filetype.id} value={filetype.id}>
@@ -718,7 +718,7 @@ export function Cars() {
                         ק"מ טיפול הבא
                       </td>
                       <td style={{ paddingLeft: '10px' }}>
-                        <input inputMode="numeric" value={nextKm} pattern="[0-9]*" onChange={(e) => setNextKm(e.target.value)} />
+                        <input className='form-control' inputMode="numeric" value={nextKm} pattern="[0-9]*" onChange={(e) => setNextKm(e.target.value)} />
                       </td>
                     </tr>}
                   <tr>
@@ -760,43 +760,43 @@ export function Cars() {
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>כינוי רכב</td>
                     <td>
-                      <input value={nickName} onChange={(e) => setNickName(e.target.value)} />
+                      <input className='form-control' value={nickName} onChange={(e) => setNickName(e.target.value)} />
                     </td>
                   </tr>
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>מספר רכב</td>
                     <td>
-                      <input value={licenseNum} required onChange={(e) => setlicenseNum(e.target.value)} />
+                      <input className='form-control' value={licenseNum} required onChange={(e) => setlicenseNum(e.target.value)} />
                     </td>
                   </tr>
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>יצרן</td>
                     <td>
-                      <input value={make} required onChange={(e) => setmake(e.target.value)} />
+                      <input className='form-control' value={make} required onChange={(e) => setmake(e.target.value)} />
                     </td>
                   </tr>
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>דגם</td>
                     <td>
-                      <input value={model} required onChange={(e) => setmodel(e.target.value)} />
+                      <input className='form-control' value={model} required onChange={(e) => setmodel(e.target.value)} />
                     </td>
                   </tr>
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>צבע</td>
                     <td>
-                      <input value={color} required onChange={(e) => setcolor(e.target.value)} />
+                      <input className='form-control' value={color} required onChange={(e) => setcolor(e.target.value)} />
                     </td>
                   </tr>
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>שנה</td>
                     <td>
-                      <input value={year} required onChange={(e) => setyear(e.target.value)} />
+                      <input className='form-control' value={year} required onChange={(e) => setyear(e.target.value)} />
                     </td>
                   </tr>
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>מחלקה</td>
                     <td>
-                      <select value={department} onChange={(e) => setdepartment(e.target.value)}>
+                      <select  className='form-select' value={department} onChange={(e) => setdepartment(e.target.value)}>
                         <option value="" disabled={true}>בחר מחלקה </option>
                         {departments.map((dep) => (
                           <option key={dep.id} value={dep.id}>
@@ -809,13 +809,13 @@ export function Cars() {
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>שם מוסך</td>
                     <td>
-                      <input value={garageName} onChange={(e) => setGarageName(e.target.value)} />
+                      <input className='form-control' value={garageName} onChange={(e) => setGarageName(e.target.value)} />
                     </td>
                   </tr>
                   <tr>
                     <td style={{ paddingLeft: '10px' }}>טלפון מוסך</td>
                     <td>
-                      <input value={garagePhone} onChange={(e) => setGaragePhone(e.target.value)} />
+                      <input className='form-control' value={garagePhone} onChange={(e) => setGaragePhone(e.target.value)} />
                     </td>
                   </tr>
                   <tr>

@@ -109,9 +109,9 @@ function App() {
                       <Dropdown.Item style={{ textAlign: "right" }} href="/departements">מחלקות</Dropdown.Item>
                       <Dropdown.Item style={{ textAlign: "right" }} href="/allUsers">משתמשים</Dropdown.Item>
                       <Dropdown.Item style={{ textAlign: "right" }} href="/Cars">רכבים</Dropdown.Item>
-                      <Dropdown.Item style={{ textAlign: "right" }} href="/maintenanceTypes">סוגי טיפולי רכב</Dropdown.Item>
                       <Dropdown.Item style={{ textAlign: "right" }} href="/shifts">ניהול תורנויות</Dropdown.Item>
-                      <Dropdown.Item style={{ textAlign: "right" }} href="/reports">דוחות</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/maintenanceTypes">סוגי תורנויות</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/fileTypes">סוגי טפסים</Dropdown.Item>
                       <Dropdown.Item style={{ textAlign: "right" }} href="/logs">מעקב פעולות</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
