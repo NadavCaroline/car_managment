@@ -30,6 +30,6 @@ export const updateUser = async (token: string, user: UserModel) => {
     headers: {
       'Authorization': `Bearer ${token}`
     }
-  }).then((res) => res.data);
+  }).then((res) => res);
 }
 

@@ -132,7 +132,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['id','user', 'user_name', 'realID', 'roleLevel',
-                  'jobTitle', 'dep_name', 'department']
+                  'jobTitle', 'dep_name', 'department','role_name']
 
 
 class CarsSerializer(serializers.ModelSerializer):

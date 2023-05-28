@@ -107,7 +107,7 @@ class AllUsersView(APIView):
         serializer = UserSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
+            # write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -160,18 +160,18 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def put(self, request, id):
-    #     my_model = User.objects.get(id=id)
-    #     serializer = ProfileSerializer(my_model, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, id):
+        my_model = User.objects.get(id=id)
+        serializer = ProfileSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def delete(self, request, id):
-    #     my_model = User.objects.get(id=id)
-    #     my_model.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, id):
+        my_model = User.objects.get(id=id)
+        my_model.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @permission_classes([IsAuthenticated])
