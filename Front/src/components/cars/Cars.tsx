@@ -597,8 +597,6 @@ export function Cars() {
                           </Card.Body>
                         </Card>
                       </Col>
-
-
                     )}
                     {carMaintenance.filter(carMaintenance => (carMaintenance.car == selectedCarId)).length == 0 &&
                       <h4 style={{ color: "red", marginBottom: "0px", marginTop: "10px" }} >לא נמצאו מסמכי רכב  </h4>

@@ -1,5 +1,6 @@
 export interface MaintenanceTypeModel {
     id?: number
     name: string
-    imgLogo?:string
+    imgLogo ?: File | null
+
 }

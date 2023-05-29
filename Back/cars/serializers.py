@@ -185,3 +185,7 @@ class FileTypesSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileTypes
         fields = ['id','name','fileFolderName' ]
+class MaintenanceTypesSerializer(serializers.ModelSerializer):
+     class Meta:
+        model = MaintenanceTypes
+        fields = ['id','name','imgLogo' ]

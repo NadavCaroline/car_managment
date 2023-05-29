@@ -17,15 +17,17 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from .helper import write_to_log,add_notification, handle_uploaded_file
-from django.db.models import Count,Q,OuterRef,Max
+from .helper import write_to_log, add_notification, handle_uploaded_file
+from django.db.models import Count, Q, OuterRef, Max
 from django.db.models.functions import Coalesce
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+
 @api_view(['GET'])
 def index(r):
     return Response('index')
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -194,7 +196,8 @@ class AllCarsView(APIView):
 
             # Use NumPy to resize the image
             image_array = np.array(Image.open(uploaded_image))
-            resized_image = np.array(Image.fromarray(image_array).resize((new_width, new_height)))
+            resized_image = np.array(Image.fromarray(
+                image_array).resize((new_width, new_height)))
 
             # Convert the resized image back to a JPEG image
             resized_image = Image.fromarray(resized_image).convert('RGB')
@@ -205,8 +208,8 @@ class AllCarsView(APIView):
 
             # Create a new SimpleUploadedFile object with a random filename
             resized_image_file = SimpleUploadedFile(
-                f'car_image_{np.random.randint(1, 100000)}.jpg', 
-                resized_image_file.getvalue(), 
+                f'car_image_{np.random.randint(1, 100000)}.jpg',
+                resized_image_file.getvalue(),
                 content_type='image/jpeg'
             )
 
@@ -354,11 +357,20 @@ class MaintenanceTypesView(APIView):
     def post(self, request):
         serializer = CreateMaintenanceTypesSerializer(data=request.data)
         if serializer.is_valid():
+            if MaintenanceTypes.objects.filter(name=request.data['name']).exists():
+                return Response("סוג תורנות כבר קיים", status=status.HTTP_208_ALREADY_REPORTED) 
             serializer.save()
             # Added maintenance type
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def patch(self, request, id):
+        my_model = MaintenanceTypes.objects.get(id=int(id))
+        serializer = MaintenanceTypesSerializer(my_model, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes([IsAuthenticated])
@@ -366,17 +378,17 @@ class ShiftsView(APIView):
     def get(self, request):
         user = request.user
         shifts = Shifts.objects.all()
-        if(user.profile.roleLevel.id==1):# filter by user if user is not admin
-            shifts= Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id))
-        shifts=shifts.order_by('-shiftDate')
- 
+        if (user.profile.roleLevel.id == 1):  # filter by user if user is not admin
+            shifts = Shifts.objects.filter(Q(user1=user.id) | Q(user2=user.id))
+        shifts = shifts.order_by('-shiftDate')
+
         serializer = ShiftsSerializer(shifts, many=True)
         return Response(serializer.data)
-    
+
     def put(self, request, id):
         try:
             my_model = Shifts.objects.get(id=int(id))
-            my_model.isDone=request.data['isDone']
+            my_model.isDone = request.data['isDone']
             model_dict = model_to_dict(my_model)
             serializer = CreateShiftsSerializer(my_model, data=model_dict)
             if serializer.is_valid():
@@ -387,56 +399,60 @@ class ShiftsView(APIView):
 
     def post(self, request):
         try:
-            user1=request.data['user1']
-            user2=request.data['user2']
-            shiftDate=request.data['shiftDate']
-            car=request.data['car']
-            maintenanceType=request.data['maintenanceType']
-            comments=request.data['comments']
-            if ( user1  and (Shifts.objects.filter(Q(shiftDate=shiftDate,user1=user1)).exclude(car=car).exists() or
-                Shifts.objects.filter(Q(shiftDate=shiftDate,user2=user1)).exclude(car=car).exists()) or
-                user2  and (Shifts.objects.filter(Q(shiftDate=shiftDate,user1=user2)).exclude(car=car).exists() or
-                Shifts.objects.filter(Q(shiftDate=shiftDate,user2=user2)).exclude(car=car).exists())):
-                                     
-                return Response("למשתמש כבר קיים תורנות בתאריך הנבחר",status=status.HTTP_208_ALREADY_REPORTED)
+            user1 = request.data['user1']
+            user2 = request.data['user2']
+            shiftDate = request.data['shiftDate']
+            car = request.data['car']
+            maintenanceType = request.data['maintenanceType']
+            comments = request.data['comments']
+            if (user1 and (Shifts.objects.filter(Q(shiftDate=shiftDate, user1=user1)).exclude(car=car).exists() or
+                           Shifts.objects.filter(Q(shiftDate=shiftDate, user2=user1)).exclude(car=car).exists()) or
+                user2 and (Shifts.objects.filter(Q(shiftDate=shiftDate, user1=user2)).exclude(car=car).exists() or
+                           Shifts.objects.filter(Q(shiftDate=shiftDate, user2=user2)).exclude(car=car).exists())):
+
+                return Response("למשתמש כבר קיים תורנות בתאריך הנבחר", status=status.HTTP_208_ALREADY_REPORTED)
             serializer = CreateShiftsSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 userMain = request.user
                 user1 = User.objects.get(id=int(user1))
-                username1=user1.first_name+" "+user1.last_name  
-                maintenanceType=MaintenanceTypes.objects.get(id=int(maintenanceType))
-                subject=' תורנות '+maintenanceType.name
-                shiftDate=datetime.fromisoformat(str(shiftDate)).strftime("%d/%m/%Y")
-                emails=[]
-                notification='הנך משובץ לתורנות בתאריך '+ shiftDate
-                car=Cars.objects.get(id=int(car))
-                carMsg=",רכב-"+car.nickName+"-"+car.licenseNum
-                if  user2=='':  
-                    username2=""
+                username1 = user1.first_name+" "+user1.last_name
+                maintenanceType = MaintenanceTypes.objects.get(
+                    id=int(maintenanceType))
+                subject = ' תורנות '+maintenanceType.name
+                shiftDate = datetime.fromisoformat(
+                    str(shiftDate)).strftime("%d/%m/%Y")
+                emails = []
+                notification = 'הנך משובץ לתורנות בתאריך ' + shiftDate
+                car = Cars.objects.get(id=int(car))
+                carMsg = ",רכב-"+car.nickName+"-"+car.licenseNum
+                if user2 == '':
+                    username2 = ""
                     message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת ל<b>{subject}</b><br> בתאריך: {shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
-                    emails=[userMain.email,user1.email]    
-                    add_notification(user1,subject,notification+carMsg)
+                    emails = [userMain.email, user1.email]
+                    add_notification(user1, subject, notification+carMsg)
                 else:
-                    user2= User.objects.get(id=int(user2))
-                    username2=   user2.first_name+" "+user2.last_name
+                    user2 = User.objects.get(id=int(user2))
+                    username2 = user2.first_name+" "+user2.last_name
                     message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים ל<b>{subject}</b><br> בתאריך:{shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
-                    emails=[userMain.email,user1.email,user2.email]
-                    add_notification(user1,subject,notification+" ביחד עם "+ username2+carMsg)
-                    add_notification(user2,subject,notification+" ביחד עם "+ username1+carMsg)
+                    emails = [userMain.email, user1.email, user2.email]
+                    add_notification(user1, subject, notification +
+                                     " ביחד עם " + username2+carMsg)
+                    add_notification(user2, subject, notification +
+                                     " ביחד עם " + username1+carMsg)
                 html_message = '<div dir="rtl">{}</div>'.format(message)
-                send_mail(subject, message, None, emails, fail_silently=False,html_message=html_message)
+                send_mail(subject, message, None, emails,
+                          fail_silently=False, html_message=html_message)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             # Handle the exception
             if "duplicate key" in str(e):
                 # if "my_shift_pk"   in str(e):
-                return Response( "תורנות כבר קיימת",status=status.HTTP_208_ALREADY_REPORTED)
+                return Response("תורנות כבר קיימת", status=status.HTTP_208_ALREADY_REPORTED)
             else:
-                 return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-    
+                return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @permission_classes([IsAuthenticated])
 class LogsView(APIView):
@@ -494,9 +510,11 @@ class DrivingsView(APIView):
             if not latest_toDate or order.toDate > latest_toDate:
                 latest_toDate = order.toDate
                 last_order_by_car = order
-        last_drive_kilo = Drivings.objects.get(order=last_order_by_car).endKilometer
+        last_drive_kilo = Drivings.objects.get(
+            order=last_order_by_car).endKilometer
 
-        kilo_warning = False if str(last_drive_kilo) == str(request.data['startKilometer']) else True
+        kilo_warning = False if str(last_drive_kilo) == str(
+            request.data['startKilometer']) else True
         if serializer.is_valid():
             serializer.save()
             if auto_start:
@@ -506,7 +524,8 @@ class DrivingsView(APIView):
                 write_to_log('warning', 'משתמש/ת שכח/ה להתחיל/לסיים נסיעה',
                              user=request.user, car=order_model.car)
             if kilo_warning:
-                write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם", user=request.user, car=order_model.car)
+                write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם",
+                             user=request.user, car=order_model.car)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -514,16 +533,21 @@ class DrivingsView(APIView):
         next_kilo = int(request.headers.get('KilometerVariable'))
         auto_end = request.data.get('endDate')
         my_model = Drivings.objects.get(id=id)
-        car_by_drive = Cars.objects.get(id= Drivings.objects.get(id=request.data['id']).car)
-        dep_by_car = Departments.objects.get(name =Cars.objects.get(id= Drivings.objects.get(id=request.data['id']).car).department)
-        manager = User.objects.get(username= Profile.objects.get(department=dep_by_car, roleLevel=2).user)
-        kilo_diff = int(CarMaintenance.objects.filter(car=Drivings.objects.get(id=request.data['id']).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
+        car_by_drive = Cars.objects.get(
+            id=Drivings.objects.get(id=request.data['id']).car)
+        dep_by_car = Departments.objects.get(name=Cars.objects.get(
+            id=Drivings.objects.get(id=request.data['id']).car).department)
+        manager = User.objects.get(username=Profile.objects.get(
+            department=dep_by_car, roleLevel=2).user)
+        kilo_diff = int(CarMaintenance.objects.filter(car=Drivings.objects.get(
+            id=request.data['id']).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
             # Check if notification about maintenance needs to be sent by the kilometer.
             if kilo_diff < next_kilo:
-                add_notification(recipient=manager, title=f'טיפול לרכב {car_by_drive} מתקרב', message=f'טיפול לרכב {car_by_drive} בעוד {kilo_diff} קילומטר.')
+                add_notification(
+                    recipient=manager, title=f'טיפול לרכב {car_by_drive} מתקרב', message=f'טיפול לרכב {car_by_drive} בעוד {kilo_diff} קילומטר.')
             if auto_end:
                 write_to_log('info', 'משתמש/ת סיים/ה נסיעה',
                              user=request.user, car=my_model.order.car)
@@ -630,13 +654,15 @@ class NotificationView(APIView):
         if serializer.is_valid():
             serializer.save()
         return Response(serializer.data)
+
     def delete(self, request, id):
         my_model = Notification.objects.get(id=id)
         deleted_id = my_model.id
         my_model.delete()
-        msg={"status":"success","deleted_id": deleted_id}
+        msg = {"status": "success", "deleted_id": deleted_id}
         return Response(msg)
-  
+
+
 @permission_classes([IsAuthenticated])
 class FileTypesView(APIView):
     def get(self, request):
@@ -649,21 +675,27 @@ class FileTypesView(APIView):
 def nextMainDate(request):
     next_noti_date = request.data
     next_noti_date.sort()
-    last_maintenance_records = CarMaintenance.objects.values('car').annotate(last_expiration_date=Max('expirationDate')).order_by()
+    last_maintenance_records = CarMaintenance.objects.values('car').annotate(
+        last_expiration_date=Max('expirationDate')).order_by()
 
     for record in last_maintenance_records:
         expiration_date = record['last_expiration_date']
         car = record['car']
         car_name = Cars.objects.get(id=car).nickName
         car_lisenceNum = Cars.objects.get(id=car).licenseNum
-        dep_by_car = Departments.objects.get(name =Cars.objects.get(id=car).department)
-        manager = User.objects.get(username= Profile.objects.get(department=dep_by_car, roleLevel=2).user)
+        dep_by_car = Departments.objects.get(
+            name=Cars.objects.get(id=car).department)
+        manager = User.objects.get(username=Profile.objects.get(
+            department=dep_by_car, roleLevel=2).user)
         days_overdue = (expiration_date - datetime.now().date()).days
         if days_overdue == 0:
-            add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} הגיע.')
+            add_notification(
+                recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} הגיע.')
         elif days_overdue < 0:
-            add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} לא בוצע.')
+            add_notification(
+                recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} לא בוצע.')
         for day in next_noti_date:
-                if days_overdue == day:
-                    add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name} מתקרב', message=f'טיפול לרכב {car_lisenceNum} - {car_name} בעוד {day} ימים.')
+            if days_overdue == day:
+                add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name} מתקרב',
+                                 message=f'טיפול לרכב {car_lisenceNum} - {car_name} בעוד {day} ימים.')
     return Response('Next Maintenance Date Checked')
