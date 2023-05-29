@@ -11,7 +11,6 @@ import { ToastContainer, toast } from 'react-toastify';
 const MaintenanceType = () => {
   const dispatch = useAppDispatch()
   const token = useAppSelector(userToken)
-  // const [listMaintenanceType, setListMaintenanceTypes] = useState<MaintenanceTypeModel[]>([]);
   const [showModal, setShowModal] = useState(false)
   const [selectedMaintenance, setselectedMaintenance] = useState<MaintenanceTypeModel | null>(null)
   const [maintenanceImage, setMaintenanceImage] = useState<File | null>(null)

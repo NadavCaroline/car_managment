@@ -22,7 +22,7 @@ from django.db.models import Count, Q, OuterRef, Max
 from django.db.models.functions import Coalesce
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
-
+import os
 
 @api_view(['GET'])
 def index(r):
@@ -662,6 +662,16 @@ class NotificationView(APIView):
         msg = {"status": "success", "deleted_id": deleted_id}
         return Response(msg)
 
+def create_static_folder(folder_name):
+    static_folder = os.path.join('static', folder_name)
+    
+    # Check if the folder exists
+    if not os.path.exists(static_folder):
+        # Create the folder
+        os.makedirs(static_folder)
+        print(f"Folder '{static_folder}' created successfully.")
+    else:
+        print(f"Folder '{static_folder}' already exists.")
 
 @permission_classes([IsAuthenticated])
 class FileTypesView(APIView):
@@ -669,6 +679,24 @@ class FileTypesView(APIView):
         my_model = FileTypes.objects.all()
         serializer = CreateFileTypesSerializer(my_model, many=True)
         return Response(serializer.data)
+    def post(self, request):
+            serializer = CreateFileTypesSerializer(data=request.data)
+            if serializer.is_valid():
+                if FileTypes.objects.filter(name=request.data['name']).exists():
+                    return Response("סוג מסמך כבר קיים", status=status.HTTP_208_ALREADY_REPORTED) 
+                serializer.save()
+                create_static_folder(request.data['fileFolderName'])
+                # Added file type
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, id):
+        my_model = FileTypes.objects.get(id=int(id))
+        serializer = FileTypesSerializer(my_model, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            create_static_folder(request.data['fileFolderName'])
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])

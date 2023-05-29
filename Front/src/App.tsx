@@ -111,7 +111,7 @@ function App() {
                       <Dropdown.Item style={{ textAlign: "right" }} href="/Cars">רכבים</Dropdown.Item>
                       <Dropdown.Item style={{ textAlign: "right" }} href="/shifts">ניהול תורנויות</Dropdown.Item>
                       <Dropdown.Item style={{ textAlign: "right" }} href="/maintenanceTypes">סוגי תורנויות</Dropdown.Item>
-                      <Dropdown.Item style={{ textAlign: "right" }} href="/fileTypes">סוגי טפסים</Dropdown.Item>
+                      <Dropdown.Item style={{ textAlign: "right" }} href="/fileTypes">סוגי מסמכי רכב</Dropdown.Item>
                       <Dropdown.Item style={{ textAlign: "right" }} href="/logs">מעקב פעולות</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
