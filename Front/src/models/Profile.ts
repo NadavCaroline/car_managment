@@ -7,4 +7,5 @@ export interface ProfileModel {
     department?: number
     dep_name?: string
     roleLevel?: number
+    role_name?:string
 }
