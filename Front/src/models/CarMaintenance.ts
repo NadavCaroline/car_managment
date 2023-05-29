@@ -2,8 +2,8 @@ export default interface CarMaintenanceModel {
     id?: number
     car?: string
     maintenanceDate?:string
-    fileMaintenance?:string
-    // fileMaintenance?:  File | null
+    // fileMaintenance?:string
+    fileMaintenance?:  File | null
     fileType?: string
     expirationDate?: string
     nextMaintenancekilometer?:string

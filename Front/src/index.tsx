@@ -26,6 +26,7 @@ import Departments from './components/deps/Departments';
 import { Drivings } from './components/drivings/Drivings';
 import Users from './components/users/Users';
 import MaintenanceType from './components/maintenanceType/MaintenanceType';
+import FileType from './components/fileType/FileType';
 import Notifications from './components/notifications/Notifications';
 import { useAppSelector } from './app/hooks';
 import { ordersSelector } from './components/orders/OrdersSlice';
@@ -59,6 +60,7 @@ root.render(
                         <Route path="/notifications" element={<Notifications />} />
                         <Route path="/logs" element={<Logs />} />
                         <Route path="/shifts" element={<Shifts/>} />
+                        <Route path="/fileTypes" element={<FileType/>} />
                         {/* <Route path="/reset/:id" element={<Reset/>} /> */}
                     </Route>
                 </Routes>

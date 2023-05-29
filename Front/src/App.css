@@ -1,3 +1,10 @@
+body {
+  margin: 0;
+  padding: 0;
+  /* display: flex; */
+  justify-content: center;
+  align-items: center;
+}
 .App {
   text-align: center;
 }
@@ -299,4 +306,24 @@ select.invalid {
 .btn-success{
   background-color: rgb(12, 185, 12)!important;
 }
+/* Default styles for the banner image */
+.banner-image {
+  width: 100%;
+  height: auto;
+}
 
+@media only screen and (min-width: 480px) {
+  /* Styles for phones in landscape mode or larger */
+  .banner-image {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  /* Styles for tablets and larger devices */
+  .banner-image {
+    max-width: 65%;
+    height: auto;
+  }
+}

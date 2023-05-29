@@ -11,5 +11,24 @@ export const getFileTypes = async (token: string) => {
         }
       }).then((res) => res.data);
   }
+  export const addFileTypes = async (token: string, fileTypes: FileTypesModel) => {
+    return axios.post(MY_SERVER + 'fileTypes', fileTypes,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      }).then((res) => res);
+  }
+  
+  export const updateFileTypes = async (token: string, fileTypes: FileTypesModel) => {
+    return axios.patch(MY_SERVER + 'fileTypes/' + fileTypes.id, fileTypes,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      }).then((res) => res);
+  }
   
 

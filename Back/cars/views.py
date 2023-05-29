@@ -22,6 +22,7 @@ from django.db.models import Count, Q, OuterRef, Max
 from django.db.models.functions import Coalesce
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
+import os
 
 
 @api_view(['GET'])
@@ -109,7 +110,7 @@ class AllUsersView(APIView):
         serializer = UserSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
+            # write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -162,18 +163,18 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def put(self, request, id):
-    #     my_model = User.objects.get(id=id)
-    #     serializer = ProfileSerializer(my_model, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, id):
+        my_model = User.objects.get(id=id)
+        serializer = ProfileSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def delete(self, request, id):
-    #     my_model = User.objects.get(id=id)
-    #     my_model.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, id):
+        my_model = User.objects.get(id=id)
+        my_model.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @permission_classes([IsAuthenticated])
@@ -217,7 +218,7 @@ class AllCarsView(APIView):
             serializer.validated_data['image'] = resized_image_file
 
             serializer.save()
-            write_to_log('info', 'מכונית התווספה', user=request.user)
+            # write_to_log('info', 'מכונית התווספה', user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -226,8 +227,8 @@ class AllCarsView(APIView):
         serializer = CarsSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('warning', 'מכונית עברה עריכה',
-                         user=request.user, car=my_model)
+            # write_to_log('warning', 'מכונית עברה עריכה',
+            #              user=request.user, car=my_model)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -369,9 +370,19 @@ class MaintenanceTypesView(APIView):
     def post(self, request):
         serializer = CreateMaintenanceTypesSerializer(data=request.data)
         if serializer.is_valid():
+            if MaintenanceTypes.objects.filter(name=request.data['name']).exists():
+                return Response("סוג תורנות כבר קיים", status=status.HTTP_208_ALREADY_REPORTED) 
             serializer.save()
             # Added maintenance type
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, id):
+        my_model = MaintenanceTypes.objects.get(id=int(id))
+        serializer = MaintenanceTypesSerializer(my_model, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -403,38 +414,48 @@ class ShiftsView(APIView):
         try:
             user1 = request.data['user1']
             user2 = request.data['user2']
-            if (user1 and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user1=user1)).exclude(car=request.data['car']).exists() or
-                           Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user2=user1)).exclude(car=request.data['car']).exists()) or
-                user2 and (Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user1=user2)).exclude(car=request.data['car']).exists() or
-                           Shifts.objects.filter(Q(shiftDate=request.data['shiftDate'], user2=user2)).exclude(car=request.data['car']).exists())):
+            shiftDate = request.data['shiftDate']
+            car = request.data['car']
+            maintenanceType = request.data['maintenanceType']
+            comments = request.data['comments']
+            if (user1 and (Shifts.objects.filter(Q(shiftDate=shiftDate, user1=user1)).exclude(car=car).exists() or
+                           Shifts.objects.filter(Q(shiftDate=shiftDate, user2=user1)).exclude(car=car).exists()) or
+                user2 and (Shifts.objects.filter(Q(shiftDate=shiftDate, user1=user2)).exclude(car=car).exists() or
+                           Shifts.objects.filter(Q(shiftDate=shiftDate, user2=user2)).exclude(car=car).exists())):
 
                 return Response("למשתמש כבר קיים תורנות בתאריך הנבחר", status=status.HTTP_208_ALREADY_REPORTED)
             serializer = CreateShiftsSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 userMain = request.user
-                user1 = User.objects.get(id=int(request.data["user1"]))
+                user1 = User.objects.get(id=int(user1))
                 username1 = user1.first_name+" "+user1.last_name
                 maintenanceType = MaintenanceTypes.objects.get(
-                    id=int(request.data["maintenanceType"]))
+                    id=int(maintenanceType))
                 subject = ' תורנות '+maintenanceType.name
                 shiftDate = datetime.fromisoformat(
-                    str(request.data['shiftDate'])).strftime("%d/%m/%Y")
+                    str(shiftDate)).strftime("%d/%m/%Y")
                 emails = []
-                if request.data["user2"] == '':
+                notification = 'הנך משובץ לתורנות בתאריך ' + shiftDate
+                car = Cars.objects.get(id=int(car))
+                carMsg = ",רכב-"+car.nickName+"-"+car.licenseNum
+                if user2 == '':
                     username2 = ""
-                    message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת לתורנות <b>{maintenanceType.name}</b><br> בתאריך: {shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
+                    message = f"שלום <b>{username1 }</b>,<br><br>הנך משובצ/ת ל<b>{subject}</b><br> בתאריך: {shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
                     emails = [userMain.email, user1.email]
+                    add_notification(user1, subject, notification+carMsg)
                 else:
-                    user2 = User.objects.get(id=int(request.data["user2"]))
+                    user2 = User.objects.get(id=int(user2))
                     username2 = user2.first_name+" "+user2.last_name
-                    message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים לתורנות <b>{maintenanceType.name}</b><br> בתאריך:{shiftDate}<br><br><u>הערות:</u><br>{request.data['comments']}"
+                    message = f"שלום <b>{username1 } ו{ username2}</b>,<br><br>הנכם משובצים ל<b>{subject}</b><br> בתאריך:{shiftDate},{carMsg}<br><br><u>הערות:</u><br>{comments}"
                     emails = [userMain.email, user1.email, user2.email]
-
+                    add_notification(user1, subject, notification +
+                                     " ביחד עם " + username2+carMsg)
+                    add_notification(user2, subject, notification +
+                                     " ביחד עם " + username1+carMsg)
                 html_message = '<div dir="rtl">{}</div>'.format(message)
                 send_mail(subject, message, None, emails,
                           fail_silently=False, html_message=html_message)
-                # Created Shift
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -568,8 +589,8 @@ class DepartmentsView(APIView):
         serializer = CreateDepartmentsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            write_to_log('warning', 'מחלקה חדשה נוספה למערכת',
-                         user=request.user)
+            # write_to_log('warning', 'מחלקה חדשה נוספה למערכת',
+            #              user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -654,6 +675,16 @@ class NotificationView(APIView):
         msg = {"status": "success", "deleted_id": deleted_id}
         return Response(msg)
 
+def create_static_folder(folder_name):
+    static_folder = os.path.join('static', folder_name)
+    
+    # Check if the folder exists
+    if not os.path.exists(static_folder):
+        # Create the folder
+        os.makedirs(static_folder)
+        print(f"Folder '{static_folder}' created successfully.")
+    else:
+        print(f"Folder '{static_folder}' already exists.")
 
 @permission_classes([IsAuthenticated])
 class FileTypesView(APIView):
@@ -661,6 +692,24 @@ class FileTypesView(APIView):
         my_model = FileTypes.objects.all()
         serializer = CreateFileTypesSerializer(my_model, many=True)
         return Response(serializer.data)
+    def post(self, request):
+            serializer = CreateFileTypesSerializer(data=request.data)
+            if serializer.is_valid():
+                if FileTypes.objects.filter(name=request.data['name']).exists():
+                    return Response("סוג מסמך כבר קיים", status=status.HTTP_208_ALREADY_REPORTED) 
+                serializer.save()
+                create_static_folder(request.data['fileFolderName'])
+                # Added file type
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, id):
+        my_model = FileTypes.objects.get(id=int(id))
+        serializer = FileTypesSerializer(my_model, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            create_static_folder(request.data['fileFolderName'])
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])

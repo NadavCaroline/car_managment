@@ -11,6 +11,8 @@ import  userReducer  from '../components/users/userSlicer';
 import notificationReducer from '../components/notifications/notificationsSlice'
 import carMaintenanceReducer from '../components/carMaintenance/carMaintenanceSlice'
 import fileTypeReducer from '../components/fileType/fileTypeSlice';
+import maintenanceTypeReducer from '../components/maintenanceType/maintenanceTypeSlice';
+
 
 export const store = configureStore({
   reducer: {
@@ -25,8 +27,8 @@ export const store = configureStore({
     shifts: shiftReducer,
     notifications:notificationReducer,
     carMaintenance:carMaintenanceReducer,
-    fileType:fileTypeReducer
-    // maintenanceTypes: maintenanceTypeReducer,
+    fileType:fileTypeReducer,
+    maintenanceTypes: maintenanceTypeReducer
   },
 });
 

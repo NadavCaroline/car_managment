@@ -132,7 +132,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['id','user', 'user_name', 'realID', 'roleLevel',
-                  'jobTitle', 'dep_name', 'department']
+                  'jobTitle', 'dep_name', 'department','role_name']
 
 
 class CarsSerializer(serializers.ModelSerializer):
@@ -185,3 +185,7 @@ class FileTypesSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileTypes
         fields = ['id','name','fileFolderName' ]
+class MaintenanceTypesSerializer(serializers.ModelSerializer):
+     class Meta:
+        model = MaintenanceTypes
+        fields = ['id','name','imgLogo' ]

@@ -11,5 +11,5 @@ export default interface CarModel {
     department? : string
     dep_name?: string
     image ?: File | null
-    isDisabled?:string
+    isDisabled?:boolean
 }
