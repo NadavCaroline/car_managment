@@ -17,15 +17,17 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from .helper import write_to_log,add_notification, handle_uploaded_file
-from django.db.models import Count,Q,OuterRef,Max
+from .helper import write_to_log, add_notification, handle_uploaded_file
+from django.db.models import Count, Q, OuterRef, Max
 from django.db.models.functions import Coalesce
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+
 @api_view(['GET'])
 def index(r):
     return Response('index')
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -194,7 +196,8 @@ class AllCarsView(APIView):
 
             # Use NumPy to resize the image
             image_array = np.array(Image.open(uploaded_image))
-            resized_image = np.array(Image.fromarray(image_array).resize((new_width, new_height)))
+            resized_image = np.array(Image.fromarray(
+                image_array).resize((new_width, new_height)))
 
             # Convert the resized image back to a JPEG image
             resized_image = Image.fromarray(resized_image).convert('RGB')
@@ -205,8 +208,8 @@ class AllCarsView(APIView):
 
             # Create a new SimpleUploadedFile object with a random filename
             resized_image_file = SimpleUploadedFile(
-                f'car_image_{np.random.randint(1, 100000)}.jpg', 
-                resized_image_file.getvalue(), 
+                f'car_image_{np.random.randint(1, 100000)}.jpg',
+                resized_image_file.getvalue(),
                 content_type='image/jpeg'
             )
 
@@ -232,6 +235,10 @@ class AllCarsView(APIView):
 @permission_classes([IsAuthenticated])
 class AvaliableOrdersView(APIView):
     def post(self, request):
+        days_list = request.headers.get(
+            'NotificationDaysExpiration').split(',')
+        integer_list = list(map(int, days_list))
+        max_days = max(integer_list)
         user = request.user
         date_object = {
             "fromDate": request.data["fromDate"], "toDate": request.data["toDate"]}
@@ -253,17 +260,16 @@ class AvaliableOrdersView(APIView):
         for car in Cars.objects.all():
             if car not in cars_black_list:
                 cars.add(car)
-        
-        last_maintenance_records = CarMaintenance.objects.values('car').annotate(last_expiration_date=Max('expirationDate')).order_by()
+        # Checks if there's an upcoming maintenance to a car 
+        last_maintenance_records = CarMaintenance.objects.values('car').annotate(
+            last_expiration_date=Max('expirationDate')).order_by()
         for record in last_maintenance_records:
-            days_overdue = (record['last_expiration_date'] - datetime.now().date()).days
+            days_overdue = (
+                record['last_expiration_date'] - datetime.now().date()).days
             car = Cars.objects.get(id=record['car'])
-            if days_overdue < 7:
-                print(car)
-                cars_black_list.add(car)
-                order_details.append({"car": car.id, 'maintenance': 'טיפול לרכב מתקרב'})
-                cars.remove(car)
-        print(cars_black_list)
+            if days_overdue < max_days:
+                order_details.append(
+                    {"car": car.id, 'maintenance': f'טיפול לרכב בעוד פחות מ{max_days} ימים'})
         cars = list(filter(lambda car: (car.department.id ==
                     user.profile.department.id), cars))
         cars_black_list = list(filter(lambda car: (
@@ -271,7 +277,6 @@ class AvaliableOrdersView(APIView):
         serializer = CarsSerializer(list(cars), many=True)
         black_list_serializer = CarsSerializer(
             list(cars_black_list), many=True)
-        print(black_list_serializer)
         return Response({"available": serializer.data, "notAvilable": black_list_serializer.data, "orderDetails": order_details})
 
 
@@ -497,9 +502,11 @@ class DrivingsView(APIView):
             if not latest_toDate or order.toDate > latest_toDate:
                 latest_toDate = order.toDate
                 last_order_by_car = order
-        last_drive_kilo = Drivings.objects.get(order=last_order_by_car).endKilometer
+        last_drive_kilo = Drivings.objects.get(
+            order=last_order_by_car).endKilometer
 
-        kilo_warning = False if str(last_drive_kilo) == str(request.data['startKilometer']) else True
+        kilo_warning = False if str(last_drive_kilo) == str(
+            request.data['startKilometer']) else True
         if serializer.is_valid():
             serializer.save()
             if auto_start:
@@ -509,7 +516,8 @@ class DrivingsView(APIView):
                 write_to_log('warning', 'משתמש/ת שכח/ה להתחיל/לסיים נסיעה',
                              user=request.user, car=order_model.car)
             if kilo_warning:
-                write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם", user=request.user, car=order_model.car)
+                write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם",
+                             user=request.user, car=order_model.car)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -517,16 +525,21 @@ class DrivingsView(APIView):
         next_kilo = int(request.headers.get('KilometerVariable'))
         auto_end = request.data.get('endDate')
         my_model = Drivings.objects.get(id=id)
-        car_by_drive = Cars.objects.get(id= Drivings.objects.get(id=request.data['id']).car)
-        dep_by_car = Departments.objects.get(name =Cars.objects.get(id= Drivings.objects.get(id=request.data['id']).car).department)
-        manager = User.objects.get(username= Profile.objects.get(department=dep_by_car, roleLevel=2).user)
-        kilo_diff = int(CarMaintenance.objects.filter(car=Drivings.objects.get(id=request.data['id']).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
+        car_by_drive = Cars.objects.get(
+            id=Drivings.objects.get(id=request.data['id']).car)
+        dep_by_car = Departments.objects.get(name=Cars.objects.get(
+            id=Drivings.objects.get(id=request.data['id']).car).department)
+        manager = User.objects.get(username=Profile.objects.get(
+            department=dep_by_car, roleLevel=2).user)
+        kilo_diff = int(CarMaintenance.objects.filter(car=Drivings.objects.get(
+            id=request.data['id']).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
             # Check if notification about maintenance needs to be sent by the kilometer.
             if kilo_diff < next_kilo:
-                add_notification(recipient=manager, title=f'טיפול לרכב {car_by_drive} מתקרב', message=f'טיפול לרכב {car_by_drive} בעוד {kilo_diff} קילומטר.')
+                add_notification(
+                    recipient=manager, title=f'טיפול לרכב {car_by_drive} מתקרב', message=f'טיפול לרכב {car_by_drive} בעוד {kilo_diff} קילומטר.')
             if auto_end:
                 write_to_log('info', 'משתמש/ת סיים/ה נסיעה',
                              user=request.user, car=my_model.order.car)
@@ -633,13 +646,15 @@ class NotificationView(APIView):
         if serializer.is_valid():
             serializer.save()
         return Response(serializer.data)
+
     def delete(self, request, id):
         my_model = Notification.objects.get(id=id)
         deleted_id = my_model.id
         my_model.delete()
-        msg={"status":"success","deleted_id": deleted_id}
+        msg = {"status": "success", "deleted_id": deleted_id}
         return Response(msg)
-  
+
+
 @permission_classes([IsAuthenticated])
 class FileTypesView(APIView):
     def get(self, request):
@@ -652,21 +667,27 @@ class FileTypesView(APIView):
 def nextMainDate(request):
     next_noti_date = request.data
     next_noti_date.sort()
-    last_maintenance_records = CarMaintenance.objects.values('car').annotate(last_expiration_date=Max('expirationDate')).order_by()
+    last_maintenance_records = CarMaintenance.objects.values('car').annotate(
+        last_expiration_date=Max('expirationDate')).order_by()
 
     for record in last_maintenance_records:
         expiration_date = record['last_expiration_date']
         car = record['car']
         car_name = Cars.objects.get(id=car).nickName
         car_lisenceNum = Cars.objects.get(id=car).licenseNum
-        dep_by_car = Departments.objects.get(name =Cars.objects.get(id=car).department)
-        manager = User.objects.get(username= Profile.objects.get(department=dep_by_car, roleLevel=2).user)
+        dep_by_car = Departments.objects.get(
+            name=Cars.objects.get(id=car).department)
+        manager = User.objects.get(username=Profile.objects.get(
+            department=dep_by_car, roleLevel=2).user)
         days_overdue = (expiration_date - datetime.now().date()).days
         if days_overdue == 0:
-            add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} הגיע.')
+            add_notification(
+                recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} הגיע.')
         elif days_overdue < 0:
-            add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} לא בוצע.')
+            add_notification(
+                recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} לא בוצע.')
         for day in next_noti_date:
-                if days_overdue == day:
-                    add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name} מתקרב', message=f'טיפול לרכב {car_lisenceNum} - {car_name} בעוד {day} ימים.')
+            if days_overdue == day:
+                add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name} מתקרב',
+                                 message=f'טיפול לרכב {car_lisenceNum} - {car_name} בעוד {day} ימים.')
     return Response('Next Maintenance Date Checked')

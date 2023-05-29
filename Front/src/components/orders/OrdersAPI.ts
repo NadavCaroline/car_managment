@@ -1,7 +1,7 @@
 import axios from  'axios';
 import { DatesCheck } from '../../models/DatesCheck';
 import OrderModel from '../../models/Order';
-import { MY_SERVER } from '../../env';
+import { MY_SERVER,NotificationDaysExpiration } from '../../env';
 
 
 // Gets the order of the user from the server.
@@ -29,7 +29,8 @@ export const checkOrderDates = async (token: string, dates: DatesCheck) => {
   return axios.post(MY_SERVER + 'CheckOrders', dates,
     {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'NotificationDaysExpiration': String(NotificationDaysExpiration)
       }
     }).then((res) => res.data);
 }

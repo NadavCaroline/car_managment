@@ -198,12 +198,8 @@ const MakeOrder = () => {
         <form onSubmit={onSubmitValid}>
 
           <div style={{ display: 'flex' }}>
-            <div style={{ padding: '10px' }}>
-              יום שלם
-              <input defaultChecked={false} type="checkbox" onChange={() => handleIsAllDay()} /><br />
-              יותר מיום אחד?
-              <input defaultChecked={false} type="checkbox" onChange={() => handleMoreThanday()} style={{ marginLeft: '5px' }} />
-            </div>
+          <button type='submit' style={{ marginRight: "10px", marginTop: '33px' }} className="btn btn-primary btn-block mb-3">{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'חפש מכוניות'}</button>
+
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={['DatePicker', 'MobileTimePicker']}>
                 {/* Date Picking Component */}
@@ -255,11 +251,23 @@ const MakeOrder = () => {
                 <input onChange={(e) => setdestination(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
               </div>
             </div>
-            <button type='submit' style={{ marginRight: "10px" }} className="btn btn-primary btn-block mb-3">{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'חפש מכוניות'}</button>
+            <div style={{ padding: '10px', marginTop: '15px' }}>
+              יום שלם
+              <input defaultChecked={false} type="checkbox" onChange={() => handleIsAllDay()} /><br />
+              יותר מיום אחד?
+              <input defaultChecked={false} type="checkbox" onChange={() => handleMoreThanday()} style={{ marginLeft: '5px' }} />
+            </div>
           </div>
         </form> :
         <div>
           <div style={{ display: 'flex' }}>
+          <div style={{ marginLeft: '0px' }}>
+              <button
+                onClick={() => resetFrom()}
+                style={{ marginLeft: '2px', marginTop: '10px' }}
+                className="btn btn-primary btn-block mb-3">
+                שנה פרטי הזמנה
+              </button>
             {moreThanDay ? (
               <div style={{ display: 'flex' }}>
                 {formatedStartDate && (
@@ -296,13 +304,7 @@ const MakeOrder = () => {
             ) : (
               <b style={{ flex: '6', padding: '10px' }}>כל היום</b>
             )}
-            <div style={{ marginLeft: '0px' }}>
-              <button
-                onClick={() => resetFrom()}
-                style={{ marginLeft: '2px', marginTop: '10px' }}
-                className="btn btn-primary btn-block mb-3">
-                שנה פרטי הזמנה
-              </button>
+
             </div>
           </div>
 
@@ -318,6 +320,12 @@ const MakeOrder = () => {
                   שנה: {car.year}<br />
                   לוחית רישוי: {car.licenseNum}<br />
                   <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
+                  {orderDetails && orderDetails.filter(order => order.car === car.id).map((order, i) => <div key={i}>
+                    <h5>
+                      {order.maintenance}
+                    </h5>
+                  </div>
+                  )}
                   <button onClick={() => setselectedCar(car)}>הזמן מכונית</button>
                 </div>
               </div>)}
@@ -344,7 +352,7 @@ const MakeOrder = () => {
                           {order.maintenance ?
                             <div>
                               <h5>
-                              {order.maintenance}
+                                {order.maintenance}
                               </h5>
                             </div> :
                             <div>
