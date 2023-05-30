@@ -14,12 +14,19 @@ import Select from 'react-select';
 
 
 const Logs = () => {
+  const options = [
+    { value: '', label: 'בחר רמה לסינון' },
+    { value: 'info', label: <span><FontAwesomeIcon icon={faInfoCircle} style={{ color: '#00B300',marginRight:'10px',marginLeft:'10px' }} /> מידע</span> },
+    { value: 'warning', label: <span><FontAwesomeIcon icon={faExclamationTriangle} style={{ color: '#F7CD29',marginRight:'10px',marginLeft:'10px' }} />הזהרה</span> },
+    { value: 'critical', label: <span><FontAwesomeIcon icon={faExclamationTriangle} style={{ color: '#C93234',marginRight:'10px',marginLeft:'10px' }} />קריטי</span> },
+  ];
+
   const logs = useAppSelector(logsSelector);
   const dispatch = useAppDispatch();
   const token = useAppSelector(userAccess)
   const profile = useAppSelector(profileSelector)
   const [searchTerm, setsearchTerm] = useState("")
-  const [filterLevel, setFilterLevel] = useState("")
+  const [selectedValue, setSelectedValue] = useState<any>(options[0]);
 
   // const handleChange = (selectedOption: { value: number; label: string } | null) => {
   //   setFilterLevel(String(selectedOption?.value));
@@ -31,16 +38,16 @@ const Logs = () => {
     //   setFilterLevel(""); // Set a default value when no option is selected
     // }
   };
+  
+  const handleSelectChange = (selectedOption:any) => {
+    setSelectedValue(selectedOption);
+  };
   useEffect(() => {
     dispatch(getLogsAsync(token))
     dispatch(getProfileAsync(token))
   }, [logs.length])
 
-  const options = [
-    { value: 1, label: <span><FontAwesomeIcon icon={faInfoCircle} style={{ color: '#00B300',marginRight:'10px',marginLeft:'10px' }} /> מידע</span> },
-    { value: 2, label: <span><FontAwesomeIcon icon={faExclamationTriangle} style={{ color: '#F7CD29',marginRight:'10px',marginLeft:'10px' }} />הזהרה</span> },
-    { value: 3, label: <span><FontAwesomeIcon icon={faExclamationTriangle} style={{ color: '#C93234',marginRight:'10px',marginLeft:'10px' }} />קריטי</span> },
-  ];
+  
   return (
     <div>
       <div style={{ marginTop: '10px' }}>
@@ -50,13 +57,15 @@ const Logs = () => {
             </td>
             <td >
               <Select
-                options={options}                // value={Number(filterLevel)}
-                // onChange={handleChange}
+                options={options}                
+                onChange={handleSelectChange}
+                value={selectedValue}
+
               />
             </td>
           </tr>
         </table>
-        <table style={{ marginLeft: "auto", marginRight: "auto" }}>
+        <table id="logTable" style={{ marginLeft: "auto", marginRight: "auto" }}>
           <thead>
 
             <tr>
@@ -68,8 +77,9 @@ const Logs = () => {
             </tr>
           </thead>
           <tbody>
-            {logs.filter(log => (log.user_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) ||
-              (log.car_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())))
+            {logs.filter(log => ((!log.user_name  || log.user_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) &&
+              (! log.car_name || log.car_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())) )&&
+              ( !selectedValue || selectedValue?.value=='' || (selectedValue?.value && selectedValue.value==log.level)))
               .map(log =>
                 <tr key={log.id}>
                   <td style={{ border: '1px solid black', padding: '5px', textAlign: 'center' }}>
