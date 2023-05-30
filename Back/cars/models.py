@@ -221,7 +221,8 @@ class Logs(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     car = models.ForeignKey(Cars, on_delete=models.CASCADE, null=True)
     action = models.CharField(max_length=50)
-
+    class Meta:
+            ordering = ['-logDate']
     @property
     def car_name(self):
         return self.car.make + ' ' + self.car.model
