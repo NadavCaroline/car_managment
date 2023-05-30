@@ -260,7 +260,7 @@ class AvaliableOrdersView(APIView):
         for car in Cars.objects.all():
             if car not in cars_black_list:
                 cars.add(car)
-        # Checks if there's an upcoming maintenance to a car 
+        # Checks if there's an upcoming maintenance to a car
         last_maintenance_records = CarMaintenance.objects.values('car').annotate(
             last_expiration_date=Max('expirationDate')).order_by()
         for record in last_maintenance_records:
@@ -522,6 +522,8 @@ class DrivingsView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
+        print(request.data['id'])
+        print(Drivings.objects.get(id=id))
         next_kilo = int(request.headers.get('KilometerVariable'))
         auto_end = request.data.get('endDate')
         my_model = Drivings.objects.get(id=id)
@@ -531,8 +533,8 @@ class DrivingsView(APIView):
             id=Drivings.objects.get(id=request.data['id']).car).department)
         manager = User.objects.get(username=Profile.objects.get(
             department=dep_by_car, roleLevel=2).user)
-        kilo_diff = int(CarMaintenance.objects.filter(car=Drivings.objects.get(
-            id=request.data['id']).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
+        kilo_diff = int(CarMaintenance.objects.filter(car=CarOrders.objects.get(id= Drivings.objects.get(
+            id=request.data['id']).order.id).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
