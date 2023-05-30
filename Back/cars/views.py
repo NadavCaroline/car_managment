@@ -24,6 +24,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import os
 
+
 @api_view(['GET'])
 def index(r):
     return Response('index')
@@ -109,7 +110,7 @@ class AllUsersView(APIView):
         serializer = UserSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            # write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
+            write_to_log('info', 'פרטי משתמש/ת עברו עריכה', user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -217,7 +218,7 @@ class AllCarsView(APIView):
             serializer.validated_data['image'] = resized_image_file
 
             serializer.save()
-            # write_to_log('info', 'מכונית התווספה', user=request.user)
+            write_to_log('info', 'מכונית התווספה', user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -226,8 +227,8 @@ class AllCarsView(APIView):
         serializer = CarsSerializer(my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            # write_to_log('warning', 'מכונית עברה עריכה',
-            #              user=request.user, car=my_model)
+            write_to_log('warning', 'מכונית עברה עריכה',
+                         user=request.user, car=my_model)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -358,7 +359,7 @@ class MaintenanceTypesView(APIView):
         serializer = CreateMaintenanceTypesSerializer(data=request.data)
         if serializer.is_valid():
             if MaintenanceTypes.objects.filter(name=request.data['name']).exists():
-                return Response("סוג תורנות כבר קיים", status=status.HTTP_208_ALREADY_REPORTED) 
+                return Response("סוג תורנות כבר קיים", status=status.HTTP_208_ALREADY_REPORTED)
             serializer.save()
             # Added maintenance type
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -366,7 +367,8 @@ class MaintenanceTypesView(APIView):
 
     def patch(self, request, id):
         my_model = MaintenanceTypes.objects.get(id=int(id))
-        serializer = MaintenanceTypesSerializer(my_model, data=request.data, partial=True)
+        serializer = MaintenanceTypesSerializer(
+            my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -575,10 +577,20 @@ class DepartmentsView(APIView):
     def post(self, request):
         serializer = CreateDepartmentsSerializer(data=request.data)
         if serializer.is_valid():
+            if Departments.objects.filter(name=request.data['name']).exists():
+                return Response("מחקלה כבר קיימת", status=status.HTTP_208_ALREADY_REPORTED)
             serializer.save()
-            # write_to_log('warning', 'מחלקה חדשה נוספה למערכת',
-            #              user=request.user)
+            write_to_log('warning', 'מחלקה חדשה נוספה למערכת',
+                         user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, id):
+        my_model = Departments.objects.get(id=int(id))
+        serializer = DepartmentsSerializer(my_model, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -662,9 +674,10 @@ class NotificationView(APIView):
         msg = {"status": "success", "deleted_id": deleted_id}
         return Response(msg)
 
+
 def create_static_folder(folder_name):
     static_folder = os.path.join('static', folder_name)
-    
+
     # Check if the folder exists
     if not os.path.exists(static_folder):
         # Create the folder
@@ -673,25 +686,29 @@ def create_static_folder(folder_name):
     else:
         print(f"Folder '{static_folder}' already exists.")
 
+
 @permission_classes([IsAuthenticated])
 class FileTypesView(APIView):
     def get(self, request):
         my_model = FileTypes.objects.all()
         serializer = CreateFileTypesSerializer(my_model, many=True)
         return Response(serializer.data)
+
     def post(self, request):
-            serializer = CreateFileTypesSerializer(data=request.data)
-            if serializer.is_valid():
-                if FileTypes.objects.filter(name=request.data['name']).exists():
-                    return Response("סוג מסמך כבר קיים", status=status.HTTP_208_ALREADY_REPORTED) 
-                serializer.save()
-                create_static_folder(request.data['fileFolderName'])
-                # Added file type
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = CreateFileTypesSerializer(data=request.data)
+        if serializer.is_valid():
+            if FileTypes.objects.filter(name=request.data['name']).exists():
+                return Response("סוג מסמך כבר קיים", status=status.HTTP_208_ALREADY_REPORTED)
+            serializer.save()
+            create_static_folder(request.data['fileFolderName'])
+            # Added file type
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def patch(self, request, id):
         my_model = FileTypes.objects.get(id=int(id))
-        serializer = FileTypesSerializer(my_model, data=request.data, partial=True)
+        serializer = FileTypesSerializer(
+            my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             create_static_folder(request.data['fileFolderName'])
