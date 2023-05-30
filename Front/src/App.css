@@ -327,3 +327,22 @@ select.invalid {
     height: auto;
   }
 }
+
+
+.option-icon {
+  margin-right: 5px; /* Adjust spacing between icon and text */
+}
+
+#logTable {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: solid 1px gray;
+  border-radius: 6px;
+}
+
+#logTable th {
+  background-color: #0F3E6A !important;
+  color:white;
+ 
+}
+

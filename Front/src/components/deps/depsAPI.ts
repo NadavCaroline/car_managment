@@ -16,5 +16,15 @@ export const addDep = async (token: string, dep: DepModel) => {
     headers: {
       'Authorization': `Bearer ${token}`
     }
-  }).then((res) => res.data);
+  }).then((res) => res);
+}
+
+export const updateDep = async (token: string, dep: DepModel) => {
+  return axios.patch(MY_SERVER + 'departments/' + dep.id, dep,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((res) => res);
 }
