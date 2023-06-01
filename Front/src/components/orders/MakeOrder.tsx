@@ -382,7 +382,6 @@ const MakeOrder = () => {
                       שנה: {car.year}<br />
                       לוחית רישוי: {car.licenseNum}<br />
                       <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
-                      <h4>פרטי הזמנה</h4>
                       <div>
                         <hr />
                         {orderDetails && orderDetails.filter(order => order.car === car.id).map((order, i) => <div key={i}>
