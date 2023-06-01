@@ -42,13 +42,13 @@ const MakeOrder = () => {
 
 
   const resetFrom = () => {
-    setdestination("")
-    setstartTime("")
-    setendTime("")
-    setselectedStartDate(null)
-    setselectedEndDate(null)
-    setisAllDay(false)
-    setmoreThanDay(false)
+    // setdestination("")
+    // setstartTime("")
+    // setendTime("")
+    // setselectedStartDate(null)
+    // setselectedEndDate(null)
+    // setisAllDay(false)
+    // setmoreThanDay(false)
     setsearched(false)
   }
 
@@ -239,11 +239,11 @@ const MakeOrder = () => {
                   <div style={{ display: 'flex' }}>
                     <div style={{ marginLeft: '10px' }}>
                       משעה:<br />
-                      <input type='time' onChange={(e) => setstartTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
+                      <input value={startTime} type='time' onChange={(e) => setstartTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
                     </div>
                     <div>
                       עד שעה:<br />
-                      <input type='time' min={startTime} onChange={(e) => setendTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', marginLeft: '10px', borderWidth: '1px', fontSize: '17px' }} />
+                      <input value={endTime} type='time' min={startTime} onChange={(e) => setendTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', marginLeft: '10px', borderWidth: '1px', fontSize: '17px' }} />
                     </div>
                   </div>
                 }
@@ -251,17 +251,17 @@ const MakeOrder = () => {
               <td style={{ display: 'inline-block', padding: '5px' }}>
                 <div>
                   יעד:<br />
-                  <input onChange={(e) => setdestination(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
+                  <input value={destination} onChange={(e) => setdestination(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
                 </div>
               </td>
               <td style={{ display: 'inline-block', padding: '5px', marginTop: '20px' }}>
                 <div className="form-check">
-                  <input defaultChecked={false} onChange={() => handleIsAllDay()} className="form-check-input" style={{ direction: "rtl" }} type="checkbox" value="" id="flexCheckDisabled" />
+                  <input checked={isAllDay} defaultChecked={false} onChange={() => handleIsAllDay()} className="form-check-input" style={{ direction: "rtl" }} type="checkbox" value="" id="flexCheckDisabled" />
                   <label className="form-check-label" htmlFor="flexCheckDisabled">
                     יום שלם                    </label>
                 </div>
                 <div className="form-check">
-                  <input defaultChecked={false} onChange={() => handleMoreThanday()} className="form-check-input" type="checkbox" style={{ direction: "rtl" }} value="" id="flexCheckCheckedDisabled" />
+                  <input checked={moreThanDay} defaultChecked={false} onChange={() => handleMoreThanday()} className="form-check-input" type="checkbox" style={{ direction: "rtl" }} value="" id="flexCheckCheckedDisabled" />
                   <label className="form-check-label" htmlFor="flexCheckCheckedDisabled">
                     יותר מיום אחד
                   </label>
@@ -342,11 +342,20 @@ const MakeOrder = () => {
             {availableCars.map(car =>
               <div key={car.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem' }} onClick={() => setselectedCar(car)}>
                 <div style={{ textAlign: 'center' }}>
+                        <table style={{ width: '100%',fontSize:'1.25rem' }}>
+                          <tr>
+                            <td>
+                              {car.nickName} <br /> {car.licenseNum}
+                            </td>
+                           
+                          </tr>
+                        </table>
+
                   יצרן: {car.make}<br />
                   דגם: {car.model}<br />
                   צבע: {car.color}<br />
                   שנה: {car.year}<br />
-                  לוחית רישוי: {car.licenseNum}<br />
+                  {/* לוחית רישוי: {car.licenseNum}<br /> */}
                   <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
                   {orderDetails && orderDetails.filter(order => order.car === car.id).map((order, i) => <div key={i}>
                     <h5 style={{ color: "red" }}>
