@@ -103,6 +103,10 @@ const MakeOrder = () => {
         messageError('יש להכניס זמנים מאוחרים יותר')
         return;
       }
+      if (start_date.getTime() > end_date.getTime()) {
+        messageError('שעת סיום מוקדמת משעת התחלה')
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -131,6 +135,7 @@ const MakeOrder = () => {
       messageError('יש להכניס יעד נסיעה')
       return;
     }
+    
     checkOrders()
   };
 
@@ -242,7 +247,7 @@ const MakeOrder = () => {
                   </div>
                   <div>
                     עד שעה:<br />
-                    <input type='time' min={startTime} onChange={(e) => setendTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', marginLeft: '10px', borderWidth: '1px', fontSize: '17px' }} />
+                    <input type='time' onChange={(e) => setendTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', marginLeft: '10px', borderWidth: '1px', fontSize: '17px' }} />
                   </div>
                 </div>
               }

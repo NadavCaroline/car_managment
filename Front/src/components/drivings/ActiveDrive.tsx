@@ -19,10 +19,10 @@ const ActiveDrive = () => {
     const orders = useAppSelector(ordersSelector)
     const [activeOrder, setactiveOrder] = useState<OrderModel | null>(null)
     const [refreshFlag, setrefreshFlag] = useState(false)
-    const [noStartKilo, setnoStartKilo] = useState("")
+    // const [noStartKilo, setnoStartKilo] = useState("")
     const [startKilometer, setstartKilometer] = useState("")
     const [endKilometer, setendKilometer] = useState("")
-    const [changeKilometer, setchangeKilometer] = useState(false)
+    const [changeKilometer, setchangeKilometer] = useState(startKilometer ? false : true)
     const [startSelectedFile1, setstartSelectedFile1] = useState<File | null>(null)
     const [startSelectedFile2, setstartSelectedFile2] = useState<File | null>(null)
     const [startSelectedFile3, setstartSelectedFile3] = useState<File | null>(null)
@@ -146,10 +146,8 @@ const ActiveDrive = () => {
 
 
     const handleButtonClick = () => {
-        console.log(startKilometer)
-        console.log(noStartKilo)
         if (!isRunning) {
-            if ((!changeKilometer && !startKilometer) || (changeKilometer && !noStartKilo)) {
+            if (!startKilometer) {
                 messageError("יש להכניס קילומטראז' התחלה")
                 return;
             }
@@ -296,16 +294,14 @@ const ActiveDrive = () => {
                                     עד שעה: {activeOrder.toDate!.toString().slice(11, 16)}<br />
                                 </div>
                             }
-                            {startKilometer ?
-                                <div>
-                                    קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={!changeKilometer} />
-                                    דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
-                                </div> :
-                                <div>
-                                    קילומטראז': <input onChange={(e) => setnoStartKilo(e.target.value)} value={noStartKilo} />
-                                    דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
-                                </div>
-                            }
+
+
+                            <div>
+                                קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={!changeKilometer} />
+                                דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
+                            </div>
+
+
                             <h5>תמונות התחלת נסיעה</h5>
                             <input type='file' onChange={handleFile1Change} />
                             {startSelectedFile1 &&

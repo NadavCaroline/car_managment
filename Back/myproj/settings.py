@@ -23,7 +23,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'carmngnoga@gmail.com'
 EMAIL_HOST_PASSWORD = 'wcgidbpbdbyrbywc' #past the key or password app here
-# the normal password is carmngnoga123
+# the normal password is carmngnoga123 
 
 
 

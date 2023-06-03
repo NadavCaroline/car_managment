@@ -78,7 +78,8 @@ const PreviousDrives = () => {
                                 קילומטראז' התחלתי: {Number(drive.startKilometer).toLocaleString()}<br />
                                 קילומטראז' סופי: {Number(drive.endKilometer).toLocaleString()}<br />
                                 הערות: {drive.comments ? drive.comments : 'אין הערות'}<br />
-                                <button onClick={() => setselectedDrive(drive)}>עריכה</button>
+
+                                <button className="btn btn-primary btn-block mb-3" onClick={() => setselectedDrive(drive)}>עריכה</button>
                             </div>
                         </div>
 
