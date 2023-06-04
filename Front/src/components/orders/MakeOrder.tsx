@@ -142,8 +142,9 @@ const MakeOrder = () => {
 
   // This function handles the 
   // const handleOrder = (e: React.FormEvent<HTMLFormElement>) => {
-    const handleOrder = () => {
-    // e.preventDefault();
+    const handleOrder = (car:CarModel) => {
+    //  e.preventDefault();
+    // setselectedCar(car);
     if (((!startTime || !endTime) && !isAllDay) || (!formatedEndDate && moreThanDay)) {
       messageError('יש לוודא שהפרטים שהוזנו נכונים')
       return;
@@ -151,13 +152,13 @@ const MakeOrder = () => {
     // console.log({ orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false })
     dispatch(addOrderAsync({
       token: token,
-      order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false }
+      order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: car?.id!, destination, ended: false }
     })).then((res) => {
       setIsLoading(false); dispatch(getNotificationAsync(token));
       res.meta.requestStatus === "fulfilled" && message('ההזמנתך התקבלה בהצלחה!');
       res.meta.requestStatus === "rejected" && messageError('ארעה שגיאה בהזמנתך. יש לוודא שהפרטים שהוזנו נכונים. ');
     });
-    setselectedCar(null);
+    // setselectedCar(null);
   }
 
   // This function handles the toastify error messages.
@@ -369,7 +370,7 @@ const MakeOrder = () => {
                     </h5>
                   </div>
                   )}
-                    <button type='submit' style={{ marginRight: "10px" }} onClick={() => {setselectedCar(car);handleOrder();}} className="btn btn-primary btn-block mb-3" >{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'הזמן'}</button>
+                    <button type='submit' style={{ marginRight: "10px" }} onClick={() => {handleOrder(car);}} className="btn btn-primary btn-block mb-3" >{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'הזמן'}</button>
                    {/* <button  className="btn btn-primary" onClick={() => setselectedCar(car)}>הזמן מכונית</button> */}
                 </div>
               </div>)}
