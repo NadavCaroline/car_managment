@@ -141,8 +141,9 @@ const MakeOrder = () => {
   };
 
   // This function handles the 
-  const handleOrder = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // const handleOrder = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleOrder = () => {
+    // e.preventDefault();
     if (((!startTime || !endTime) && !isAllDay) || (!formatedEndDate && moreThanDay)) {
       messageError('יש לוודא שהפרטים שהוזנו נכונים')
       return;
@@ -283,7 +284,7 @@ const MakeOrder = () => {
 
 
         </form> :
-        <div>
+        <div style={{padding:'10px'}}>
 
 
           <table align="center" bgcolor="fff" style={{ width: '100%', backgroundColor: '#fff' }} >
@@ -368,7 +369,8 @@ const MakeOrder = () => {
                     </h5>
                   </div>
                   )}
-                  <button className="btn btn-primary" onClick={() => setselectedCar(car)}>הזמן מכונית</button>
+                    <button type='submit' style={{ marginRight: "10px" }} onClick={() => {setselectedCar(car);handleOrder();}} className="btn btn-primary btn-block mb-3" >{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'הזמן'}</button>
+                   {/* <button  className="btn btn-primary" onClick={() => setselectedCar(car)}>הזמן מכונית</button> */}
                 </div>
               </div>)}
           </div>
@@ -425,7 +427,7 @@ const MakeOrder = () => {
         </div>
       }
 
-      {
+      {/* {
         selectedCar &&
         <div style={{ position: "fixed", top: "0", left: "0", width: "100%", height: "100vh", backgroundColor: "rgba(0,0,0,0.2)", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <div style={{ position: "relative", padding: "32px", width: "400px", height: "300px", maxWidth: "640px", backgroundColor: "white", border: "2px solid black", borderRadius: "5px" }}>
@@ -444,7 +446,7 @@ const MakeOrder = () => {
             </form>
           </div>
         </div>
-      }
+      } */}
     </div >
   )
 }
