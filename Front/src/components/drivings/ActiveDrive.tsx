@@ -7,6 +7,7 @@ import OrderModel from '../../models/Order';
 import { DriveModel } from '../../models/Drive';
 import { getOrdersAsync, orderEndedAsync, ordersSelector } from '../orders/OrdersSlice';
 import { MY_SERVER, NotificationKilomter } from '../../env';
+import { ToastContainer, toast } from 'react-toastify';
 
 const ActiveDrive = () => {
     const dispatch = useAppDispatch()
@@ -18,10 +19,10 @@ const ActiveDrive = () => {
     const orders = useAppSelector(ordersSelector)
     const [activeOrder, setactiveOrder] = useState<OrderModel | null>(null)
     const [refreshFlag, setrefreshFlag] = useState(false)
-    const [noStartKilo, setnoStartKilo] = useState("")
+    // const [noStartKilo, setnoStartKilo] = useState("")
     const [startKilometer, setstartKilometer] = useState("")
     const [endKilometer, setendKilometer] = useState("")
-    const [changeKilometer, setchangeKilometer] = useState(false)
+    const [changeKilometer, setchangeKilometer] = useState(startKilometer ? false : true)
     const [startSelectedFile1, setstartSelectedFile1] = useState<File | null>(null)
     const [startSelectedFile2, setstartSelectedFile2] = useState<File | null>(null)
     const [startSelectedFile3, setstartSelectedFile3] = useState<File | null>(null)
@@ -114,8 +115,48 @@ const ActiveDrive = () => {
         handleStartKilometer()
     }, [refreshFlag, allDrives.length, token])
 
+    // This function handles the toastify error messages.
+    const messageError = (value: string) => toast.error(value, {
+        position: "top-left",
+        //autoClose: 5000,
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        rtl: true,
+    });
+
+    // This function handles the toastify success messages.
+    const message = (value: string) => toast.success(value, {
+        position: "top-left",
+        //autoClose: 5000,
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        rtl: true,
+    });
+
+
+
     const handleButtonClick = () => {
-        const startStopBtn = document.querySelector('.round') as HTMLButtonElement;
+        if (!isRunning) {
+            if (!startKilometer) {
+                messageError("יש להכניס קילומטראז' התחלה")
+                return;
+            }
+        } else {
+            if (!endKilometer) {
+                messageError("יש להכניס קילומטראז' סיום")
+                return;
+            }
+        }
         setIsRunning(!isRunning);
         if (!isRunning) {
             localStorage.setItem('isRunning', "true")
@@ -130,11 +171,8 @@ const ActiveDrive = () => {
                     startImg2: startSelectedFile2,
                     startImg3: startSelectedFile3,
                 }
-                
-            }))
 
-            startStopBtn.textContent = 'Stop';
-            startStopBtn.className = "round redBtn";
+            }))
         } else {
             dispatch(endDriveAsync({
                 token: token, drive: {
@@ -145,7 +183,7 @@ const ActiveDrive = () => {
                     endImg1: endSelectedFile1,
                     endImg2: endSelectedFile2,
                     endImg3: endSelectedFile3
-                },kilo: NotificationKilomter
+                }, kilo: NotificationKilomter
             }))
             dispatch(orderEndedAsync({
                 token: token,
@@ -155,34 +193,12 @@ const ActiveDrive = () => {
             setactiveOrder(null)
             localStorage.removeItem('isRunning')
             localStorage.removeItem('activeDrive')
-            startStopBtn.textContent = 'Start';
-            startStopBtn.className = "round greenBtn";
         }
     };
     // Handles the auto fill of the start/end date of a drive
     // if the user didn't start/end the drive
     useEffect(() => {
         if (orders) {
-            // const activeOrder = orders.find(o => o.id === drives[drives.length -1].order)
-            // if ((activeOrder?.ended === false) && (new Date().getTime() > new Date(activeOrder?.toDate!).getTime())) {
-            //     console.log("Entered First If")
-            //     if (activeDrive) {
-            //         dispatch(endDriveAsync({
-            //             token: token, drive: drives[drives.length - 1]
-            //         }))
-            //         dispatch(orderEndedAsync({
-            //             token: token,
-            //             id: activeOrder?.id!
-            //         }))
-            //         localStorage.removeItem('isRunning')
-            //         localStorage.removeItem('activeDrive')
-            //         setactiveDrive(null)
-            //         setIsRunning(false)
-            //         dispatch(getDrivesAsync(token))
-            //     }
-
-            // }
-            // else
             if (orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)) {
                 let active = orders.find(order => new Date().getTime() > new Date(order.toDate).getTime() && order.ended === false)
                 let drive = drives.find(drive => drive.order === active?.id)
@@ -215,6 +231,16 @@ const ActiveDrive = () => {
 
     return (
         <div>
+            <ToastContainer
+                position="top-left"
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+            />
             {isRunning ?
                 <div>
                     <h1 style={{color: 'rgb(19, 125, 141)'}}>נסיעה פעילה</h1>
@@ -222,7 +248,6 @@ const ActiveDrive = () => {
                     <h3 style={{color: 'rgb(19, 125, 141)'}}>הנסיעה התחילה</h3>
 
                     <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
-                    {/* בשעה: {activeDrive?.startDate!.toString().slice(11, 16)}<br /> */}
                     קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} /><br />
 
                     <input type='file' onChange={handleendFile1Change} /><br />
@@ -269,15 +294,15 @@ const ActiveDrive = () => {
                                     עד שעה: {activeOrder.toDate!.toString().slice(11, 16)}<br />
                                 </div>
                             }
-                            {startKilometer ?
-                                <div>
-                                    קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={!changeKilometer} />
-                                    דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
-                                </div> :
-                                <div>
-                                    קילומטראז': <input onChange={(e) => setnoStartKilo(e.target.value)} value={noStartKilo} />
-                                </div>
-                            }
+
+
+                            <div>
+                                קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={!changeKilometer} />
+                                דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
+                            </div>
+
+
+                            <h5>תמונות התחלת נסיעה</h5>
                             <input type='file' onChange={handleFile1Change} />
                             {startSelectedFile1 &&
                                 <div>

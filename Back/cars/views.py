@@ -2,6 +2,7 @@ from datetime import datetime
 import pytz
 import numpy as np
 import io
+import jwt
 from PIL import Image
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
@@ -101,7 +102,13 @@ class AllProfilesView(APIView):
 @permission_classes([IsAuthenticated])
 class AllUsersView(APIView):
     def get(self, request):
-        users = User.objects.all()
+        user = request.user
+        users_profile = Profile.objects.get(user = user)
+        if users_profile.roleLevel.id == 2:
+            users = User.objects.filter(profile__department_id=users_profile.department.id)
+        else:
+            users = User.objects.all()
+        print(users)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
@@ -181,7 +188,13 @@ class ProfileView(APIView):
 class AllCarsView(APIView):
     def get(self, request):
         # get all Cars also car that are disabled
-        cars = Cars.objects.all()
+        user = request.user
+        profile_model = user.profile
+        print(profile_model)
+        if profile_model.roleLevel.id == 2:
+            cars = Cars.objects.filter(department = profile_model.department.id)
+        else:
+            cars = Cars.objects.all()
         serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data)
 
@@ -258,21 +271,26 @@ class AvaliableOrdersView(APIView):
             else:
                 available_cars.add(order.car)
         cars = available_cars.difference(cars_black_list)
-        for car in Cars.objects.all():
+        for car in Cars.objects.all():               
             if car not in cars_black_list:
                 cars.add(car)
-        # Checks if there's an upcoming maintenance to a car 
-        last_maintenance_records = CarMaintenance.objects.values('car').annotate(
+        # Checks if there's an upcoming maintenance to a car
+        last_maintenance_records = CarMaintenance.objects.values('car', 'fileType').annotate(
             last_expiration_date=Max('expirationDate')).order_by()
         for record in last_maintenance_records:
+            file_name = FileTypes.objects.get(id=record['fileType'])
             days_overdue = (
                 record['last_expiration_date'] - datetime.now().date()).days
             car = Cars.objects.get(id=record['car'])
-            if days_overdue < max_days:
+            if days_overdue < 0:
                 order_details.append(
-                    {"car": car.id, 'maintenance': f'טיפול לרכב בעוד פחות מ{max_days} ימים'})
+                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף'})    
+            elif days_overdue < max_days:
+                order_details.append(
+                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף בועד {max_days} ימים'})    
+
         cars = list(filter(lambda car: (car.department.id ==
-                    user.profile.department.id), cars))
+                    user.profile.department.id and car.isDisabled == False), cars))
         cars_black_list = list(filter(lambda car: (
             car.department.id == user.profile.department.id), cars_black_list))
         serializer = CarsSerializer(list(cars), many=True)
@@ -471,8 +489,12 @@ class ShiftsView(APIView):
 @permission_classes([IsAuthenticated])
 class LogsView(APIView):
     def get(self, request):
-        my_model = Logs.objects.all()
-        serializer = LogsSerializer(my_model, many=True)
+        department_id = request.user.profile.department.id
+        if request.user.profile.roleLevel.id == 2:
+            logs = Logs.objects.filter(user__profile__department_id=department_id)
+        else:
+            logs = Logs.objects.all()
+        serializer = LogsSerializer(logs, many=True)
         return Response(serializer.data)
 
 #     def post(self, request):
@@ -524,11 +546,18 @@ class DrivingsView(APIView):
             if not latest_toDate or order.toDate > latest_toDate:
                 latest_toDate = order.toDate
                 last_order_by_car = order
-        last_drive_kilo = Drivings.objects.get(
-            order=last_order_by_car).endKilometer
+        try:
+            last_drive_kilo = Drivings.objects.get(
+                order=last_order_by_car).endKilometer
 
-        kilo_warning = False if str(last_drive_kilo) == str(
-            request.data['startKilometer']) else True
+            kilo_warning = False if str(last_drive_kilo) == str(
+                request.data['startKilometer']) else True
+            if kilo_warning:
+                write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם",
+                             user=request.user, car=order_model.car)
+        except Exception as e:
+            print(e)
+
         if serializer.is_valid():
             serializer.save()
             if auto_start:
@@ -537,9 +566,7 @@ class DrivingsView(APIView):
             else:
                 write_to_log('warning', 'משתמש/ת שכח/ה להתחיל/לסיים נסיעה',
                              user=request.user, car=order_model.car)
-            if kilo_warning:
-                write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם",
-                             user=request.user, car=order_model.car)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -549,25 +576,34 @@ class DrivingsView(APIView):
         my_model = Drivings.objects.get(id=id)
         car_by_drive = Cars.objects.get(
             id=Drivings.objects.get(id=request.data['id']).car)
+        print(car_by_drive.nickName)
         dep_by_car = Departments.objects.get(name=Cars.objects.get(
             id=Drivings.objects.get(id=request.data['id']).car).department)
         manager = User.objects.get(username=Profile.objects.get(
             department=dep_by_car, roleLevel=2).user)
-        kilo_diff = int(CarMaintenance.objects.filter(car=Drivings.objects.get(
-            id=request.data['id']).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
-        serializer = CreateDrivingsSerializer(my_model, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        try:
+            kilo_diff = int(CarMaintenance.objects.filter(car=CarOrders.objects.get(id= Drivings.objects.get(
+                id=request.data['id']).order.id).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
             # Check if notification about maintenance needs to be sent by the kilometer.
             if kilo_diff < next_kilo:
                 add_notification(
-                    recipient=manager, title=f'טיפול לרכב {car_by_drive} מתקרב', message=f'טיפול לרכב {car_by_drive} בעוד {kilo_diff} קילומטר.')
+                    recipient=manager, title=f'טיפול לרכב {car_by_drive.nickName} מתקרב', message=f'טיפול לרכב {car_by_drive.nickName} בעוד {kilo_diff} קילומטר.')
+        except Exception as e:
+            add_notification(
+                recipient=manager, title=f'טיפול לרכב {car_by_drive.nickName} חסר', message=f'יש להכניס טיפול לרכב {car_by_drive.nickName}')
+            write_to_log('critical', 'חסר טיפול לרכב', car=car_by_drive)
+            # send_mail('התראה על טיפול רכב חסר', f'יש להכניס טיפולי רכב לרכב {car_by_drive.nickName}',
+            #     None, [manager.email], fail_silently=False)
+        serializer = CreateDrivingsSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
             if auto_end:
                 write_to_log('info', 'משתמש/ת סיים/ה נסיעה',
-                             user=request.user, car=my_model.order.car)
+                             user=request.user, car=car_by_drive)
             else:
                 write_to_log('warning', 'משתמש/ת שכח/ה לסיים/ה נסיעה',
-                             user=request.user, car=my_model.order.car)
+                             user=request.user, car=car_by_drive)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -576,13 +612,17 @@ class RolesView(APIView):
     def get(self, request):
         my_model = Roles.objects.all()
         serializer = CreateRolesSerializer(my_model, many=True)
-
         return Response(serializer.data)
 
-
+@permission_classes([IsAuthenticated])
 class DepartmentsView(APIView):
     def get(self, request):
-        my_model = Departments.objects.all()
+        user = request.user
+        profile= user.profile
+        if profile.roleLevel.id == 2:
+            my_model = Departments.objects.filter(id = profile.department.id)
+        else:
+            my_model = Departments.objects.all()
         serializer = CreateDepartmentsSerializer(my_model, many=True)
         return Response(serializer.data)
 

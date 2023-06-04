@@ -104,6 +104,10 @@ const MakeOrder = () => {
         messageError('יש להכניס זמנים מאוחרים יותר')
         return;
       }
+      if (start_date.getTime() > end_date.getTime()) {
+        messageError('שעת סיום מוקדמת משעת התחלה')
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -132,6 +136,7 @@ const MakeOrder = () => {
       messageError('יש להכניס יעד נסיעה')
       return;
     }
+    
     checkOrders()
   };
 
@@ -187,7 +192,7 @@ const MakeOrder = () => {
     <div>
       <ToastContainer
         position="top-left"
-        newestOnTop={false}
+        newestOnTop={false}   
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
