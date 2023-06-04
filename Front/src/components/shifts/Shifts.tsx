@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { userToken } from '../login/loginSlice'
+import { userAccess, userToken } from '../login/loginSlice'
 import { ToastContainer, toast } from 'react-toastify';
 import { MaintenanceTypeModel } from '../../models/MaintenanceType'
 import { getmaintenanceTypeAsync } from '../maintenanceType/maintenanceTypeSlice';
@@ -28,7 +28,7 @@ const Shifts = () => {
     const [listMaintenanceType, setListMaintenanceTypes] = useState<MaintenanceTypeModel[]>([]);
     const cars = useAppSelector(carsSelector);
     const shifts = useAppSelector(shiftSelector);
-    const token = useAppSelector(userToken)
+    const token = useAppSelector(userAccess)
     const users = useAppSelector(usersSelector)
     const [selectedCar, setSelectedCar] = useState<HTMLElement | null>(null);
     const [selectedUser, setSelectedUser] = useState<string[]>([]);
