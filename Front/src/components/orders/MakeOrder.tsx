@@ -16,6 +16,7 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getNotificationAsync } from '../notifications/notificationsSlice';
 import { ToastContainer, toast } from 'react-toastify';
+import { red } from '@mui/material/colors';
 
 const MakeOrder = () => {
   const dispatch = useAppDispatch()
@@ -41,13 +42,13 @@ const MakeOrder = () => {
 
 
   const resetFrom = () => {
-    setdestination("")
-    setstartTime("")
-    setendTime("")
-    setselectedStartDate(null)
-    setselectedEndDate(null)
-    setisAllDay(false)
-    setmoreThanDay(false)
+    // setdestination("")
+    // setstartTime("")
+    // setendTime("")
+    // setselectedStartDate(null)
+    // setselectedEndDate(null)
+    // setisAllDay(false)
+    // setmoreThanDay(false)
     setsearched(false)
   }
 
@@ -201,137 +202,173 @@ const MakeOrder = () => {
       />
       {!searched ?
         <form onSubmit={onSubmitValid}>
+          <table align="center" bgcolor="fff" style={{ width: '100%', backgroundColor: '#fff' }} >
+            <tr>
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={['DatePicker', 'MobileTimePicker']}>
+                    {/* Date Picking Component */}
+                    <div style={{ marginRight: '10px', marginLeft: '10px' }}>
+                      <DemoItem>
+                        מתאריך:
+                        <DatePicker
+                          minDate={dayjs()}
+                          maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
+                          format="DD-MM-YYYY"
+                          value={selectedStartDate}
+                          onChange={handleStartDateChange}
+                        />
+                      </DemoItem>
+                    </div>
 
-          <div style={{ display: 'flex' }}>
-          <button type='submit' style={{ marginRight: "10px", marginTop: '33px' }} className="btn btn-primary btn-block mb-3">{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'חפש מכוניות'}</button>
-
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['DatePicker', 'MobileTimePicker']}>
-                {/* Date Picking Component */}
-                <div style={{ marginRight: '10px', marginLeft: '10px' }}>
-                  <DemoItem>
-                    מתאריך:
-                    <DatePicker
-                      minDate={dayjs()}
-                      maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
-                      format="DD-MM-YYYY"
-                      value={selectedStartDate}
-                      onChange={handleStartDateChange}
-                    />
-                  </DemoItem>
+                    {/* Time Picking Components */}
+                    {moreThanDay && (
+                      <div style={{ marginLeft: '10px' }}>
+                        <DemoItem>
+                          עד תאריך:
+                          <DatePicker
+                            minDate={selectedStartDate!}
+                            maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
+                            format="DD-MM-YYYY"
+                            value={selectedEndDate}
+                            onChange={handleEndDateChange}
+                          />
+                        </DemoItem>
+                      </div>
+                    )}
+                  </DemoContainer>
+                </LocalizationProvider>
+              </td>
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                {!isAllDay &&
+                  <div style={{ display: 'flex' }}>
+                    <div style={{ marginLeft: '10px' }}>
+                      משעה:<br />
+                      <input value={startTime} type='time' onChange={(e) => setstartTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
+                    </div>
+                    <div>
+                      עד שעה:<br />
+                      <input value={endTime} type='time' min={startTime} onChange={(e) => setendTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', marginLeft: '10px', borderWidth: '1px', fontSize: '17px' }} />
+                    </div>
+                  </div>
+                }
+              </td>
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                <div>
+                  יעד:<br />
+                  <input value={destination} onChange={(e) => setdestination(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
                 </div>
-
-                {/* Time Picking Components */}
-                {moreThanDay && (
-                  <div style={{ marginLeft: '10px' }}>
-                    <DemoItem>
-                      עד תאריך:
-                      <DatePicker
-                        minDate={selectedStartDate!}
-                        maxDate={dayjs().add(MaxDayOrderAdvance, 'day')}
-                        format="DD-MM-YYYY"
-                        value={selectedEndDate}
-                        onChange={handleEndDateChange}
-                      />
-                    </DemoItem>
-                  </div>
-                )}
-              </DemoContainer>
-            </LocalizationProvider>
-            <div style={{ display: 'flex', marginTop: '8px' }}>
-              {!isAllDay &&
-                <div style={{ display: 'flex' }}>
-                  <div style={{ marginLeft: '10px' }}>
-                    משעה:<br />
-                    <input type='time' onChange={(e) => setstartTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
-                  </div>
-                  <div>
-                    עד שעה:<br />
-                    <input type='time' onChange={(e) => setendTime(e.target.value)} style={{ height: '56px', borderRadius: '3px', marginLeft: '10px', borderWidth: '1px', fontSize: '17px' }} />
-                  </div>
+              </td>
+              <td style={{ display: 'inline-block', padding: '5px', marginTop: '20px' }}>
+                <div className="form-check">
+                  <input checked={isAllDay} defaultChecked={false} onChange={() => handleIsAllDay()} className="form-check-input" style={{ direction: "rtl" }} type="checkbox" value="" id="flexCheckDisabled" />
+                  <label className="form-check-label" htmlFor="flexCheckDisabled">
+                    יום שלם                    </label>
                 </div>
-              }
-              <div>
-                יעד:<br />
-                <input onChange={(e) => setdestination(e.target.value)} style={{ height: '56px', borderRadius: '3px', borderWidth: '1px', fontSize: '17px' }} />
-              </div>
-            </div>
-            <div style={{ padding: '10px', marginTop: '15px' }}>
-              יום שלם
-              <input defaultChecked={false} type="checkbox" onChange={() => handleIsAllDay()} /><br />
-              יותר מיום אחד?
-              <input defaultChecked={false} type="checkbox" onChange={() => handleMoreThanday()} style={{ marginLeft: '5px' }} />
-            </div>
-          </div>
+                <div className="form-check">
+                  <input checked={moreThanDay} defaultChecked={false} onChange={() => handleMoreThanday()} className="form-check-input" type="checkbox" style={{ direction: "rtl" }} value="" id="flexCheckCheckedDisabled" />
+                  <label className="form-check-label" htmlFor="flexCheckCheckedDisabled">
+                    יותר מיום אחד
+                  </label>
+                </div>
+              </td>
+
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                <button type='submit' style={{ marginRight: "10px", marginTop: '33px' }} className="btn btn-primary btn-block mb-3">{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'חפש מכוניות'}</button>
+
+              </td>
+            </tr>
+
+          </table>
+
+
         </form> :
         <div>
-          <div style={{ display: 'flex' }}>
-          <div style={{ marginLeft: '0px' }}>
-              <button
-                onClick={() => resetFrom()}
-                style={{ marginLeft: '2px', marginTop: '10px' }}
-                className="btn btn-primary btn-block mb-3">
-                שנה פרטי הזמנה
-              </button>
-            {moreThanDay ? (
-              <div style={{ display: 'flex' }}>
-                {formatedStartDate && (
+
+
+          <table align="center" bgcolor="fff" style={{ width: '100%', backgroundColor: '#fff' }} >
+            <tr>
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                { moreThanDay && formatedStartDate && (
                   <div style={{ padding: '10px', flex: '1' }}>
                     <b>מתאריך:</b> {formatedStartDate}
                   </div>
                 )}
-                {formatedEndDate && (
+              </td>
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                { moreThanDay && formatedEndDate && (
                   <div style={{ padding: '10px', flex: '1' }}>
                     <b>עד תאריך:</b> {formatedEndDate}
                   </div>
                 )}
-              </div>
-            ) : (
-              formatedStartDate && (
+              </td>
+              
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+               {!moreThanDay && formatedStartDate && (
                 <div style={{ padding: '10px', flex: '1' }}>
                   <b>בתאריך:</b> {formatedStartDate}
                 </div>
-              )
-            )}
-            {!isAllDay ? (
-              <div style={{ display: 'flex', flex: '2' }}>
-                {startTime && (
-                  <div style={{ padding: '10px' }}>
-                    <b>משעה:</b> {startTime}
-                  </div>
                 )}
-                {endTime && (
-                  <div style={{ padding: '10px' }}>
-                    <b>עד שעה:</b> {endTime}
+              </td>
+             
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                {!isAllDay ? (
+                  <div style={{ display: 'flex', flex: '2' }}>
+                    {startTime && (
+                      <div style={{ padding: '10px' }}>
+                        <b>משעה:</b> {startTime}
+                      </div>
+                    )}
+                    {endTime && (
+                      <div style={{ padding: '10px' }}>
+                        <b>עד שעה:</b> {endTime}
+                      </div>
+                    )}
                   </div>
+                ) : (
+                  <b style={{ flex: '6', padding: '10px' }}>כל היום</b>
                 )}
-              </div>
-            ) : (
-              <b style={{ flex: '6', padding: '10px' }}>כל היום</b>
-            )}
-
-            </div>
-          </div>
-
-
+              </td>
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                <b>יעד:</b> {destination}
+              </td>
+              <td style={{ display: 'inline-block', padding: '5px' }}>
+                <button
+                  onClick={() => resetFrom()}
+                  style={{ marginLeft: '2px', marginTop: '10px' }}
+                  className="btn btn-primary btn-block mb-3">
+                  שנה פרטי הזמנה
+                </button>
+              </td>
+            </tr>
+          </table>
           {/* Display The cars */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
             {availableCars.map(car =>
-              <div key={car.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem' }} onClick={() => setselectedCar(car)}>
+              <div key={car.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem' }} onClick={() => setselectedCar(car)}>
                 <div style={{ textAlign: 'center' }}>
+                        <table style={{ width: '100%',fontSize:'1.25rem' }}>
+                          <tr>
+                            <td>
+                              {car.nickName} <br /> {car.licenseNum}
+                            </td>
+                           
+                          </tr>
+                        </table>
+
                   יצרן: {car.make}<br />
                   דגם: {car.model}<br />
                   צבע: {car.color}<br />
                   שנה: {car.year}<br />
-                  לוחית רישוי: {car.licenseNum}<br />
+                  {/* לוחית רישוי: {car.licenseNum}<br /> */}
                   <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
                   {orderDetails && orderDetails.filter(order => order.car === car.id).map((order, i) => <div key={i}>
-                    <h5>
+                    <h5 style={{ color: "red" }}>
                       {order.maintenance}
                     </h5>
                   </div>
                   )}
-                  <button onClick={() => setselectedCar(car)}>הזמן מכונית</button>
+                  <button className="btn btn-primary" onClick={() => setselectedCar(car)}>הזמן מכונית</button>
                 </div>
               </div>)}
           </div>
@@ -339,10 +376,10 @@ const MakeOrder = () => {
             notAvailableCars.length > 0 &&
             <div>
               <hr />
-              <h3>לא זמינות</h3>
+              <h3 style={{ color: 'rgb(19, 125, 141)' }}>לא זמינות</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
                 {notAvailableCars.map(car =>
-                  <div key={car.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem' }}>
+                  <div key={car.id} style={{ borderRadius: '5px', border: '2px solid rgb(222, 226, 230)', padding: '.5rem' }}>
                     <div style={{ textAlign: 'center' }}>
                       יצרן: {car.make}<br />
                       דגם: {car.model}<br />
@@ -350,7 +387,6 @@ const MakeOrder = () => {
                       שנה: {car.year}<br />
                       לוחית רישוי: {car.licenseNum}<br />
                       <img src={MY_SERVER + car.image} style={{ width: '150px', height: '100px' }} alt={car.model} /><br />
-                      <h4>פרטי הזמנה</h4>
                       <div>
                         <hr />
                         {orderDetails && orderDetails.filter(order => order.car === car.id).map((order, i) => <div key={i}>
@@ -361,7 +397,7 @@ const MakeOrder = () => {
                               </h5>
                             </div> :
                             <div>
-                              <h5>הזמנה תפוסה</h5>
+                              <h5 style={{ color: 'red' }}>הזמנה תפוסה</h5>
                               {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) ?
                                 <div>
                                   מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />

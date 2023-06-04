@@ -65,6 +65,8 @@ class Cars(models.Model):
 
     def __str__(self):
         return self.model
+    class Meta:
+        ordering = ['isDisabled','nickName','licenseNum']
 
 
 class CarOrders(models.Model):
