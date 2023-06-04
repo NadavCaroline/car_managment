@@ -93,6 +93,10 @@ const Departments = () => {
     theme: "colored",
     rtl: true,
   });
+  const [addState, setaddState] = useState(false)
+  const [depName, setdepName] = useState("")
+
+// responsible for calling the server once the page is loaded
   useEffect(() => {
     dispatch(getDepsAsync(token))
     // dispatch(getAllProfilesAsync(token))
@@ -140,7 +144,7 @@ const Departments = () => {
               <button style={{ marginLeft: "10px", marginBottom: "10px" }} className="btn btn-primary" onClick={() => { setdepartmentName(""); setselectedDep(null); setShowModal(true); }} >הוספת מחלקה</button>
             </div>
             <Row className="align-items-stretch" xs={1} md={2} lg={3}>
-              {deps.map((dep) => (
+              {deps.map(dep => (
                 <Col key={dep.id} style={{ marginBottom: '10px' }}>
                   <Card className='h-100 text-center notSelectedDiv' onClick={() => updateModalDep(dep)}>
                     <Card.Body>

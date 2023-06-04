@@ -16,6 +16,7 @@ const Profile = () => {
     return (
         <div>
             <h1>הפרופיל שלך</h1>
+            {profile.roleLevel}
             <div>
                 שם מלא: {profile.user_name}
             </div>
