@@ -217,9 +217,9 @@ const ActiveDrive = () => {
         <div>
             {isRunning ?
                 <div>
-                    <h1>נסיעה פעילה</h1>
+                    <h1 style={{color: 'rgb(19, 125, 141)'}}>נסיעה פעילה</h1>
                     <hr />
-                    <h3>הנסיעה התחילה</h3>
+                    <h3 style={{color: 'rgb(19, 125, 141)'}}>הנסיעה התחילה</h3>
 
                     <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
                     {/* בשעה: {activeDrive?.startDate!.toString().slice(11, 16)}<br /> */}
@@ -256,7 +256,7 @@ const ActiveDrive = () => {
                 <div>
                     {(activeOrder && !activeOrder?.ended) &&
                         <div>
-                            <h3>הזמנה פעילה</h3>
+                            <h3 style={{color: 'rgb(19, 125, 141)'}}>הזמנה פעילה</h3>
                             <div> {activeOrder.car_name}</div><br />
                             <div>{activeOrder.ended}</div>
                             <img src={MY_SERVER + activeOrder.car_image} style={{ width: '150px', height: '100px' }} alt={activeOrder.car_name} /><br />

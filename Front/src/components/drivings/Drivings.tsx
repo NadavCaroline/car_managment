@@ -16,7 +16,7 @@ export function Drivings() {
     <div >
       <ActiveDrive />
       <div>
-        <h1>נסיעות קודמות</h1>
+        <h1 style={{color: 'rgb(19, 125, 141)'}}>נסיעות קודמות</h1>
         <PreviousDrives />
       </div>
 
