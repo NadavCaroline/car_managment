@@ -361,8 +361,8 @@ const Shifts = () => {
                     }
                     <form dir="rtl" id="formShifts" style={{ border: ".2rem solid #ececec", borderRadius: "8px", padding: "1rem" }}>
                         <div style={{ marginTop: '10px' }}>
-                            <input placeholder='חיפוש' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px' }} />
-                            <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תורנויות עתידיות</h3><hr />
+                            <input placeholder='חיפוש' onChange={(e) => setsearchTerm(e.target.value)} style={{ width: '300px', left: '150px',marginRight:'10px' }} />
+                            <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' , marginRight: "10px", marginBottom: "10px", marginTop: "10px" }} >תורנויות עתידיות</h3>
                             <Container>
                                 <Row className="align-items-stretch" xs={1} md={2} lg={3} >
                                     {shifts && shifts.filter(shift => ((shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
@@ -398,7 +398,7 @@ const Shifts = () => {
                                     )}
                                 </Row>
                             </Container>
-                            <h3 style={{ color: "rgb(19, 125, 141)", marginRight: "10px", marginBottom: "0px", marginTop: "10px" }} >תורנויות קודמות</h3><hr />
+                            <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' , marginRight: "10px", marginBottom: "10px", marginTop: "10px" }} >תורנויות קודמות</h3>
                             <Container>
                                 <Row className="align-items-stretch" xs={1} md={2} lg={3}>
                                     {shifts && shifts.filter(shift => ((shift.maintenance_name?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()) ||

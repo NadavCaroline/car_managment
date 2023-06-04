@@ -243,9 +243,9 @@ const ActiveDrive = () => {
             />
             {isRunning ?
                 <div>
-                    <h1 style={{color: 'rgb(19, 125, 141)'}}>נסיעה פעילה</h1>
+                    <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>נסיעה פעילה</h3>
                     <hr />
-                    <h3 style={{color: 'rgb(19, 125, 141)'}}>הנסיעה התחילה</h3>
+                    <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הנסיעה התחילה</h3>
 
                     <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
                     קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} /><br />
@@ -281,7 +281,7 @@ const ActiveDrive = () => {
                 <div>
                     {(activeOrder && !activeOrder?.ended) &&
                         <div>
-                            <h3 style={{color: 'rgb(19, 125, 141)'}}>הזמנה פעילה</h3>
+                            <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הזמנה פעילה</h3>
                             <div> {activeOrder.car_name}</div><br />
                             <div>{activeOrder.ended}</div>
                             <img src={MY_SERVER + activeOrder.car_image} style={{ width: '150px', height: '100px' }} alt={activeOrder.car_name} /><br />

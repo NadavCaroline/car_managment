@@ -344,7 +344,7 @@ const MakeOrder = () => {
             </tr>
           </table>
           {/* Display The cars */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)',paddingBottom:'10px' }}>
             {availableCars.map(car =>
               <div key={car.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem' }} onClick={() => setselectedCar(car)}>
                 <div style={{ textAlign: 'center' }}>
@@ -377,8 +377,7 @@ const MakeOrder = () => {
           {
             notAvailableCars.length > 0 &&
             <div>
-              <hr />
-              <h3 style={{ color: 'rgb(19, 125, 141)' }}>לא זמינות</h3>
+              <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>לא זמינות</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
                 {notAvailableCars.map(car =>
                   <div key={car.id} style={{ borderRadius: '5px', border: '2px solid rgb(222, 226, 230)', padding: '.5rem' }}>

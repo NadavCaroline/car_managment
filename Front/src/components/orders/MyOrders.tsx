@@ -33,8 +33,8 @@ export function MyOrders() {
           {/* Active Orders */}
           {orders.filter(order => new Date(order.toDate).getTime() >= today.getTime() && new Date(order.fromDate).getTime() <= today.getTime()).length > 0 &&
             <div>
-              <h3 style={{ color: 'rgb(19, 125, 141)' }}>הזמנות פעילות</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
+              <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הזמנות פעילות</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)',paddingBottom:'10px' }}>
                 {orders.filter(order => new Date(order.toDate).getTime() >= today.getTime() && new Date(order.fromDate).getTime() <= today.getTime()).map(order =>
                   <div key={order.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem', textAlign: 'center' }}>
                     <table style={{ width: '100%', fontSize: '1.25rem' }}>
@@ -61,8 +61,8 @@ export function MyOrders() {
             </div>
           }
           {/* Future Orders */}
-          <h3 style={{ color: 'rgb(19, 125, 141)' }}>הזמנות עתידיות</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
+          <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הזמנות עתידיות</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)',paddingBottom:'10px' }}>
             {orders.filter(order => new Date(order.fromDate).getTime() > today.getTime()).map(order =>
               <div key={order.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem', textAlign: 'center' }}>
                 <table style={{ width: '100%', fontSize: '1.25rem' }}>
@@ -91,7 +91,7 @@ export function MyOrders() {
               </div>)}
           </div>
           {/* Previous Orders */}
-          <h3 style={{ color: 'rgb(19, 125, 141)' }}>הזמנות קודמות</h3>
+          <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הזמנות קודמות</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
             {orders.filter(order => new Date(order.toDate).getTime() < today.getTime()).map(order =>
               <div key={order.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem', textAlign: 'center' }}>

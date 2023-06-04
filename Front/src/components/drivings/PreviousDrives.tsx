@@ -52,7 +52,7 @@ const PreviousDrives = () => {
                                 מכונית: {drive.car_name}<br />
                                 <img src={MY_SERVER + drive.car_image} style={{ width: '150px', height: '100px' }} alt={drive.car_name} /><br /><br />
                                 יעד: {orders.filter(order => order.id === drive.order)[0]?.destination}<br/>
-                                <button onClick={() => setselectedDrive(drive)}>עריכה</button>
+                                <button className="btn btn-primary"  onClick={() => setselectedDrive(drive)}>עריכה</button>
                             </div>
                         </div>
                     )}
@@ -88,7 +88,7 @@ const PreviousDrives = () => {
                         <UpdateDrive setselectedDrive={setselectedDrive} selectedDrive={selectedDrive} />
                     }
                 </div> :
-                <h3>אין לך נסיעות קודמות</h3>
+                <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>אין לך נסיעות קודמות</h3>
             }
         </div>
     )
