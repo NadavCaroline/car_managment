@@ -119,9 +119,9 @@ body {
   color: white;
   border: none;
   padding: 5px;
-  font-size: 31px;
-  height: 130px;
-  width: 130px;
+  font-size: 1em;
+  height: 80px;
+  width: 80px;
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: 10px;

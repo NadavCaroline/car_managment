@@ -243,9 +243,9 @@ const ActiveDrive = () => {
             />
             {isRunning ?
                 <div>
-                    <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>נסיעה פעילה</h3>
+                    <h3 style={{ color: 'white', backgroundColor: 'rgb(19, 125, 141)' }}>נסיעה פעילה</h3>
                     <hr />
-                    <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הנסיעה התחילה</h3>
+                    <h3 style={{ color: 'white', backgroundColor: 'rgb(19, 125, 141)' }}>הנסיעה התחילה</h3>
 
                     <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
                     קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} /><br />
@@ -278,54 +278,67 @@ const ActiveDrive = () => {
                         <button className="round redBtn" onClick={handleButtonClick}>Stop</button>
                     </div>
                 </div> :
+
                 <div>
+
                     {(activeOrder && !activeOrder?.ended) &&
                         <div>
-                            <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הזמנה פעילה</h3>
-                            <div> {activeOrder.car_name}</div><br />
-                            <div>{activeOrder.ended}</div>
-                            <img src={MY_SERVER + activeOrder.car_image} style={{ width: '150px', height: '100px' }} alt={activeOrder.car_name} /><br />
-                            {activeOrder.isAllDay ?
-                                <div>
-                                    כל היום
-                                </div> :
-                                <div>
-                                    משעה: {activeOrder.fromDate!.toString().slice(11, 16)}<br />
-                                    עד שעה: {activeOrder.toDate!.toString().slice(11, 16)}<br />
+                            <h3 style={{ color: 'white', backgroundColor: 'rgb(19, 125, 141)' }}>הזמנה פעילה</h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)', paddingBottom: '10px', textAlign: 'center' }}>
+                                <div style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem' }} >
+                                    <table style={{ width: '100%', fontSize: '1.25rem' }}>
+                                        <tr>
+                                            <td>
+                                                {activeOrder.car_name}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    {/* <br /> */}
+                                    <div>{activeOrder.ended}</div>
+                                    <img src={MY_SERVER + activeOrder.car_image} style={{ width: '150px', height: '100px' }} alt={activeOrder.car_name} /><br />
+                                    {activeOrder.isAllDay ?
+                                        <div>
+                                            כל היום
+                                        </div> :
+                                        <div>
+                                            משעה: {activeOrder.fromDate!.toString().slice(11, 16)}<br />
+                                            עד שעה: {activeOrder.toDate!.toString().slice(11, 16)}<br />
+                                        </div>
+                                    }
+
+
+                                    <div>
+                                        קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer=='null'?'':startKilometer} disabled={!changeKilometer} />
+                                        דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
+                                    </div>
+
+
+                                    <h5>תמונות התחלת נסיעה</h5>
+                                    <input type='file' onChange={handleFile1Change} />
+                                    {startSelectedFile1 &&
+                                        <div>
+                                            <img src={URL.createObjectURL(startSelectedFile1)}
+                                                alt={startSelectedFile1.name}
+                                                style={{ width: '150px', height: '100px' }} /><br />
+                                            <input type='file' onChange={handleFile2Change} />
+                                        </div>}
+                                    {startSelectedFile2 &&
+                                        <div>
+                                            <img src={URL.createObjectURL(startSelectedFile2)}
+                                                alt={startSelectedFile2.name}
+                                                style={{ width: '150px', height: '100px' }} /><br />
+                                            <input type='file' onChange={handleFile3Change} />
+                                        </div>}
+                                    {startSelectedFile3 &&
+                                        <div>
+                                            <img src={URL.createObjectURL(startSelectedFile3)}
+                                                alt={startSelectedFile3.name}
+                                                style={{ width: '150px', height: '100px' }} /><br />
+                                        </div>}
+                                    <div className="d-flex justify-content-center">
+                                        <button className="round greenBtn" onClick={handleButtonClick}>Start</button>
+                                    </div>
                                 </div>
-                            }
-
-
-                            <div>
-                                קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={!changeKilometer} />
-                                דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
-                            </div>
-
-
-                            <h5>תמונות התחלת נסיעה</h5>
-                            <input type='file' onChange={handleFile1Change} />
-                            {startSelectedFile1 &&
-                                <div>
-                                    <img src={URL.createObjectURL(startSelectedFile1)}
-                                        alt={startSelectedFile1.name}
-                                        style={{ width: '150px', height: '100px' }} /><br />
-                                    <input type='file' onChange={handleFile2Change} />
-                                </div>}
-                            {startSelectedFile2 &&
-                                <div>
-                                    <img src={URL.createObjectURL(startSelectedFile2)}
-                                        alt={startSelectedFile2.name}
-                                        style={{ width: '150px', height: '100px' }} /><br />
-                                    <input type='file' onChange={handleFile3Change} />
-                                </div>}
-                            {startSelectedFile3 &&
-                                <div>
-                                    <img src={URL.createObjectURL(startSelectedFile3)}
-                                        alt={startSelectedFile3.name}
-                                        style={{ width: '150px', height: '100px' }} /><br />
-                                </div>}
-                            <div className="d-flex justify-content-center">
-                                <button className="round greenBtn" onClick={handleButtonClick}>Start</button>
                             </div>
                         </div>
                     }
