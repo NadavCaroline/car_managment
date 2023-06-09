@@ -16,7 +16,6 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getNotificationAsync } from '../notifications/notificationsSlice';
 import { ToastContainer, toast } from 'react-toastify';
-import { red } from '@mui/material/colors';
 
 const MakeOrder = () => {
   const dispatch = useAppDispatch()
@@ -41,7 +40,7 @@ const MakeOrder = () => {
   const [searched, setsearched] = useState(false)
 
 
-  const resetFrom = () => {
+  const resetForm = () => {
     // setdestination("")
     // setstartTime("")
     // setendTime("")
@@ -67,7 +66,6 @@ const MakeOrder = () => {
   // This function hanldes the change if the order is all day long - or not.
   const handleIsAllDay = () => {
     setisAllDay(!isAllDay)
-    console.log(isAllDay)
     if (!isAllDay) {
       setstartTime("")
       setendTime("")
@@ -95,7 +93,6 @@ const MakeOrder = () => {
       start_date = new Date(startyear, startmonth - 1, startday)
       start_date.setHours(0, 0, 0, 0)
       end_date.setHours(23, 59, 0, 0)
-
     }
     else {
       moreThanDay ? end_date = new Date(endyear, endmonth - 1, endday, endhours, endminutes) : end_date = new Date(startyear, startmonth - 1, startday, endhours, endminutes)
@@ -136,7 +133,6 @@ const MakeOrder = () => {
       messageError('יש להכניס יעד נסיעה')
       return;
     }
-    
     checkOrders()
   };
 
@@ -147,7 +143,6 @@ const MakeOrder = () => {
       messageError('יש לוודא שהפרטים שהוזנו נכונים')
       return;
     }
-    // console.log({ orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false })
     dispatch(addOrderAsync({
       token: token,
       order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false }
@@ -156,7 +151,8 @@ const MakeOrder = () => {
       res.meta.requestStatus === "fulfilled" && message('ההזמנתך התקבלה בהצלחה!');
       res.meta.requestStatus === "rejected" && messageError('ארעה שגיאה בהזמנתך. יש לוודא שהפרטים שהוזנו נכונים. ');
     });
-    setselectedCar(null);
+    setselectedCar(null)
+    resetForm()
   }
 
   // This function handles the toastify error messages.
@@ -261,12 +257,12 @@ const MakeOrder = () => {
               </td>
               <td style={{ display: 'inline-block', padding: '5px', marginTop: '20px' }}>
                 <div className="form-check">
-                  <input checked={isAllDay} defaultChecked={false} onChange={() => handleIsAllDay()} className="form-check-input" style={{ direction: "rtl" }} type="checkbox" value="" id="flexCheckDisabled" />
+                  <input checked={isAllDay} onChange={() => handleIsAllDay()} className="form-check-input" style={{ direction: "rtl" }} type="checkbox" value="" id="flexCheckDisabled" />
                   <label className="form-check-label" htmlFor="flexCheckDisabled">
                     יום שלם                    </label>
                 </div>
                 <div className="form-check">
-                  <input checked={moreThanDay} defaultChecked={false} onChange={() => handleMoreThanday()} className="form-check-input" type="checkbox" style={{ direction: "rtl" }} value="" id="flexCheckCheckedDisabled" />
+                  <input checked={moreThanDay} onChange={() => handleMoreThanday()} className="form-check-input" type="checkbox" style={{ direction: "rtl" }} value="" id="flexCheckCheckedDisabled" />
                   <label className="form-check-label" htmlFor="flexCheckCheckedDisabled">
                     יותר מיום אחד
                   </label>
@@ -334,7 +330,7 @@ const MakeOrder = () => {
               </td>
               <td style={{ display: 'inline-block', padding: '5px' }}>
                 <button
-                  onClick={() => resetFrom()}
+                  onClick={() => resetForm()}
                   style={{ marginLeft: '2px', marginTop: '10px' }}
                   className="btn btn-primary btn-block mb-3">
                   שנה פרטי הזמנה

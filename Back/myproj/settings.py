@@ -111,6 +111,7 @@ CORS_ALLOW_HEADERS = [
     'content-type',
     'kilometervariable',
     'NotificationDaysExpiration',
+    'orderID',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True

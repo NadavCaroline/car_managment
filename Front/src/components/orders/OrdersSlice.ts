@@ -3,7 +3,7 @@ import { RootState, AppThunk } from '../../app/store';
 import CarModel from '../../models/Car';
 import { DatesCheck } from '../../models/DatesCheck';
 import OrderModel from '../../models/Order';
-import { addOrder, checkOrderDates, getOrders, orderEnded } from './OrdersAPI';
+import { addOrder, checkOrderDates, checkOrderUpdateDates, getOrders, orderEnded, updateOrder } from './OrdersAPI';
 
 export interface OrderState {
   orders: OrderModel[]
@@ -36,6 +36,13 @@ export const addOrderAsync = createAsyncThunk(
     return response;
   }
 );
+export const updateOrderAsync = createAsyncThunk(
+  'myOrder/updateOrder',
+  async ({ token, order, id }: { token: string, order: OrderModel, id: number }) => {
+    const response = await updateOrder(token, id, order);
+    return response;
+  }
+);
 
 export const orderEndedAsync = createAsyncThunk(
   'myOrder/orderEnded',
@@ -49,6 +56,13 @@ export const checkOrderDatesAsync = createAsyncThunk(
   'myOrder/checkOrderDates',
   async ({ token, dates }: { token: string, dates: DatesCheck }) => {
     const response = await checkOrderDates(token, dates);
+    return response;
+  }
+);
+export const checkOrderUpdateDatesAsync = createAsyncThunk(
+  'myOrder/checkOrderUpdateDates',
+  async ({ token, dates, id }: { token: string, dates: DatesCheck, id: number }) => {
+    const response = await checkOrderUpdateDates(token, dates, id);
     return response;
   }
 );
@@ -68,11 +82,26 @@ export const myOrderSlice = createSlice({
       .addCase(addOrderAsync.fulfilled, (state, action) => {
         state.orders.push(action.payload)
       })
+      .addCase(updateOrderAsync.fulfilled, (state, action) => {
+        let temp = state.orders.filter(order => order.id === action.payload.id)[0]
+        console.log(temp)
+        temp.orderDate = action.payload.orderDate
+        temp.fromDate = action.payload.fromDate
+        temp.toDate = action.payload.toDate
+        temp.car = action.payload.car
+        temp.destination = action.payload.destination
+        temp.isAllDay = action.payload.isAllDay
+      })
       .addCase(orderEndedAsync.fulfilled, (state, action) => {
         let temp = state.orders.filter(order => order.id === action.payload.id)[0]
         temp.ended = true
       })
       .addCase(checkOrderDatesAsync.fulfilled, (state, action) => {
+        state.availableCars = action.payload.available
+        state.notAvilable = action.payload.notAvilable
+        state.orderDetails = action.payload.orderDetails
+      })
+      .addCase(checkOrderUpdateDatesAsync.fulfilled, (state, action) => {
         state.availableCars = action.payload.available
         state.notAvilable = action.payload.notAvilable
         state.orderDetails = action.payload.orderDetails

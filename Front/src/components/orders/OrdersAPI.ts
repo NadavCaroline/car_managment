@@ -35,11 +35,33 @@ export const checkOrderDates = async (token: string, dates: DatesCheck) => {
     }).then((res) => res.data);
 }
 
+
+// Check the available rental dates for the cars.
+export const checkOrderUpdateDates = async (token: string, dates: DatesCheck,id: number) => {
+  return axios.post(MY_SERVER + 'CheckOrdersUpdate', dates,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'NotificationDaysExpiration': String(NotificationDaysExpiration),
+        'orderID': id
+      }
+    }).then((res) => res.data);
+}
+
 // After the Driver ended the drive that was connected to the order.
 export const orderEnded = async (token: string, id: number) => {
-
-  return axios.put(MY_SERVER + 'orders/' + id,
+  return axios.patch(MY_SERVER + 'orders/' + id,
   {ended: true},
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((res) => res.data);
+}
+
+// After the Driver ended the drive that was connected to the order.
+export const updateOrder = async (token: string, id: number, order: OrderModel) => {
+  return axios.put(MY_SERVER + 'orders/' + id,order,
     {
       headers: {
         'Authorization': `Bearer ${token}`

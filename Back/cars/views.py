@@ -24,6 +24,7 @@ from django.db.models.functions import Coalesce
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import os
+from django.utils import timezone
 
 
 @api_view(['GET'])
@@ -103,9 +104,10 @@ class AllProfilesView(APIView):
 class AllUsersView(APIView):
     def get(self, request):
         user = request.user
-        users_profile = Profile.objects.get(user = user)
+        users_profile = Profile.objects.get(user=user)
         if users_profile.roleLevel.id == 2:
-            users = User.objects.filter(profile__department_id=users_profile.department.id)
+            users = User.objects.filter(
+                profile__department_id=users_profile.department.id)
         else:
             users = User.objects.all()
         print(users)
@@ -192,7 +194,7 @@ class AllCarsView(APIView):
         profile_model = user.profile
         print(profile_model)
         if profile_model.roleLevel.id == 2:
-            cars = Cars.objects.filter(department = profile_model.department.id)
+            cars = Cars.objects.filter(department=profile_model.department.id)
         else:
             cars = Cars.objects.all()
         serializer = CarsSerializer(cars, many=True)
@@ -258,20 +260,22 @@ class AvaliableOrdersView(APIView):
             "fromDate": request.data["fromDate"], "toDate": request.data["toDate"]}
         fromDate = datetime.fromisoformat(date_object['fromDate'][:-1])
         toDate = datetime.fromisoformat(date_object['toDate'][:-1])
+
         all_orders = CarOrders.objects.all()
         available_cars = set()
         cars_black_list = set()  # Contains the cars that are taken on the specific date
         order_details = []
         for order in all_orders:
             # This row checks wether there is alreay and order on the dates the user entered.
-            if (order.toDate.replace(tzinfo=None) <= toDate and order.toDate.replace(tzinfo=None) >= fromDate) or (order.fromDate.replace(tzinfo=None) <= toDate and order.fromDate.replace(tzinfo=None) >= fromDate):
+            if (order.toDate.replace(tzinfo=None) >= fromDate >= order.fromDate.replace(tzinfo=None)) or (order.toDate.replace(tzinfo=None) >= toDate >= order.fromDate.replace(tzinfo=None)) or (fromDate <= order.fromDate.replace(tzinfo=None) <= toDate) or (fromDate <= order.toDate.replace(tzinfo=None) <= toDate):
                 cars_black_list.add(order.car)
-                order_details.append({"car": order.car.id, "fromDate": datetime.fromisoformat(str(order.fromDate)).astimezone(pytz.timezone('Israel')).strftime(
+                order_details.append({"car": order.car.id, "order": order.id, "fromDate": datetime.fromisoformat(str(order.fromDate)).astimezone(pytz.timezone('Israel')).strftime(
                     "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).astimezone(pytz.timezone('Israel')).strftime("%Y-%m-%d %H:%M:%S"), 'isAllDay': order.isAllDay})
             else:
                 available_cars.add(order.car)
         cars = available_cars.difference(cars_black_list)
-        for car in Cars.objects.all():               
+        print(cars_black_list)
+        for car in Cars.objects.all():
             if car not in cars_black_list:
                 cars.add(car)
         # Checks if there's an upcoming maintenance to a car
@@ -284,10 +288,10 @@ class AvaliableOrdersView(APIView):
             car = Cars.objects.get(id=record['car'])
             if days_overdue < 0:
                 order_details.append(
-                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף'})    
+                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף'})
             elif days_overdue < max_days:
                 order_details.append(
-                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף בועד {max_days} ימים'})    
+                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף בועד {max_days} ימים'})
 
         cars = list(filter(lambda car: (car.department.id ==
                     user.profile.department.id and car.isDisabled == False), cars))
@@ -297,6 +301,69 @@ class AvaliableOrdersView(APIView):
         black_list_serializer = CarsSerializer(
             list(cars_black_list), many=True)
         return Response({"available": serializer.data, "notAvilable": black_list_serializer.data, "orderDetails": order_details})
+
+
+@permission_classes([IsAuthenticated])
+class AvaliableOrdersUpdateView(APIView):
+    def post(self, request):
+        order_id = request.headers.get(
+            'orderID')
+        days_list = request.headers.get(
+            'NotificationDaysExpiration').split(',')
+        integer_list = list(map(int, days_list))
+        max_days = max(integer_list)
+        user = request.user
+        date_object = {
+            "fromDate": request.data["fromDate"], "toDate": request.data["toDate"]}
+        fromDate = datetime.fromisoformat(date_object['fromDate'][:-1])
+        toDate = datetime.fromisoformat(date_object['toDate'][:-1])
+        all_orders = CarOrders.objects.all()
+        available_cars = set()
+        cars_black_list = set()  # Contains the cars that are taken on the specific date
+        order_details = []
+        for order in all_orders:
+            # This row checks wether there is alreay and order on the dates the user entered.
+            if (order.toDate.replace(tzinfo=None) >= fromDate >= order.fromDate.replace(tzinfo=None)) or (order.toDate.replace(tzinfo=None) >= toDate >= order.fromDate.replace(tzinfo=None)) or (fromDate <= order.fromDate.replace(tzinfo=None) <= toDate) or (fromDate <= order.toDate.replace(tzinfo=None) <= toDate):
+                cars_black_list.add(order.car)
+                order_details.append({"car": order.car.id, "order": order.id, "fromDate": datetime.fromisoformat(str(order.fromDate)).astimezone(pytz.timezone('Israel')).strftime(
+                    "%Y-%m-%d %H:%M:%S"), "toDate": datetime.fromisoformat(str(order.toDate)).astimezone(pytz.timezone('Israel')).strftime("%Y-%m-%d %H:%M:%S"), 'isAllDay': order.isAllDay})
+            else:
+                available_cars.add(order.car)
+        cars = available_cars.difference(cars_black_list)
+        print(cars_black_list)
+        for car in Cars.objects.all():
+            if car not in cars_black_list:
+                cars.add(car)
+
+        for i in order_details:
+            if i['order'] == int(order_id):
+                cars_black_list.remove(Cars.objects.get(id=i['car']))
+                cars.add(Cars.objects.get(id=i['car']))
+        # removes details if the order is the one that he wants to udpate
+        new_order_details = [
+            d for d in order_details if d.get("order") != int(order_id)]
+        # Checks if there's an upcoming maintenance to a car
+        last_maintenance_records = CarMaintenance.objects.values('car', 'fileType').annotate(
+            last_expiration_date=Max('expirationDate')).order_by()
+        for record in last_maintenance_records:
+            file_name = FileTypes.objects.get(id=record['fileType'])
+            days_overdue = (
+                record['last_expiration_date'] - datetime.now().date()).days
+            car = Cars.objects.get(id=record['car'])
+            if days_overdue < 0:
+                new_order_details.append(
+                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף'})
+            elif days_overdue < max_days:
+                new_order_details.append(
+                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף בועד {max_days} ימים'})
+        cars = list(filter(lambda car: (car.department.id ==
+                    user.profile.department.id and car.isDisabled == False), cars))
+        cars_black_list = list(filter(lambda car: (
+            car.department.id == user.profile.department.id), cars_black_list))
+        serializer = CarsSerializer(list(cars), many=True)
+        black_list_serializer = CarsSerializer(
+            list(cars_black_list), many=True)
+        return Response({"available": serializer.data, "notAvilable": black_list_serializer.data, "orderDetails": new_order_details})
 
 
 @permission_classes([IsAuthenticated])
@@ -348,7 +415,7 @@ class CarOrdersView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # End order - change the ended attribute to be True
-    def put(self, request, id):
+    def patch(self, request, id):
         my_model = CarOrders.objects.get(id=int(id))
         my_model.ended = True
         model_dict = model_to_dict(my_model)
@@ -357,13 +424,17 @@ class CarOrdersView(APIView):
             serializer.save()
         return Response(serializer.data)
 
+    def put(self, request, id):
+        my_model = CarOrders.objects.get(id=int(id))
+        serializer = CreateCarOrdersSerializer(my_model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @permission_classes([IsAuthenticated])
 class CarMaintenanceView(APIView):
-    # def get(self, request,id):
-    #     my_model = CarMaintenance.objects.filter(car=id).order_by('-expirationDate')
-    #     serializer = CarMaintenanceSerializer(my_model, many=True)
-    #     return Response(serializer.data)
     def get(self, request):
         my_model = CarMaintenance.objects.all().order_by('-expirationDate')
         serializer = CarMaintenanceSerializer(my_model, many=True)
@@ -491,7 +562,8 @@ class LogsView(APIView):
     def get(self, request):
         department_id = request.user.profile.department.id
         if request.user.profile.roleLevel.id == 2:
-            logs = Logs.objects.filter(user__profile__department_id=department_id)
+            logs = Logs.objects.filter(
+                user__profile__department_id=department_id)
         else:
             logs = Logs.objects.all()
         serializer = LogsSerializer(logs, many=True)
@@ -576,13 +648,12 @@ class DrivingsView(APIView):
         my_model = Drivings.objects.get(id=id)
         car_by_drive = Cars.objects.get(
             id=Drivings.objects.get(id=request.data['id']).car)
-        print(car_by_drive.nickName)
         dep_by_car = Departments.objects.get(name=Cars.objects.get(
             id=Drivings.objects.get(id=request.data['id']).car).department)
         manager = User.objects.get(username=Profile.objects.get(
             department=dep_by_car, roleLevel=2).user)
         try:
-            kilo_diff = int(CarMaintenance.objects.filter(car=CarOrders.objects.get(id= Drivings.objects.get(
+            kilo_diff = int(CarMaintenance.objects.filter(car=CarOrders.objects.get(id=Drivings.objects.get(
                 id=request.data['id']).order.id).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
             # Check if notification about maintenance needs to be sent by the kilometer.
             if kilo_diff < next_kilo:
@@ -614,13 +685,14 @@ class RolesView(APIView):
         serializer = CreateRolesSerializer(my_model, many=True)
         return Response(serializer.data)
 
+
 @permission_classes([IsAuthenticated])
 class DepartmentsView(APIView):
     def get(self, request):
         user = request.user
-        profile= user.profile
+        profile = user.profile
         if profile.roleLevel.id == 2:
-            my_model = Departments.objects.filter(id = profile.department.id)
+            my_model = Departments.objects.filter(id=profile.department.id)
         else:
             my_model = Departments.objects.all()
         serializer = CreateDepartmentsSerializer(my_model, many=True)
@@ -639,7 +711,8 @@ class DepartmentsView(APIView):
 
     def patch(self, request, id):
         my_model = Departments.objects.get(id=int(id))
-        serializer = DepartmentsSerializer(my_model, data=request.data, partial=True)
+        serializer = DepartmentsSerializer(
+            my_model, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

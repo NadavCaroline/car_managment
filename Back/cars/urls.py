@@ -26,6 +26,7 @@ urlpatterns = [
     path('orders', views.CarOrdersView.as_view()),
     path('orders/<id>', views.CarOrdersView.as_view()),
     path('CheckOrders', views.AvaliableOrdersView.as_view()),
+    path('CheckOrdersUpdate', views.AvaliableOrdersUpdateView.as_view()),
     path('carmaintenance', views.CarMaintenanceView.as_view()),
     path('carmaintenance/<id>', views.CarMaintenanceView.as_view()),
     path('maintenancetype', views.MaintenanceTypesView.as_view()),

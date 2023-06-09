@@ -55,7 +55,7 @@ export function MyOrders() {
           <h3>הזמנות עתידיות</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
             {orders.filter(order => new Date(order.fromDate).getTime() > today.getTime()).map(order =>
-              <div key={order.id} onClick={()=>setselectedOrder(order)} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', textAlign: 'center', cursor: 'pointer' }}>
+              <div key={order.id} onClick={() => setselectedOrder(order)} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', textAlign: 'center', cursor: 'pointer' }}>
                 מכונית: {order.car_name}<br />
                 {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) ?
                   <div>
@@ -72,7 +72,7 @@ export function MyOrders() {
                 }
                 יעד: {order.destination}<br />
                 <img src={MY_SERVER + order.car_image} style={{ width: '150px', height: '100px' }} alt={order.car_name} /><br />
-                <button onClick={()=>setselectedOrder(order)} className="btn btn-primary btn-block mb-3">ערוך הזמנה</button>
+                <button onClick={() => setselectedOrder(order)} className="btn btn-primary btn-block mb-3">ערוך הזמנה</button>
               </div>)}
           </div>
           {/* Previous Orders */}
@@ -103,10 +103,10 @@ export function MyOrders() {
           <h2>אין לך הזמנות במערכת</h2>
         </div>
       }
-                    {selectedOrder &&
-                        <UpdateOrder setselectedOrder={setselectedOrder} selectedOrder={selectedOrder} />
-                    }
-      
+      {selectedOrder &&
+        <UpdateOrder setselectedOrder={setselectedOrder} selectedOrder={selectedOrder} />
+      }
+
 
     </div>
   );
