@@ -13,10 +13,10 @@ import ActiveDrive from './ActiveDrive';
 export function Drivings() {
 
   return (
-    <div >
+    <div style={{padding:'10px'}} >
       <ActiveDrive />
       <div>
-        <h1>נסיעות קודמות</h1>
+        <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>נסיעות קודמות</h3>
         <PreviousDrives />
       </div>
 

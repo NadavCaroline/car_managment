@@ -10,6 +10,7 @@ import { MY_SERVER } from '../../env';
 import OrderModel from '../../models/Order';
 import UpdateOrder from './UpdateOrder';
 
+
 export function MyOrders() {
   const orders = useAppSelector(ordersSelector);
   const token = useAppSelector(userAccess);
@@ -24,18 +25,25 @@ export function MyOrders() {
 
 
   return (
-    <div>
-      <h1>ההזמנות שלי</h1><hr />
+    <div style={{padding:'10px'}}>
+      {/* <h1>ההזמנות שלי</h1><hr /> */}
       {orders.length > 0 ?
         <div>
           {/* Active Orders */}
           {orders.filter(order => new Date(order.toDate).getTime() >= today.getTime() && new Date(order.fromDate).getTime() <= today.getTime()).length > 0 &&
             <div>
-              <h3>הזמנות פעילות</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
+              <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הזמנות פעילות</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)',paddingBottom:'10px' }}>
                 {orders.filter(order => new Date(order.toDate).getTime() >= today.getTime() && new Date(order.fromDate).getTime() <= today.getTime()).map(order =>
-                  <div key={order.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', textAlign: 'center' }}>
-                    מכונית: {order.car_name}<br />
+                  <div key={order.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem', textAlign: 'center' }}>
+                    <table style={{ width: '100%', fontSize: '1.25rem' }}>
+                      <tr>
+                        <td>
+                          {order.car_name}
+                        </td>
+                      </tr>
+                    </table>
+                    {/* מכונית: {order.car_name}<br /> */}
                     מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
                     {new Date(order.toDate).getTime() - new Date(order.fromDate).getTime() >= oneDay &&
                       <div>
@@ -52,11 +60,18 @@ export function MyOrders() {
             </div>
           }
           {/* Future Orders */}
-          <h3>הזמנות עתידיות</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
+          <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הזמנות עתידיות</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)',paddingBottom:'10px' }}>
             {orders.filter(order => new Date(order.fromDate).getTime() > today.getTime()).map(order =>
-              <div key={order.id} onClick={() => setselectedOrder(order)} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', textAlign: 'center', cursor: 'pointer' }}>
-                מכונית: {order.car_name}<br />
+              <div key={order.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem', textAlign: 'center' }}>
+                <table style={{ width: '100%', fontSize: '1.25rem' }}>
+                  <tr>
+                    <td>
+                      {order.car_name}
+                    </td>
+                  </tr>
+                </table>
+                {/* מכונית: {order.car_name}<br /> */}
                 {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) ?
                   <div>
                     מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
@@ -76,11 +91,18 @@ export function MyOrders() {
               </div>)}
           </div>
           {/* Previous Orders */}
-          <h3>הזמנות קודמות</h3>
+          <h3 style={{  color:'white' ,backgroundColor:'rgb(19, 125, 141)' }}>הזמנות קודמות</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
             {orders.filter(order => new Date(order.toDate).getTime() < today.getTime()).map(order =>
-              <div key={order.id} style={{ borderRadius: '5px', border: '2px solid rgb(0, 0, 0)', padding: '.5rem', textAlign: 'center' }}>
-                מכונית: {order.car_name}<br />
+              <div key={order.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem', textAlign: 'center' }}>
+                 <table style={{ width: '100%', fontSize: '1.25rem' }}>
+                  <tr>
+                    <td>
+                      {order.car_name}
+                    </td>
+                  </tr>
+                </table>
+                {/* מכונית: {order.car_name}<br /> */}
                 {order.fromDate!.toString().slice(0, 10) !== order.toDate!.toString().slice(0, 10) ?
                   <div>
                     מתאריך: {order.fromDate!.toString().slice(0, 10)}<br />
@@ -106,7 +128,6 @@ export function MyOrders() {
       {selectedOrder &&
         <UpdateOrder setselectedOrder={setselectedOrder} selectedOrder={selectedOrder} />
       }
-
 
     </div>
   );

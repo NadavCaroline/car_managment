@@ -82,7 +82,7 @@ class CarOrders(models.Model):
 
     @property
     def car_name(self):
-        return self.car.make + ' ' + self.car.model
+        return self.car.nickName + ' ' + self.car.licenseNum
 
     @property
     def user_name(self):
