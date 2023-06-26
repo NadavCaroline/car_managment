@@ -246,36 +246,66 @@ const ActiveDrive = () => {
                     <h3 style={{ color: 'white', backgroundColor: 'rgb(19, 125, 141)' }}>נסיעה פעילה</h3>
                     <hr />
                     <h3 style={{ color: 'white', backgroundColor: 'rgb(19, 125, 141)' }}>הנסיעה התחילה</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)', paddingBottom: '10px', textAlign: 'center' }}>
+                        <div style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem' }} >
+                            <table style={{ width: '100%', fontSize: '1.25rem' }}>
+                                <tr>
+                                    <td colSpan={2}>
+                                        <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
 
-                    <img src={MY_SERVER + activeOrder?.car_image} style={{ width: '150px', height: '100px' }} alt={activeDrive?.car_name} /><br />
-                    קילומטראז': <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} /><br />
-
-                    <input type='file' onChange={handleendFile1Change} /><br />
-
-                    {endSelectedFile1 &&
-                        <div>
-                            <img src={URL.createObjectURL(endSelectedFile1)}
-                                alt={endSelectedFile1.name}
-                                style={{ width: '150px', height: '100px' }} /><br />
-                            <input type='file' onChange={handleendFile2Change} />
-                        </div>}
-                    {endSelectedFile2 &&
-                        <div>
-                            <img src={URL.createObjectURL(endSelectedFile2)}
-                                alt={endSelectedFile2.name}
-                                style={{ width: '150px', height: '100px' }} /><br />
-                            <input type='file' onChange={handleendFile3Change} />
-                        </div>}
-                    {endSelectedFile3 &&
-                        <div>
-                            <img src={URL.createObjectURL(endSelectedFile3)}
-                                alt={endSelectedFile3.name}
-                                style={{ width: '150px', height: '100px' }} /><br />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        תחילת נסיעה
+                                    </td>
+                                    <td>
+                                        {activeDrive?.startTime}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                    קילומטראז'
+                                    </td>
+                                    <td>
+                                    <input onChange={(e) => setendKilometer(e.target.value)} value={endKilometer} />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td >
+                                    <input type='file' onChange={handleendFile1Change} />
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            
+                            {endSelectedFile1 &&
+                                <div>
+                                    <img src={URL.createObjectURL(endSelectedFile1)}
+                                        alt={endSelectedFile1.name}
+                                        style={{ width: '150px', height: '100px' }} /><br />
+                                    <input type='file' onChange={handleendFile2Change} />
+                                </div>}
+                            {endSelectedFile2 &&
+                                <div>
+                                    <img src={URL.createObjectURL(endSelectedFile2)}
+                                        alt={endSelectedFile2.name}
+                                        style={{ width: '150px', height: '100px' }} /><br />
+                                    <input type='file' onChange={handleendFile3Change} />
+                                </div>}
+                            {endSelectedFile3 &&
+                                <div>
+                                    <img src={URL.createObjectURL(endSelectedFile3)}
+                                        alt={endSelectedFile3.name}
+                                        style={{ width: '150px', height: '100px' }} /><br />
+                                </div>
+                            }
+                            הערות: <input onChange={(e) => setcomments(e.target.value)} />
+                            <div className="d-flex justify-content-center">
+                                <button className="round redBtn" onClick={handleButtonClick}>Stop</button>
+                            </div>
                         </div>
-                    }
-                    הערות: <input onChange={(e) => setcomments(e.target.value)} />
-                    <div className="d-flex justify-content-center">
-                        <button className="round redBtn" onClick={handleButtonClick}>Stop</button>
                     </div>
                 </div> :
 
@@ -308,7 +338,7 @@ const ActiveDrive = () => {
 
 
                                     <div>
-                                        קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer=='null'?'':startKilometer} disabled={!changeKilometer} />
+                                        קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer == 'null' ? '' : startKilometer} disabled={!changeKilometer} />
                                         דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
                                     </div>
 
