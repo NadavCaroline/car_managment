@@ -684,7 +684,12 @@ class RolesView(APIView):
         my_model = Roles.objects.all()
         serializer = CreateRolesSerializer(my_model, many=True)
         return Response(serializer.data)
-
+    
+class AllDepartmentsView(APIView):
+    def get(self, request):
+        my_model = Departments.objects.all()
+        serializer = CreateDepartmentsSerializer(my_model, many=True)
+        return Response(serializer.data)
 
 @permission_classes([IsAuthenticated])
 class DepartmentsView(APIView):
@@ -697,7 +702,7 @@ class DepartmentsView(APIView):
             my_model = Departments.objects.all()
         serializer = CreateDepartmentsSerializer(my_model, many=True)
         return Response(serializer.data)
-
+    
     def post(self, request):
         serializer = CreateDepartmentsSerializer(data=request.data)
         if serializer.is_valid():
@@ -708,7 +713,7 @@ class DepartmentsView(APIView):
                          user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
     def patch(self, request, id):
         my_model = Departments.objects.get(id=int(id))
         serializer = DepartmentsSerializer(

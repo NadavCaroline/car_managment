@@ -53,7 +53,8 @@ export const getProfile = async (token: string) => {
 }
 
 export const getDepartments = async () => {
-  return axios.get(MY_SERVER + 'departments',
+  // return axios.get(MY_SERVER + 'departments',
+  return axios.get(MY_SERVER + 'AllDepartments',
   ).then((res) => res.data);
 }
 export const getRoles = async () => {

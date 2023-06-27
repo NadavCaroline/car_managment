@@ -23,6 +23,7 @@ urlpatterns = [
     path('cars/<id>', views.CarsView.as_view()),
     path('departments', views.DepartmentsView.as_view()),
     path('departments/<id>', views.DepartmentsView.as_view()),
+    path('AllDepartments', views.AllDepartmentsView.as_view()),
     path('orders', views.CarOrdersView.as_view()),
     path('orders/<id>', views.CarOrdersView.as_view()),
     path('CheckOrders', views.AvaliableOrdersView.as_view()),
@@ -46,6 +47,6 @@ urlpatterns = [
     path('fileTypes/<id>', views.FileTypesView.as_view()),
     path('notifications/<id>', views.NotificationView.as_view()),
     path('reset/<str:uidb64>/<str:token>',  views.ResetView.as_view(), name='password_reset_confirm'),
-   path('nextmaindate', views.nextMainDate),
+    path('nextmaindate', views.nextMainDate),
 
 ]
