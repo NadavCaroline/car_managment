@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { MaintenanceTypeModel } from '../../models/MaintenanceType'
 import { addMaintenanceTypeAsync,maintenanceTypeSelector ,getmaintenanceTypeAsync, maintenanceTypeError, maintenanceTypeMessage, SetError, SetMsg, updateMaintenanceTypeAsync } from '../maintenanceType/maintenanceTypeSlice';
-import { userToken } from '../login/loginSlice'
+import { userAccess, userToken } from '../login/loginSlice'
 import { Card, Container, Row, Col, Badge, Button, Modal } from "react-bootstrap";
 import { MY_SERVER } from '../../env';
 import { ToastContainer, toast } from 'react-toastify';
@@ -10,7 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 const MaintenanceType = () => {
   const dispatch = useAppDispatch()
-  const token = useAppSelector(userToken)
+  const token = useAppSelector(userAccess)
   const [showModal, setShowModal] = useState(false)
   const [selectedMaintenance, setselectedMaintenance] = useState<MaintenanceTypeModel | null>(null)
   const [maintenanceImage, setMaintenanceImage] = useState<File | null>(null)

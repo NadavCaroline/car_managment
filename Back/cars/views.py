@@ -286,12 +286,13 @@ class AvaliableOrdersView(APIView):
             days_overdue = (
                 record['last_expiration_date'] - datetime.now().date()).days
             car = Cars.objects.get(id=record['car'])
-            if days_overdue < 0:
+            print(days_overdue)
+            if days_overdue <= 0:
                 order_details.append(
                     {"car": car.id, 'maintenance': f'{file_name} פג תוקף'})
             elif days_overdue < max_days:
                 order_details.append(
-                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף בועד {max_days} ימים'})
+                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף בעוד {days_overdue} ימים'})
 
         cars = list(filter(lambda car: (car.department.id ==
                     user.profile.department.id and car.isDisabled == False), cars))
@@ -350,12 +351,12 @@ class AvaliableOrdersUpdateView(APIView):
             days_overdue = (
                 record['last_expiration_date'] - datetime.now().date()).days
             car = Cars.objects.get(id=record['car'])
-            if days_overdue < 0:
+            if days_overdue <= 0:
                 new_order_details.append(
                     {"car": car.id, 'maintenance': f'{file_name} פג תוקף'})
             elif days_overdue < max_days:
                 new_order_details.append(
-                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף בועד {max_days} ימים'})
+                    {"car": car.id, 'maintenance': f'{file_name} פג תוקף בעוד {days_overdue} ימים'})
         cars = list(filter(lambda car: (car.department.id ==
                     user.profile.department.id and car.isDisabled == False), cars))
         cars_black_list = list(filter(lambda car: (
@@ -614,6 +615,11 @@ class DrivingsView(APIView):
         car_by_order = CarOrders.objects.get(id=request.data['order']).car
         last_order_by_car = ""
         latest_toDate = None
+        dep_by_car = Departments.objects.get(name=Cars.objects.get(
+            id=car_by_order).department)
+        
+        manager = User.objects.get(username=Profile.objects.get(
+            department=dep_by_car, roleLevel=2).user)
         for order in CarOrders.objects.filter(car=car_by_order, ended=True):
             if not latest_toDate or order.toDate > latest_toDate:
                 latest_toDate = order.toDate
@@ -625,6 +631,8 @@ class DrivingsView(APIView):
             kilo_warning = False if str(last_drive_kilo) == str(
                 request.data['startKilometer']) else True
             if kilo_warning:
+                send_mail('התראה על טיפול רכב חסר', f'יש להכניס טיפולי רכב לרכב {car_by_order.nickName}',
+                    None, [manager.email], fail_silently=False)
                 write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם",
                              user=request.user, car=order_model.car)
         except Exception as e:

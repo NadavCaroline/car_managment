@@ -297,7 +297,7 @@ const ActiveDrive = () => {
 
 
                             <div>
-                                קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={!changeKilometer} />
+                                קילומטראז': <input onChange={(e) => setstartKilometer(e.target.value)} value={startKilometer} disabled={changeKilometer} />
                                 דרוש שינוי? <input type={'checkbox'} onChange={() => setchangeKilometer(!changeKilometer)} /><br />
                             </div>
 
