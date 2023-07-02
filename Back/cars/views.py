@@ -274,7 +274,6 @@ class AvaliableOrdersView(APIView):
             else:
                 available_cars.add(order.car)
         cars = available_cars.difference(cars_black_list)
-        print(cars_black_list)
         for car in Cars.objects.all():
             if car not in cars_black_list:
                 cars.add(car)
@@ -286,7 +285,6 @@ class AvaliableOrdersView(APIView):
             days_overdue = (
                 record['last_expiration_date'] - datetime.now().date()).days
             car = Cars.objects.get(id=record['car'])
-            print(days_overdue)
             if days_overdue <= 0:
                 order_details.append(
                     {"car": car.id, 'maintenance': f'{file_name} פג תוקף'})
@@ -331,7 +329,6 @@ class AvaliableOrdersUpdateView(APIView):
             else:
                 available_cars.add(order.car)
         cars = available_cars.difference(cars_black_list)
-        print(cars_black_list)
         for car in Cars.objects.all():
             if car not in cars_black_list:
                 cars.add(car)
@@ -424,6 +421,7 @@ class CarOrdersView(APIView):
         if serializer.is_valid():
             serializer.save()
         return Response(serializer.data)
+
 
     def put(self, request, id):
         my_model = CarOrders.objects.get(id=int(id))
@@ -609,17 +607,16 @@ class DrivingsView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        user = request.user
+        user_profile = Profile.objects.get(user=user)
         auto_start = request.POST.get('startDate')
         order_model = CarOrders.objects.get(id=request.POST.get('order'))
         serializer = CreateDrivingsSerializer(data=request.data)
         car_by_order = CarOrders.objects.get(id=request.data['order']).car
         last_order_by_car = ""
         latest_toDate = None
-        dep_by_car = Departments.objects.get(name=Cars.objects.get(
-            id=car_by_order).department)
-        
         manager = User.objects.get(username=Profile.objects.get(
-            department=dep_by_car, roleLevel=2).user)
+            department=user_profile.department.id, roleLevel=2).user)
         for order in CarOrders.objects.filter(car=car_by_order, ended=True):
             if not latest_toDate or order.toDate > latest_toDate:
                 latest_toDate = order.toDate
@@ -631,7 +628,7 @@ class DrivingsView(APIView):
             kilo_warning = False if str(last_drive_kilo) == str(
                 request.data['startKilometer']) else True
             if kilo_warning:
-                send_mail('התראה על טיפול רכב חסר', f'יש להכניס טיפולי רכב לרכב {car_by_order.nickName}',
+                send_mail("התראה על קילומטראז' התחלה לא תואם", f"הוכנס קילומטראז' התחלה לא תואם לרכב- {car_by_order.nickName}",
                     None, [manager.email], fail_silently=False)
                 write_to_log('critical', "קילומטראז' התחלתי של נסיעה לא תואם",
                              user=request.user, car=order_model.car)
@@ -660,19 +657,7 @@ class DrivingsView(APIView):
             id=Drivings.objects.get(id=request.data['id']).car).department)
         manager = User.objects.get(username=Profile.objects.get(
             department=dep_by_car, roleLevel=2).user)
-        try:
-            kilo_diff = int(CarMaintenance.objects.filter(car=CarOrders.objects.get(id=Drivings.objects.get(
-                id=request.data['id']).order.id).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
-            # Check if notification about maintenance needs to be sent by the kilometer.
-            if kilo_diff < next_kilo:
-                add_notification(
-                    recipient=manager, title=f'טיפול לרכב {car_by_drive.nickName} מתקרב', message=f'טיפול לרכב {car_by_drive.nickName} בעוד {kilo_diff} קילומטר.')
-        except Exception as e:
-            add_notification(
-                recipient=manager, title=f'טיפול לרכב {car_by_drive.nickName} חסר', message=f'יש להכניס טיפול לרכב {car_by_drive.nickName}')
-            write_to_log('critical', 'חסר טיפול לרכב', car=car_by_drive)
-            # send_mail('התראה על טיפול רכב חסר', f'יש להכניס טיפולי רכב לרכב {car_by_drive.nickName}',
-            #     None, [manager.email], fail_silently=False)
+        
         serializer = CreateDrivingsSerializer(my_model, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -683,6 +668,29 @@ class DrivingsView(APIView):
             else:
                 write_to_log('warning', 'משתמש/ת שכח/ה לסיים/ה נסיעה',
                              user=request.user, car=car_by_drive)
+
+            try:
+                kilo_diff = int(CarMaintenance.objects.filter(car=CarOrders.objects.get(id=Drivings.objects.get(
+                    id=request.data['id']).order.id).car).last().nextMaintenancekilometer) - int(request.data['endKilometer'])
+                # Check if notification about maintenance needs to be sent by the kilometer.
+                if kilo_diff < 0:
+                    add_notification(
+                        recipient=manager, title=f'יש להכניס טיפול לרכב {car_by_drive.nickName}', message=f"טיפול לפי קילומטראז' לרכב {car_by_drive.nickName} עבר. יש להכניס טיפול לרכב זה.")
+                    send_mail('התראה על טיפול רכב חסר', f'טיפול לרכב {car_by_drive.nickName} עבר לפני {-kilo_diff} קילומטר.',
+                        None, [manager.email], fail_silently=False)
+                if kilo_diff < next_kilo:
+                    add_notification(
+                        recipient=manager, title=f'טיפול לרכב {car_by_drive.nickName} מתקרב', message=f'טיפול לרכב {car_by_drive.nickName} בעוד {kilo_diff} קילומטר.')
+                    send_mail('התראה על טיפול רכב מתקרב', f'טיפול לרכב {car_by_drive.nickName} בעוד {kilo_diff} קילומטר.',
+                        None, [manager.email], fail_silently=False)
+            except Exception as e:
+                add_notification(
+                    recipient=manager, title=f'טיפול לרכב {car_by_drive.nickName} חסר', message=f'יש להכניס טיפול לרכב {car_by_drive.nickName}')
+                write_to_log('critical', 'חסר טיפול לרכב', car=car_by_drive)
+                send_mail('התראה על טיפול רכב חסר', f'יש להכניס טיפולי רכב לרכב {car_by_drive.nickName}',
+                    None, [manager.email], fail_silently=False)
+
+
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -874,11 +882,17 @@ def nextMainDate(request):
         if days_overdue == 0:
             add_notification(
                 recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} הגיע.')
+            send_mail("התראה על טיפול רכב", f'טיפול לרכב {car_lisenceNum} - {car_name} הגיע.',
+                None, [manager.email], fail_silently=False)
         elif days_overdue < 0:
             add_notification(
                 recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name}', message=f'טיפול לרכב {car_lisenceNum} - {car_name} לא בוצע.')
+            send_mail("התראה על טיפול רכב", f'טיפול לרכב {car_lisenceNum} - {car_name} לא בוצע.',
+                None, [manager.email], fail_silently=False)
         for day in next_noti_date:
             if days_overdue == day:
                 add_notification(recipient=manager, title=f'טיפול לרכב {car_lisenceNum} - {car_name} מתקרב',
                                  message=f'טיפול לרכב {car_lisenceNum} - {car_name} בעוד {day} ימים.')
+                send_mail(f'טיפול לרכב {car_lisenceNum} - {car_name} מתקרב', f'טיפול לרכב {car_lisenceNum} - {car_name} בעוד {day} ימים.',
+                    None, [manager.email], fail_silently=False)
     return Response('Next Maintenance Date Checked')

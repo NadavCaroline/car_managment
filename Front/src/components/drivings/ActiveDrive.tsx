@@ -19,7 +19,6 @@ const ActiveDrive = () => {
     const orders = useAppSelector(ordersSelector)
     const [activeOrder, setactiveOrder] = useState<OrderModel | null>(null)
     const [refreshFlag, setrefreshFlag] = useState(false)
-    // const [noStartKilo, setnoStartKilo] = useState("")
     const [startKilometer, setstartKilometer] = useState("")
     const [endKilometer, setendKilometer] = useState("")
     const [changeKilometer, setchangeKilometer] = useState(startKilometer ? false : true)
@@ -156,6 +155,10 @@ const ActiveDrive = () => {
                 messageError("יש להכניס קילומטראז' סיום")
                 return;
             }
+            if (Number(endKilometer) < Number(activeDrive?.startKilometer)) {
+                messageError("יש להכניס קילומטראז' סיום מתאים")
+                return;
+            }
         }
         setIsRunning(!isRunning);
         if (!isRunning) {
@@ -173,6 +176,7 @@ const ActiveDrive = () => {
                 }
 
             }))
+            message('נסיעה התחילה בהצלחה')
         } else {
             dispatch(endDriveAsync({
                 token: token, drive: {
@@ -193,6 +197,8 @@ const ActiveDrive = () => {
             setactiveOrder(null)
             localStorage.removeItem('isRunning')
             localStorage.removeItem('activeDrive')
+            message("נסיעה נרשמה בהצלחה")
+            dispatch(getDrivesAsync(token))
         }
     };
     // Handles the auto fill of the start/end date of a drive
