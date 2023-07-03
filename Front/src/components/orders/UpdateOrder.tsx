@@ -10,7 +10,7 @@ import { userAccess } from '../login/loginSlice';
 import { MY_SERVER, MaxDayOrderAdvance } from '../../env';
 import CarModel from '../../models/Car';
 import { ToastContainer, toast } from 'react-toastify';
-import { addOrderAsync, availableCarsSelector, checkOrderDatesAsync, checkOrderUpdateDatesAsync, notAvilableSelector, orderDetailsSelector, updateOrderAsync } from './OrdersSlice';
+import { addOrderAsync, availableCarsSelector, checkOrderDatesAsync, checkOrderUpdateDatesAsync, getOrdersAsync, notAvilableSelector, orderDetailsSelector, updateOrderAsync } from './OrdersSlice';
 import jwt_decode from "jwt-decode"
 import { getNotificationAsync } from '../notifications/notificationsSlice';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -25,20 +25,24 @@ const UpdateOrder = (props: any) => {
     const notAvailableCars = useAppSelector(notAvilableSelector)
     const orderDetails = useAppSelector(orderDetailsSelector)
     const decoded: any = jwt_decode(token)
-    const [selectedCar, setselectedCar] = useState<CarModel | null>(null)
-    const [isAllDay, setisAllDay] = useState(false)
-    const [selectedStartDate, setselectedStartDate] = useState<Dayjs | null>(null)
-    const [selectedEndDate, setselectedEndDate] = useState<Dayjs | null>(null)
-    const [formatedEndDate, setformatedEndDate] = useState("")
-    const [moreThanDay, setmoreThanDay] = useState(false)
+    const [isAllDay, setisAllDay] = useState(selectedOrder.isAllDay)
+    const [selectedStartDate, setselectedStartDate] = useState<Dayjs | null>(dayjs(selectedOrder.fromDate))
+    const [selectedEndDate, setselectedEndDate] = useState<Dayjs | null>(dayjs(selectedOrder.toDate))
+    const [destination, setdestination] = useState(selectedOrder.destination)
+    const [moreThanDay, setmoreThanDay] = useState(dayjs(selectedOrder.fromDate).format('DD-MM-YYYY') !== dayjs(selectedOrder.toDate).format('DD-MM-YYYY'))
     const [formatedStartDate, setformatedStartDate] = useState("")
-    const [startTime, setstartTime] = useState<string>("")
-    const [endTime, setendTime] = useState<string>("")
+    const [formatedEndDate, setformatedEndDate] = useState("")
+    const [startTime, setstartTime] = useState<string>(dayjs(selectedOrder.fromDate).format('HH:mm'))
+    const [endTime, setendTime] = useState<string>(dayjs(selectedOrder.toDate).format('HH:mm'))
     const [fromDate, setfromDate] = useState<Date>(new Date())
     const [toDate, settoDate] = useState<Date>(new Date())
-    const [destination, setdestination] = useState("")
     const [isLoading, setIsLoading] = useState(false);
     const [searched, setsearched] = useState(false)
+
+    useEffect(() => {
+        console.log(dayjs(selectedOrder.fromDate).format('HH:mm'))  
+    }, [moreThanDay])
+    
 
 
     const resetFrom = () => {
@@ -52,6 +56,10 @@ const UpdateOrder = (props: any) => {
         setsearched(false)
     }
 
+    useEffect(() => {
+        handleStartDateChange(selectedStartDate)
+        handleEndDateChange(selectedEndDate)
+    }, [selectedStartDate, selectedEndDate])
 
     // This function handles the start date of the order.
     const handleStartDateChange = (date: Dayjs | null) => {
@@ -140,23 +148,24 @@ const UpdateOrder = (props: any) => {
     };
 
     // This function handles the 
-    const handleUpdateOrder = () => {
+    const handleUpdateOrder = (car: CarModel) => {
         if (((!startTime || !endTime) && !isAllDay) || (!formatedEndDate && moreThanDay)) {
             messageError('יש לוודא שהפרטים שהוזנו נכונים')
             return;
         }
-        // console.log({ orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false })
         dispatch(updateOrderAsync({
             token: token, id: selectedOrder.id,
-            order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false }
+            order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: car.id!, destination, ended: false }
         })).then((res) => {
             setIsLoading(false); dispatch(getNotificationAsync(token));
             res.meta.requestStatus === "fulfilled" && message('ההזמנתך התקבלה בהצלחה!');
             res.meta.requestStatus === "rejected" && messageError('ארעה שגיאה בהזמנתך. יש לוודא שהפרטים שהוזנו נכונים. ');
         });
         setsearched(false)
+        dispatch(getOrdersAsync(token))
         setTimeout(() => {
             props.setselectedOrder(null);
+            window.location.reload()
         }, 2000);
     }
     // This function handles the toastify error messages.
@@ -334,7 +343,7 @@ const UpdateOrder = (props: any) => {
                         {/* Display The cars */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '.25rem', gridAutoRows: 'minmax(160px, auto)' }}>
                             {availableCars.map(car =>
-                                <div key={car.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem' }} onClick={() => setselectedCar(car)}>
+                                <div key={car.id} style={{ borderRadius: '5px', border: '2px solid #dee2e6', padding: '.5rem' }}>
                                     <div style={{ textAlign: 'center' }}>
                                         <table style={{ width: '100%', fontSize: '1.25rem' }}>
                                             <tr>
@@ -357,7 +366,7 @@ const UpdateOrder = (props: any) => {
                                             </h5>
                                         </div>
                                         )}
-                                        <button className="btn btn-primary" onClick={() => handleUpdateOrder()}>הזמן מכונית</button>
+                                        <button className="btn btn-primary" onClick={() => handleUpdateOrder(car)}>עדכן הזמנה</button>
                                     </div>
                                 </div>)}
                         </div>

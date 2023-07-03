@@ -51,7 +51,6 @@ const MakeOrder = () => {
     setsearched(false)
   }
 
-
   // This function handles the start date of the order.
   const handleStartDateChange = (date: Dayjs | null) => {
     setselectedStartDate(date)
@@ -138,7 +137,7 @@ const MakeOrder = () => {
 
   // This function handles the 
   // const handleOrder = (e: React.FormEvent<HTMLFormElement>) => {
-    const handleOrder = () => {
+    const handleOrder = (car: CarModel) => {
     // e.preventDefault();
     if (((!startTime || !endTime) && !isAllDay) || (!formatedEndDate && moreThanDay)) {
       messageError('יש לוודא שהפרטים שהוזנו נכונים')
@@ -146,7 +145,7 @@ const MakeOrder = () => {
     }
     dispatch(addOrderAsync({
       token: token,
-      order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: selectedCar?.id!, destination, ended: false }
+      order: { orderDate: new Date(), fromDate: fromDate, toDate: toDate, isAllDay: isAllDay, user: decoded.user_id, car: car.id!, destination, ended: false }
     })).then((res) => {
       setIsLoading(false); dispatch(getNotificationAsync(token));
       res.meta.requestStatus === "fulfilled" && message('ההזמנתך התקבלה בהצלחה!');
@@ -365,7 +364,7 @@ const MakeOrder = () => {
                     </h5>
                   </div>
                   )}
-                    <button type='submit' style={{ marginRight: "10px" }} onClick={() => {setselectedCar(car);handleOrder();}} className="btn btn-primary btn-block mb-3" >{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'הזמן'}</button>
+                    <button type='submit' style={{ marginRight: "10px" }} onClick={() => {handleOrder(car)}} className="btn btn-primary btn-block mb-3" >{isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'הזמן'}</button>
                    {/* <button  className="btn btn-primary" onClick={() => setselectedCar(car)}>הזמן מכונית</button> */}
                 </div>
               </div>)}
