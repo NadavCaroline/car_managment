@@ -174,8 +174,8 @@ const Register = () => {
                 <label className="form-label" htmlFor="selectDepartment" style={{ marginLeft: "0px" }}>מחלקה</label>
             </div>
             {/* <!-- Role level select --> */}
-            <div className="form-floating mb-2">
-                <select id="selectRole"  {...register('role')} className={`form-select ${errors.role ? 'is-invalid' : ''}`} defaultValue={''} >
+            <div className="form-floating mb-2" style={{visibility:'hidden'}}>
+                <select id="selectRole"  {...register('role')} className={`form-select ${errors.role ? 'is-invalid' : ''}`} defaultValue={'1'} >
                     <option value="" disabled>בחר הרשאה...</option>
                     {listRoles.map(item => (
                         <option value={item.id} key={item.id}>{item.name}</option>
